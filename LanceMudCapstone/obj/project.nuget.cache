@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "B3zpXXWFNzs=",
+  "dgSpecHash": "lckHzay0Yqk=",
   "success": true,
   "projectFilePath": "C:\\Users\\josep\\Source\\Repos\\Lancev3\\LanceMudCapstone\\LanceMudCapstone.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\josep\\.nuget\\packages\\dapper\\2.1.66\\dapper.2.1.66.nupkg.sha512",
     "C:\\Users\\josep\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.2\\microsoft.aspnetcore.app.internal.assets.10.0.2.nupkg.sha512",
     "C:\\Users\\josep\\.nuget\\packages\\microsoft.entityframeworkcore\\10.0.0\\microsoft.entityframeworkcore.10.0.0.nupkg.sha512",
     "C:\\Users\\josep\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\10.0.0\\microsoft.entityframeworkcore.abstractions.10.0.0.nupkg.sha512",

@@ -109,3 +109,4 @@ C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\bin\Debug\net10.0\Supabase.
 C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\bin\Debug\net10.0\System.IdentityModel.Tokens.Jwt.dll
 C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\bin\Debug\net10.0\System.Reactive.dll
 C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\bin\Debug\net10.0\Websocket.Client.dll
+C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\bin\Debug\net10.0\Dapper.dll
