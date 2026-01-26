@@ -32,22 +32,22 @@ jobs:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
 
-deploy:
-  runs-on: windows-latest
-  needs: build
-  permissions:
-    contents: read
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    permissions:
+      contents: read
 
-  steps:
-    - name: Download artifact from build job
-      uses: actions/download-artifact@v4
-      with:
-        name: .net-app
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
 
-    - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v3
-      with:
-        app-name: 'Capstoneproject'
-        slot-name: 'Production'
-        publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-        package: .
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'Capstoneproject'
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+          package: .
