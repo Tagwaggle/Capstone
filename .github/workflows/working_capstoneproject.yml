@@ -24,9 +24,10 @@ jobs:
           dotnet-version: '10.x'
 
       - name: Build with dotnet
-        run: dotnet build ./LanceMudCapstone/LanceMudCapstone.csproj --configuration Release
+        run: dotnet build --configuration Release
+
       - name: dotnet publish
-        run: dotnet publish ./LanceMudCapstone/LanceMudCapstone.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -50,9 +51,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.__clientidsecretname__ }}
-          tenant-id: ${{ secrets.__tenantidsecretname__ }}
-          subscription-id: ${{ secrets.__subscriptionidsecretname__ }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_91984234DCDF4CC987DCD33763062130 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_BC0582C322A94569B0E6627B26FA84CF }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A033EB16AB2D4102866C50B638697800 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -61,4 +62,4 @@ jobs:
           app-name: 'Capstoneproject'
           slot-name: 'Production'
           package: .
-
+          
