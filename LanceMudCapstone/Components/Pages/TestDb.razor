@@ -1,22 +1,38 @@
-﻿@page "/test-db"
-@inject DatabaseService Db
+﻿@page "/test-admin"
+@inject UserService Users
 @rendermode InteractiveServer
 
-<h3>Database Connection Test</h3>
 
-<button @onclick="TestConnection">Test Connection</button>
+<h3>Admin Insert Test</h3>
 
-@if (message is not null)
+<button @onclick="InsertAdmin">Insert Admin User</button>
+
+@if (!string.IsNullOrEmpty(Message))
 {
-    <p>@message</p>
+    <p>@Message</p>
 }
 
 @code {
-    private string? message;
+    private string Message = "";
 
-    private async Task TestConnection()
+    private async Task InsertAdmin()
     {
-        var ok = await Db.CanConnectAsync();
-        message = ok ? "Connected successfully!" : "Failed to connect.";
+        var admin = new User
+        {
+            Username = "admin",
+            Email = "admin@example.com",
+            PasswordHash = PasswordHelper.HashPassword("admin123"), // replace with hashed later
+            IsActive = true
+        };
+
+        try
+        {
+            var id = await Users.AddUserAsync(admin);
+            Message = $"Admin user created with ID: {id}";
+        }
+        catch (Exception ex)
+        {
+            Message = $"Error: {ex.Message}";
+        }
     }
 }

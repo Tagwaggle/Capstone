@@ -1,4 +1,5 @@
 using LanceMudCapstone.Components;
+using LanceMudCapstone.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +8,9 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddScoped<DatabaseService>();
 builder.Services.AddScoped<SupabaseService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<DbHelper>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

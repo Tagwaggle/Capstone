@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v10.0": {
       "LanceMudCapstone/1.0.0": {
         "dependencies": {
+          "Dapper": "2.1.66",
           "Npgsql": "10.0.1",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.0",
           "Supabase": "1.1.1",
@@ -15,6 +16,14 @@
         },
         "runtime": {
           "LanceMudCapstone.dll": {}
+        }
+      },
+      "Dapper/2.1.66": {
+        "runtime": {
+          "lib/net8.0/Dapper.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.1.66.48463"
+          }
         }
       },
       "Microsoft.EntityFrameworkCore/10.0.0": {
@@ -261,6 +270,13 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "Dapper/2.1.66": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/q77jUgDOS+bzkmk3Vy9SiWMaetTw+NOoPAV0xPBsGVAyljd5S6P+4RUW7R3ZUGGr9lDRyPKgAMj2UAOwvqZYw==",
+      "path": "dapper/2.1.66",
+      "hashPath": "dapper.2.1.66.nupkg.sha512"
     },
     "Microsoft.EntityFrameworkCore/10.0.0": {
       "type": "package",
