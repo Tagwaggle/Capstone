@@ -1,0 +1,22 @@
+﻿@page "/test-db"
+@inject DatabaseService Db
+@rendermode InteractiveServer
+
+<h3>Database Connection Test</h3>
+
+<button @onclick="TestConnection">Test Connection</button>
+
+@if (message is not null)
+{
+    <p>@message</p>
+}
+
+@code {
+    private string? message;
+
+    private async Task TestConnection()
+    {
+        var ok = await Db.CanConnectAsync();
+        message = ok ? "Connected successfully!" : "Failed to connect.";
+    }
+}
