@@ -1,3 +1,253 @@
+/* /Components/Layout/Branding/HeroCard.razor.rz.scp.css */
+.hero-card[b-2c6locjrv2] {
+    
+    width: 60ch;
+    margin: 3rem auto;
+    padding: 2rem;
+    background: radial-gradient(circle at center, #0a0015 0%, #000000 100%);
+    border: 2px solid rgba(255, 0, 255, 0.3);
+    box-shadow: 0 0 12px rgba(255, 0, 255, 0.4), 0 0 24px rgba(220, 220, 255, 0.15), inset 0 0 20px rgba(0, 0, 0, 0.6);
+    border-radius: 8px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    display: block;
+}
+
+    .hero-card[b-2c6locjrv2]::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-radial-gradient(circle, rgba(255, 0, 255, 0.05) 0%, transparent 6%);
+        animation: hero-shimmer-b-2c6locjrv2 40s linear infinite;
+        z-index: -1;
+    }
+
+@keyframes hero-shimmer-b-2c6locjrv2 {
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+
+    100% {
+        transform: rotate(360deg) scale(1.2);
+    }
+}
+
+.hero-card pre[b-2c6locjrv2] {
+    font-family: "Cascadia Mono", "Consolas", monospace;
+    font-size: 0.9rem;
+    line-height: 1.1rem;
+    color: #f8eaff;
+    white-space: pre;
+    text-align: left;
+    margin: 0;
+}
+/* /Components/Layout/Branding/LunitariHeader.razor.rz.scp.css */
+.lunitari-header[b-nmg7akz9bf] {
+    width: 100%;
+    padding: 2rem 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(ellipse at center, #0a0015 0%, #000000 100%);
+    box-shadow: inset 0 0 60px rgba(255, 0, 255, 0.1);
+    z-index: 0;
+}
+
+    .lunitari-header[b-nmg7akz9bf]::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-radial-gradient(circle, rgba(255, 0, 255, 0.05) 0%, transparent 5%);
+        animation: shimmer-shift-b-nmg7akz9bf 30s linear infinite;
+        z-index: -1;
+    }
+
+    .lunitari-header.compact[b-nmg7akz9bf] {
+        padding: 0.75rem 0;
+        transform: scale(0.75);
+    }
+
+.glyph-title[b-nmg7akz9bf] {
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: 0.15rem;
+    color: #f8eaff;
+    text-shadow: 0 0 12px rgba(255, 0, 255, 0.6), 0 0 24px rgba(255, 0, 255, 0.3), 0 0 36px rgba(0, 0, 0, 0.6);
+    position: relative;
+    display: inline-block;
+    z-index: 1;
+}
+
+    .glyph-title span[b-nmg7akz9bf] {
+        position: relative;
+        display: inline-block;
+    }
+
+        .glyph-title span[b-nmg7akz9bf]::before {
+            content: attr(data-rune);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            color: rgba(255, 0, 255, 0.85);
+            text-shadow: 0 0 8px rgba(255, 0, 255, 0.9);
+            opacity: 1;
+            transform: scale(1.2);
+            pointer-events: none;
+            animation: rune-reveal-b-nmg7akz9bf 1.8s ease forwards;
+            animation-delay: calc(var(--i) * 0.12s);
+        }
+
+.lunitari-header:hover .glyph-title span[b-nmg7akz9bf]::before {
+    animation: none;
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.lunitari-header:hover .glyph-title span[b-nmg7akz9bf]::before {
+    animation: rune-reveal-b-nmg7akz9bf 1.8s ease forwards;
+    animation-delay: calc(var(--i) * 0.12s);
+}
+
+@keyframes rune-reveal-b-nmg7akz9bf {
+    0% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+
+    60% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(1);
+    }
+}
+
+@keyframes shimmer-shift-b-nmg7akz9bf {
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+
+    100% {
+        transform: rotate(360deg) scale(1.2);
+    }
+}
+/* /Components/Layout/Branding/MainNavBar.razor.rz.scp.css */
+.main-nav[b-zc1xxckdv4] {
+    width: 100%;
+    padding: 0.75rem 0;
+    background: #000000;
+    animation: lunar-eclipse-b-zc1xxckdv4 1.8s ease forwards, moonlight-ripple-b-zc1xxckdv4 6s ease-in-out infinite 1.8s, triple-moon-pulse-b-zc1xxckdv4 4s ease-in-out infinite 1.8s;
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid rgba(255, 0, 255, 0.25);
+    display: flex;
+    justify-content: center;
+}
+
+@keyframes lunar-eclipse-b-zc1xxckdv4 {
+    0% {
+        background: #ffffff;
+    }
+
+    40% {
+        background: #d8d8ff;
+    }
+
+    70% {
+        background: #0a0015;
+    }
+
+    100% {
+        background: #000000;
+    }
+}
+
+@keyframes moonlight-ripple-b-zc1xxckdv4 {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes triple-moon-pulse-b-zc1xxckdv4 {
+    0% {
+        box-shadow: inset 0 0 20px rgba(220, 220, 255, 0.15);
+    }
+
+    33% {
+        box-shadow: inset 0 0 25px rgba(255, 0, 255, 0.25);
+    }
+
+    66% {
+        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.4);
+    }
+
+    100% {
+        box-shadow: inset 0 0 20px rgba(220, 220, 255, 0.15);
+    }
+}
+
+.main-nav ul[b-zc1xxckdv4] {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+}
+
+.main-nav a[b-zc1xxckdv4] {
+    color: #f8eaff;
+    font-weight: 600;
+    background: transparent;
+    text-decoration: none;
+    letter-spacing: 0.05rem;
+    position: relative;
+    padding: 0.25rem 0;
+    transition: color 0.3s ease;
+}
+
+    .main-nav a[b-zc1xxckdv4]::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        width: 0%;
+        height: 2px;
+        background: rgba(255, 0, 255, 0.8);
+        box-shadow: 0 0 6px rgba(255, 0, 255, 0.8);
+        transition: width 0.3s ease;
+    }
+
+    .main-nav a:hover[b-zc1xxckdv4] {
+        color: #ffffff;
+        text-shadow: 0 0 6px rgba(255, 0, 255, 0.7);
+    }
+
+        .main-nav a:hover[b-zc1xxckdv4]::after {
+            width: 100%;
+        }
+
+
+
+
 /* /Components/Layout/MainLayout.razor.rz.scp.css */
 .page[b-u1mvp6sug3] {
     position: relative;
@@ -360,4 +610,11 @@ main[b-u1mvp6sug3] {
         height: 80px;
         opacity: 0;
     }
+}
+/* /Components/Pages/Home.razor.rz.scp.css */
+.intro[b-uofw73lbew] {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 1.2rem;
+    color: blue;
 }

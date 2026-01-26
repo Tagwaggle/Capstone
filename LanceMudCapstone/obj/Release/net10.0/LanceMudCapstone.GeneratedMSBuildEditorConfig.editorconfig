@@ -58,6 +58,18 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xfSW1wb3J0cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/josep/source/repos/Lancev3/LanceMudCapstone/Components/Layout/Branding/HeroCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcQnJhbmRpbmdcSGVyb0NhcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-2c6locjrv2
+
+[C:/Users/josep/source/repos/Lancev3/LanceMudCapstone/Components/Layout/Branding/LunitariHeader.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcQnJhbmRpbmdcTHVuaXRhcmlIZWFkZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-nmg7akz9bf
+
+[C:/Users/josep/source/repos/Lancev3/LanceMudCapstone/Components/Layout/Branding/MainNavBar.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcQnJhbmRpbmdcTWFpbk5hdkJhci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-zc1xxckdv4
+
 [C:/Users/josep/source/repos/Lancev3/LanceMudCapstone/Components/Layout/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTWFpbkxheW91dC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-u1mvp6sug3

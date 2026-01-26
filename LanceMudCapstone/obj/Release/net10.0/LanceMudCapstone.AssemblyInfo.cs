@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LanceMudCapstone")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+45b6da0c1cd2cdc1de03a448be5c5c0037331bf0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+250d5bb830c245e839109db117b09919f182a104")]
 [assembly: System.Reflection.AssemblyProductAttribute("LanceMudCapstone")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LanceMudCapstone")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

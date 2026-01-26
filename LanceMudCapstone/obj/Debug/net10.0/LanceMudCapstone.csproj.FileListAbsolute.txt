@@ -72,8 +72,6 @@ C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\compresse
 C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\compressed\mr0xcvwzgm-{0}-abdmv1u4y3-abdmv1u4y3.gz
 C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\compressed\uvs4k5bvdh-{0}-2i0r6wwb69-2i0r6wwb69.gz
 C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\compressed\bxxmx69zif-{0}-iz83ucvm53-iz83ucvm53.gz
-C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\compressed\onrfdvhfwj-{0}-sg22omwxoo-sg22omwxoo.gz
-C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\compressed\4u2m642azu-{0}-sg22omwxoo-sg22omwxoo.gz
 C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\staticwebassets.build.json
 C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\staticwebassets.build.json.cache
 C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\staticwebassets.development.json
@@ -110,3 +108,9 @@ C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\bin\Debug\net10.0\System.Id
 C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\bin\Debug\net10.0\System.Reactive.dll
 C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\bin\Debug\net10.0\Websocket.Client.dll
 C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\bin\Debug\net10.0\Dapper.dll
+C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\scopedcss\Components\Layout\Branding\LunitariHeader.razor.rz.scp.css
+C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\scopedcss\Components\Layout\Branding\MainNavBar.razor.rz.scp.css
+C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\scopedcss\Components\Layout\Branding\HeroCard.razor.rz.scp.css
+C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\scopedcss\Components\Pages\Home.razor.rz.scp.css
+C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\compressed\onrfdvhfwj-{0}-53y0ar9bm5-53y0ar9bm5.gz
+C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\compressed\4u2m642azu-{0}-53y0ar9bm5-53y0ar9bm5.gz
