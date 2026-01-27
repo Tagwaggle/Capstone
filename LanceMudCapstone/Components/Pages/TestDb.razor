@@ -1,38 +1,25 @@
-﻿@page "/test-admin"
-@inject UserService Users
-@rendermode InteractiveServer
+﻿@page "/test-db"
 
+<h3>Database Connectivity Test</h3>
 
-<h3>Admin Insert Test</h3>
+<button @onclick="TestConnection">Test DB Connection</button>
 
-<button @onclick="InsertAdmin">Insert Admin User</button>
-
-@if (!string.IsNullOrEmpty(Message))
-{
-    <p>@Message</p>
-}
+<p>@Result</p>
 
 @code {
-    private string Message = "";
+    private string Result = "";
 
-    private async Task InsertAdmin()
+    private async Task TestConnection()
     {
-        var admin = new User
-        {
-            Username = "admin",
-            Email = "admin@example.com",
-            PasswordHash = PasswordHelper.HashPassword("admin123"), // replace with hashed later
-            IsActive = true
-        };
-
         try
         {
-            var id = await Users.AddUserAsync(admin);
-            Message = $"Admin user created with ID: {id}";
+            using var client = new HttpClient();
+            var response = await client.GetAsync("/api/test-db");
+            Result = await response.Content.ReadAsStringAsync();
         }
         catch (Exception ex)
         {
-            Message = $"Error: {ex.Message}";
+            Result = $"Error: {ex.Message}";
         }
     }
 }
