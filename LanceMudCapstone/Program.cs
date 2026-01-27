@@ -1,4 +1,5 @@
 using LanceMudCapstone.Components;
+using LanceMudCapstone.Models;
 using LanceMudCapstone.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<DbHelper>();
 builder.Services.AddScoped<SessionState>();
 builder.Services.AddScoped<EmailService>();
+builder.Configuration.AddUserSecrets<Program>();
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
@@ -31,5 +33,11 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
+app.MapPost("/api/contact", async (
+    ContactFormModel form,
+    EmailService emailService) =>
+{
+    await emailService.SendContactFormEmail(form.Name, form.Email, form.Message);
+    return Results.Ok();
+});
 app.Run();

@@ -1,19 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+		<UserSecretsId>9eea44b1-6062-4e3d-86c6-099d1f13cc98</UserSecretsId>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Azure.Communication.Email" Version="1.1.0" />
-    <PackageReference Include="Dapper" Version="2.1.66" />
-    <PackageReference Include="Npgsql" Version="10.0.1" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
-    <PackageReference Include="Supabase" Version="1.1.1" />
-    <PackageReference Include="Supabase.Postgrest" Version="4.1.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Azure.Communication.Email" Version="1.1.0" />
+		<PackageReference Include="Dapper" Version="2.1.66" />
+		<PackageReference Include="Npgsql" Version="10.0.1" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+		<PackageReference Include="Supabase" Version="1.1.1" />
+		<PackageReference Include="Supabase.Postgrest" Version="4.1.0" />
+	</ItemGroup>
 
 </Project>
