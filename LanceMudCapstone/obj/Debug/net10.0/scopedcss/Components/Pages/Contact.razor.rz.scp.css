@@ -1,0 +1,60 @@
+.contact-container[b-gkde07ru5m] {
+    max-width: 600px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    color: #e0e0f8;
+}
+
+.contact-title[b-gkde07ru5m] {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    color: #dcdcff;
+}
+
+.form-group[b-gkde07ru5m] {
+    margin-bottom: 1.2rem;
+}
+
+.form-control[b-gkde07ru5m] {
+    width: 100%;
+    padding: 0.6rem;
+    border-radius: 6px;
+    border: 1px solid #666;
+    background: rgba(255, 255, 255, 0.1);
+    color: #f0f0ff;
+}
+
+.message-box[b-gkde07ru5m] {
+    height: 150px;
+}
+
+.submit-button[b-gkde07ru5m] {
+    width: 100%;
+    padding: 0.8rem;
+    background: #6a5acd;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+    .submit-button:hover[b-gkde07ru5m] {
+        background: #7b6fe0;
+    }
+
+.success-message[b-gkde07ru5m] {
+    margin-top: 1rem;
+    color: #9cffb0;
+    text-align: center;
+}
+
+.error-message[b-gkde07ru5m] {
+    margin-top: 1rem;
+    color: #ff9c9c;
+    text-align: center;
+}

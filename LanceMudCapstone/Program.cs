@@ -11,6 +11,8 @@ builder.Services.AddScoped<SupabaseService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<DbHelper>();
 builder.Services.AddScoped<SessionState>();
+builder.Services.AddScoped<EmailService>();
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 

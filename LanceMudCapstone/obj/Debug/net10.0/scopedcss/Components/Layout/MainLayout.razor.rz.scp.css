@@ -1,11 +1,13 @@
-.page[b-u1mvp6sug3] {
-    position: relative;
+.layout-root[b-u1mvp6sug3] {
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
 main[b-u1mvp6sug3] {
     flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar[b-u1mvp6sug3] {
@@ -21,36 +23,35 @@ main[b-u1mvp6sug3] {
     align-items: center;
 }
 
-    .top-row[b-u1mvp6sug3]  a, .top-row[b-u1mvp6sug3]  .btn-link {
+    .top-row[b-u1mvp6sug3]  a,
+    .top-row[b-u1mvp6sug3]  .btn-link {
         white-space: nowrap;
         margin-left: 1.5rem;
         text-decoration: none;
     }
 
-    .top-row[b-u1mvp6sug3]  a:hover, .top-row[b-u1mvp6sug3]  .btn-link:hover {
-        text-decoration: underline;
-    }
+        .top-row[b-u1mvp6sug3]  a:hover,
+        .top-row[b-u1mvp6sug3]  .btn-link:hover {
+            text-decoration: underline;
+        }
 
-    .top-row[b-u1mvp6sug3]  a:first-child {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+        .top-row[b-u1mvp6sug3]  a:first-child {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
 @media (max-width: 640.98px) {
     .top-row[b-u1mvp6sug3] {
         justify-content: space-between;
     }
 
-    .top-row[b-u1mvp6sug3]  a, .top-row[b-u1mvp6sug3]  .btn-link {
-        margin-left: 0;
-    }
+        .top-row[b-u1mvp6sug3]  a,
+        .top-row[b-u1mvp6sug3]  .btn-link {
+            margin-left: 0;
+        }
 }
 
 @media (min-width: 641px) {
-    .page[b-u1mvp6sug3] {
-        flex-direction: row;
-    }
-
     .sidebar[b-u1mvp6sug3] {
         width: 250px;
         height: 100vh;
@@ -64,13 +65,14 @@ main[b-u1mvp6sug3] {
         z-index: 1;
     }
 
-    .top-row.auth[b-u1mvp6sug3]  a:first-child {
-        flex: 1;
-        text-align: right;
-        width: 0;
-    }
+        .top-row.auth[b-u1mvp6sug3]  a:first-child {
+            flex: 1;
+            text-align: right;
+            width: 0;
+        }
 
-    .top-row[b-u1mvp6sug3], article[b-u1mvp6sug3] {
+    .top-row[b-u1mvp6sug3],
+    article[b-u1mvp6sug3] {
         padding-left: 2rem !important;
         padding-right: 1.5rem !important;
     }

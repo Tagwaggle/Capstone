@@ -1,6 +1,22 @@
+.root-element[b-uofw73lbew] {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: radial-gradient(circle at top, #1a1a2e, #0f0f17);
+}
 .intro[b-uofw73lbew] {
     text-align: center;
     margin-top: 2rem;
     font-size: 1.2rem;
     color: blue;
+
+}
+
+.main[b-uofw73lbew] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    padding: 0 2rem 0 2rem;
+    background: radial-gradient(circle at top, #1a1a2e, #0f0f17);
 }
