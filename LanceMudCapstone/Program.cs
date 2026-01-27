@@ -13,7 +13,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<DbHelper>();
 builder.Services.AddScoped<SessionState>();
 builder.Services.AddScoped<EmailService>();
-builder.Configuration.AddUserSecrets<Program>();
+
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
@@ -40,4 +40,10 @@ app.MapPost("/api/contact", async (
     await emailService.SendContactFormEmail(form.Name, form.Email, form.Message);
     return Results.Ok();
 });
+app.MapGet("/api/test-db", async (DatabaseService db) =>
+{
+    var result = await db.CanConnectAsync();
+    return result ? Results.Ok("DB connection successful") : Results.Problem("DB connection failed");
+});
+
 app.Run();
