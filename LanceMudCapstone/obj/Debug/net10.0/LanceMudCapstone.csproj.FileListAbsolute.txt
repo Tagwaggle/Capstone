@@ -114,5 +114,5 @@ C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\scopedcss
 C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\scopedcss\Components\Pages\Home.razor.rz.scp.css
 C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\scopedcss\Components\Pages\CreateUser.razor.rz.scp.css
 C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\scopedcss\Components\Pages\Login.razor.rz.scp.css
-C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\compressed\onrfdvhfwj-{0}-ewib88d0i9-ewib88d0i9.gz
-C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\compressed\4u2m642azu-{0}-ewib88d0i9-ewib88d0i9.gz
+C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\compressed\onrfdvhfwj-{0}-5sbpqn1n4f-5sbpqn1n4f.gz
+C:\Users\josep\Source\Repos\Lancev3\LanceMudCapstone\obj\Debug\net10.0\compressed\4u2m642azu-{0}-5sbpqn1n4f-5sbpqn1n4f.gz

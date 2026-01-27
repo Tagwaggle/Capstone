@@ -1,2 +1,112 @@
-body[b-seklycxntd] {
+
+.login-wrapper[b-seklycxntd] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: radial-gradient(circle at top, #1a1a2e, #0f0f17);
 }
+
+.login-card[b-seklycxntd] {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(8px);
+    padding: 2.5rem;
+    border-radius: 12px;
+    width: 360px;
+    box-shadow: 0 0 20px rgba(180, 180, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.login-title[b-seklycxntd] {
+    text-align: center;
+    margin-bottom: 0.5rem;
+    color: #e0e0ff;
+    font-size: 1.8rem;
+}
+
+.login-subtitle[b-seklycxntd] {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #b8b8d9;
+    font-size: 0.95rem;
+}
+
+.form-group[b-seklycxntd] {
+    margin-bottom: 1rem;
+}
+
+label[b-seklycxntd] {
+    display: block;
+    margin-bottom: 0.3rem;
+    color: #dcdcff;
+    font-size: 0.9rem;
+}
+
+.input[b-seklycxntd] {
+    width: 100%;
+    padding: 0.6rem;
+    border-radius: 6px;
+    border: 1px solid #444466;
+    background: rgba(255, 255, 255, 0.08);
+    color: #e8e8ff;
+}
+
+    .input:focus[b-seklycxntd] {
+        outline: none;
+        border-color: #8a8aff;
+        box-shadow: 0 0 6px rgba(138, 138, 255, 0.4);
+    }
+
+.login-button[b-seklycxntd] {
+    width: 100%;
+    padding: 0.7rem;
+    margin-top: 0.5rem;
+    background: #6a6aff;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+    .login-button:hover[b-seklycxntd] {
+        background: #7d7dff;
+        box-shadow: 0 0 10px rgba(125, 125, 255, 0.5);
+    }
+
+.login-footer[b-seklycxntd] {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+    .login-footer a[b-seklycxntd] {
+        color: #9d9dff;
+        text-decoration: none;
+    }
+
+        .login-footer a:hover[b-seklycxntd] {
+            text-decoration: underline;
+        }
+
+.password-wrapper[b-seklycxntd] {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.show-btn[b-seklycxntd] {
+    margin-left: 8px;
+    padding: 0.4rem 0.6rem;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid #666688;
+    border-radius: 6px;
+    color: #e0e0ff;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: 0.2s ease;
+}
+
+    .show-btn:hover[b-seklycxntd] {
+        background: rgba(255, 255, 255, 0.25);
+    }

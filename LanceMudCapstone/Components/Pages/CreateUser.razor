@@ -1,5 +1,7 @@
 ﻿@page "/create"
 @layout MainLayout
+@rendermode InteractiveServer
+
 
 @using LanceMudCapstone.Services
 @using LanceMudCapstone.Models
@@ -16,7 +18,7 @@
             <div class="error-message">@Message</div>
         }
 
-        <EditForm Model="@model" OnValidSubmit="HandleCreate" FormName="CreateAccount">
+        <EditForm Model="@model" OnValidSubmit="HandleCreate">
             <DataAnnotationsValidator />
 
             <div class="form-group">
@@ -29,9 +31,26 @@
                 <InputText @bind-Value="model.Email" class="input" />
             </div>
 
-            <div class="form-group">
+            <div class="form-group password-group">
                 <label>Password</label>
-                <InputText @bind-Value="model.Password" type="password" class="input" />
+                <div class="password-wrapper">
+                    <InputText @bind-Value="model.Password"
+                               type="@(_showPassword ? "text" : "password")"
+                               class="input" />
+                    <button type="button" class="show-btn" @onclick="ToggleShowPassword">
+                        @(_showPassword ? "Hide" : "Show")
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group password-group">
+                <label>Confirm Password</label>
+                <div class="password-wrapper">
+                    <InputText @bind-Value="model.ConfirmPassword"
+                               type="@(_showPassword ? "text" : "password")"
+                               class="input" />
+                   
+                </div>
             </div>
 
             <button type="submit" class="login-button">Create Account</button>
@@ -42,16 +61,29 @@
 @code {
     private CreateUserModel model = new();
     private string? Message;
+    private bool _showPassword = false;
 
     public class CreateUserModel
     {
         public string Username { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public string ConfirmPassword { get; set; } = string.Empty;
+    }
+
+    private void ToggleShowPassword()
+    {
+        _showPassword = !_showPassword;
     }
 
     private async Task HandleCreate()
     {
+        if (model.Password != model.ConfirmPassword)
+        {
+            Message = "Passwords do not match.";
+            return;
+        }
+
         try
         {
             var user = new User
@@ -64,8 +96,7 @@
 
             int newId = await UserService.AddUserAsync(user);
 
-            Message = $"User created with ID {newId}. Redirecting to login...";
-
+            Message = $"User created. Redirecting to login...";
             await Task.Delay(1000);
             Nav.NavigateTo("/login");
         }
