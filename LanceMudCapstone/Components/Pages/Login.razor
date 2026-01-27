@@ -1,0 +1,67 @@
+﻿@page "/login"
+@layout MainLayout
+
+@using LanceMudCapstone.Services
+@using LanceMudCapstone.Models
+
+@inject UserService UserService
+@inject SessionState Session
+@inject NavigationManager Nav
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <h2 class="login-title">Login</h2>
+
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="error-message">@ErrorMessage</div>
+        }
+
+        <EditForm Model="@loginModel" OnValidSubmit="HandleLogin" FormName="Login">
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <label>Username</label>
+                <InputText @bind-Value="loginModel.Username" class="input" />
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <InputText @bind-Value="loginModel.Password" type="password" class="input" />
+            </div>
+
+            <button type="submit" class="login-button">Log In</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private LoginModel loginModel = new();
+    private string? ErrorMessage;
+
+    public class LoginModel
+    {
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    private async Task HandleLogin()
+    {
+        var user = await UserService.GetUserByUsernameAsync(loginModel.Username);
+
+        if (user == null)
+        {
+            ErrorMessage = "User not found.";
+            return;
+        }
+
+        if (!PasswordHelper.VerifyPassword(loginModel.Password, user.PasswordHash))
+        {
+            ErrorMessage = "Incorrect password.";
+            return;
+        }
+
+        Session.SetUser(user.UserId, user.Username);
+        Nav.NavigateTo("/test");
+    }
+}

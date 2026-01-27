@@ -1,6 +1,8 @@
 ﻿using System.Data;
 using Dapper;
 using Npgsql;
+using LanceMudCapstone.Models;
+
 
 namespace LanceMudCapstone.Services;
 
@@ -13,7 +15,7 @@ public class DbHelper
         _config = config;
     }
 
-    private IDbConnection CreateConnection()
+    public IDbConnection CreateConnection()
     {
         var connString = _config.GetConnectionString("SupabaseDb");
         return new NpgsqlConnection(connString);
@@ -46,4 +48,5 @@ public class DbHelper
 
         return result;
     }
+
 }

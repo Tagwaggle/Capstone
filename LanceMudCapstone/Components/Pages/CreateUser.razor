@@ -1,0 +1,77 @@
+﻿@page "/create"
+@layout MainLayout
+
+@using LanceMudCapstone.Services
+@using LanceMudCapstone.Models
+
+@inject UserService UserService
+@inject NavigationManager Nav
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <h2 class="login-title">Create Account</h2>
+
+        @if (!string.IsNullOrEmpty(Message))
+        {
+            <div class="error-message">@Message</div>
+        }
+
+        <EditForm Model="@model" OnValidSubmit="HandleCreate" FormName="CreateAccount">
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <label>Username</label>
+                <InputText @bind-Value="model.Username" class="input" />
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <InputText @bind-Value="model.Email" class="input" />
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <InputText @bind-Value="model.Password" type="password" class="input" />
+            </div>
+
+            <button type="submit" class="login-button">Create Account</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private CreateUserModel model = new();
+    private string? Message;
+
+    public class CreateUserModel
+    {
+        public string Username { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    private async Task HandleCreate()
+    {
+        try
+        {
+            var user = new User
+            {
+                Username = model.Username,
+                Email = model.Email,
+                PasswordHash = PasswordHelper.HashPassword(model.Password),
+                IsActive = true
+            };
+
+            int newId = await UserService.AddUserAsync(user);
+
+            Message = $"User created with ID {newId}. Redirecting to login...";
+
+            await Task.Delay(1000);
+            Nav.NavigateTo("/login");
+        }
+        catch (Exception ex)
+        {
+            Message = $"Error: {ex.Message}";
+        }
+    }
+}

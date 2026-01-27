@@ -78,6 +78,14 @@ build_metadata.AdditionalFiles.CssScope = b-ynokemcarx
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcUmVjb25uZWN0TW9kYWwucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-k33sb93op3
 
+[C:/Users/josep/Source/Repos/Lancev3/LanceMudCapstone/Components/Pages/CreateUser.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDcmVhdGVVc2VyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-seklycxntd
+
 [C:/Users/josep/Source/Repos/Lancev3/LanceMudCapstone/Components/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xIb21lLnJhem9y
 build_metadata.AdditionalFiles.CssScope = b-uofw73lbew
+
+[C:/Users/josep/Source/Repos/Lancev3/LanceMudCapstone/Components/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xMb2dpbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-fj85yjy865

@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using Npgsql;
 using LanceMudCapstone.Models;
 
 namespace LanceMudCapstone.Services;
@@ -15,12 +14,33 @@ public class UserService
 
     public async Task<int> AddUserAsync(User user)
     {
+        using var conn = _db.CreateConnection();
+
         var sql = @"
             INSERT INTO users (username, passwordhash, email, isactive)
-            VALUES (@UserName, @PasswordHash, @Email, @IsActive)
+            VALUES (@Username, @PasswordHash, @Email, @IsActive)
             RETURNING userid;
-            ";
+        ";
 
-        return await _db.ExecuteScalarAsync<int>(sql, user);
+        return await conn.ExecuteScalarAsync<int>(sql, user);
+    }
+
+    public async Task<User?> GetUserByUsernameAsync(string username)
+    {
+        using var conn = _db.CreateConnection();
+
+        var sql = @"SELECT * FROM users WHERE username = @username LIMIT 1;";
+
+        return await conn.QuerySingleOrDefaultAsync<User>(sql, new { username });
+    }
+
+    public async Task<User?> ValidateLoginAsync(string username, string password)
+    {
+        var user = await GetUserByUsernameAsync(username);
+
+        if (user == null) return null;
+        if (!PasswordHelper.VerifyPassword(password, user.PasswordHash)) return null;
+
+        return user;
     }
 }

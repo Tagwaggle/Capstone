@@ -10,6 +10,7 @@ builder.Services.AddScoped<DatabaseService>();
 builder.Services.AddScoped<SupabaseService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<DbHelper>();
+builder.Services.AddScoped<SessionState>();
 
 var app = builder.Build();
 
