@@ -1,5 +1,6 @@
 ﻿@page "/test-db"
 @rendermode InteractiveServer
+@inject IHttpClientFactory ClientFactory
 
 
 <h3>Database Connectivity Test</h3>
@@ -11,17 +12,20 @@
 @code {
     private string Result = "";
 
-    private async Task TestConnection()
+
+private async Task TestConnection()
     {
         try
         {
-            using var client = new HttpClient();
-            var response = await client.GetAsync("/api/test-db");
+            var client = ClientFactory.CreateClient("ServerAPI");
+            var response = await client.GetAsync("api/test-db");
             Result = await response.Content.ReadAsStringAsync();
         }
         catch (Exception ex)
         {
             Result = $"Error: {ex.Message}";
         }
+    
+
     }
 }
