@@ -1,6 +1,6 @@
-﻿using LanceMudCapstone.Services;
-using LanceMudCapstone.DTOs;
-using LanceMudCapstone.Models;
+﻿using LanceMudCapstone.DTOs;
+using LanceMudCapstone.Services;
+using Npgsql;
 
 public static class AuthApi
 {
@@ -8,38 +8,91 @@ public static class AuthApi
     {
         var auth = app.MapGroup("/api/auth");
 
-        auth.MapPost("/register", async (CreateUserDto dto, UserService svc) =>
+        // POST /api/auth/register
+        auth.MapPost("/register", async (CreateUserDto dto, IConfiguration config) =>
         {
-            var user = new User
+            var connString = config["SupabaseDb"];
+
+            try
             {
-                Username = dto.Username,
-                Email = dto.Email,
-                PasswordHash = PasswordHelper.HashPassword(dto.Password),
-                IsActive = true
-            };
+                await using var conn = new NpgsqlConnection(connString);
+                await conn.OpenAsync();
 
-            var id = await svc.AddUserAsync(user);
-            return Results.Ok(new { userId = id });
-        });
-
-        auth.MapPost("/login", async (LoginDto dto, UserService svc, SessionState session) =>
-        {
-            var user = await svc.ValidateLoginAsync(dto.Username, dto.Password);
-            if (user is null)
-                return Results.Json(
-                    new ApiErrorDto { Message = "Invalid credentials" },
-                    statusCode: 401
+                var cmd = new NpgsqlCommand(
+                    @"INSERT INTO users (username, email, passwordhash, isactive)
+              VALUES (@u, @e, @p, true)
+              RETURNING userid;",
+                    conn
                 );
 
-            session.SetUser(user.UserId, user.Username);
+                cmd.Parameters.AddWithValue("@u", dto.Username.Trim());
+                cmd.Parameters.AddWithValue("@e", dto.Email);
+                cmd.Parameters.AddWithValue("@p", PasswordHelper.HashPassword(dto.Password));
 
-            return Results.Ok(new UserDto
+                var result = await cmd.ExecuteScalarAsync();
+
+                if (result is int newId)
+                {
+                    return Results.Ok(new { userId = newId });
+                }
+
+                return Results.Problem("Failed to create user. No ID returned from database.");
+            }
+            catch (Exception ex)
             {
-                UserId = user.UserId,
-                Username = user.Username,
-                Email = user.Email,
-                IsActive = user.IsActive
-            });
+                return Results.Problem(ex.ToString());
+            }
+        });
+
+
+        // POST /api/auth/login
+        auth.MapPost("/login", async (LoginDto dto, IConfiguration config) =>
+        {
+            var connString = config["SupabaseDb"];
+
+            try
+            {
+                await using var conn = new NpgsqlConnection(connString);
+                await conn.OpenAsync();
+
+                var cmd = new NpgsqlCommand(
+                    @"SELECT userid, username, email, passwordhash, isactive
+                      FROM users
+                      WHERE username = @u
+                      LIMIT 1;",
+                    conn
+                );
+
+                cmd.Parameters.AddWithValue("@u", dto.Username);
+
+                var reader = await cmd.ExecuteReaderAsync();
+
+                if (!await reader.ReadAsync())
+                {
+                    return Results.BadRequest(new ApiErrorDto { Message = $"DTOuname{dto.Username}Invalid credentials" });
+                }
+
+                var storedHash = reader.GetString(reader.GetOrdinal("passwordhash"));
+
+                if (!PasswordHelper.VerifyPassword(dto.Password, storedHash))
+                {
+                    return Results.BadRequest(new ApiErrorDto { Message = $"DTOuname{dto.Username}Invalid credentials" });
+                }
+
+                var user = new UserDto
+                {
+                    UserId = reader.GetInt32(reader.GetOrdinal("userid")),
+                    Username = reader.GetString(reader.GetOrdinal("username")),
+                    Email = reader.GetString(reader.GetOrdinal("email")),
+                    IsActive = reader.GetBoolean(reader.GetOrdinal("isactive"))
+                };
+
+                return Results.Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(ex.ToString());
+            }
         });
     }
 }

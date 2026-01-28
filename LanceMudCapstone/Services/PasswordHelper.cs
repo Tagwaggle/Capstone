@@ -30,8 +30,11 @@ public class PasswordHelper
         byte[] key = Convert.FromBase64String(parts[2]);
 
         byte[] keyToCheck = Rfc2898DeriveBytes.Pbkdf2(
-            password, salt, Iterations, HashAlgorithmName.SHA256, key.Length);
+            password, salt, iterations, HashAlgorithmName.SHA256, key.Length);
+        
+        Console.WriteLine($"Stored hash: {storedHash}");
 
         return CryptographicOperations.FixedTimeEquals(keyToCheck, key);
     }
+
 }

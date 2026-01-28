@@ -1,5 +1,4 @@
 ﻿using LanceMudCapstone.DTOs;
-using LanceMudCapstone.Services;
 using Npgsql;
 
 public static class UserApi
@@ -8,60 +7,42 @@ public static class UserApi
     {
         var users = app.MapGroup("/api/users");
 
-        users.MapGet("/", async (DbHelper db) =>
+        // GET /api/users
+        users.MapGet("/", async (IConfiguration config) =>
         {
-            var sql = "SELECT userid, username, email, isactive FROM users ORDER BY userid;";
-            users.MapGet("/", async (IConfiguration config) =>
+            var connString = config["SupabaseDb"];
+
+            try
             {
-                var connString = config["SupabaseDb"];
+                await using var conn = new NpgsqlConnection(connString);
+                await conn.OpenAsync();
 
-                try
+                var cmd = new NpgsqlCommand(
+                    "SELECT userid, username, email, isactive FROM users ORDER BY userid;",
+                    conn
+                );
+
+                var reader = await cmd.ExecuteReaderAsync();
+
+                var results = new List<UserDto>();
+
+                while (await reader.ReadAsync())
                 {
-                    await using var conn = new NpgsqlConnection(connString);
-                    await conn.OpenAsync();
-
-                    var cmd = new NpgsqlCommand(
-                        "SELECT userid, username, email, isactive FROM users ORDER BY userid;",
-                        conn
-                    );
-
-                    var reader = await cmd.ExecuteReaderAsync();
-
-                    var results = new List<UserDto>();
-
-                    while (await reader.ReadAsync())
+                    results.Add(new UserDto
                     {
-                        results.Add(new UserDto
-                        {
-                            UserId = reader.GetInt32(reader.GetOrdinal("userid")),
-                            Username = reader.GetString(reader.GetOrdinal("username")),
-                            Email = reader.GetString(reader.GetOrdinal("email")),
-                            IsActive = reader.GetBoolean(reader.GetOrdinal("isactive"))
-                        });
-                    }
-
-                    return Results.Ok(results);
+                        UserId = reader.GetInt32(reader.GetOrdinal("userid")),
+                        Username = reader.GetString(reader.GetOrdinal("username")),
+                        Email = reader.GetString(reader.GetOrdinal("email")),
+                        IsActive = reader.GetBoolean(reader.GetOrdinal("isactive"))
+                    });
                 }
-                catch (Exception ex)
-                {
-                    return Results.Problem(ex.ToString());
-                }
-            });
-        });
 
-        users.MapGet("/{id:int}", async (int id, UserService svc) =>
-        {
-            var user = await svc.GetUserByIdAsync(id);
-            if (user is null)
-                return Results.NotFound(new ApiErrorDto { Message = "User not found" });
-
-            return Results.Ok(new UserDto
+                return Results.Ok(results);
+            }
+            catch (Exception ex)
             {
-                UserId = user.UserId,
-                Username = user.Username,
-                Email = user.Email,
-                IsActive = user.IsActive
-            });
+                return Results.Problem(ex.ToString());
+            }
         });
     }
 }

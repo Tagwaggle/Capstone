@@ -5,16 +5,14 @@ using LanceMudCapstone.API;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Services
+// Razor Components
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
-builder.Services.AddScoped<DatabaseService>();
-builder.Services.AddScoped<SupabaseService>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<DbHelper>();
+
+// Only keep services you actually use
 builder.Services.AddScoped<SessionState>();
 builder.Services.AddScoped<EmailService>();
-builder.Services.AddScoped<CharacterService>();
 
+// HttpClient
 builder.Services.AddHttpClient();
 builder.Services.AddHttpClient("ServerAPI", client =>
 {
