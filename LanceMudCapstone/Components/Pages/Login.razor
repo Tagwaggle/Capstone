@@ -1,5 +1,6 @@
 ﻿@page "/login"
 @layout MainLayout
+@rendermode InteractiveServer
 
 @using LanceMudCapstone.DTOs
 
@@ -16,24 +17,20 @@
             <div class="error-message">@ErrorMessage</div>
         }
 
-        <EditForm Model="@loginModel" OnValidSubmit="HandleLogin" FormName="Login">
-            <DataAnnotationsValidator />
+        <div class="form-group">
+            <label for="usernameInput">Username</label>
+            <InputText id="usernameInput" @bind-Value="loginModel.Username" class="input" />
+        </div>
 
-            <div class="form-group">
-                <label for="usernameInput">Username</label>
-                <InputText id="usernameInput" @bind-Value="loginModel.Username" class="input" />
-            </div>
+        <div class="form-group">
+            <label for="passwordInput">Password</label>
+            <InputText id="passwordInput" @bind-Value="loginModel.Password" type="password" class="input" />
+        </div>
 
-            <div class="form-group">
-                <label for="passwordInput">Password</label>
-                <InputText id="passwordInput" @bind-Value="loginModel.Password" type="password" class="input" />
-            </div>
+        <button @onclick="HandleLogin" class="login-button">Log In</button>
 
+        <p>DEBUG: @loginModel.Username | @loginModel.Password</p>
 
-            <button type="submit" class="login-button">Log In</button>
-            <p>DEBUG: @loginModel.Username | @loginModel.Password</p>
-
-        </EditForm>
     </div>
 </div>
 
