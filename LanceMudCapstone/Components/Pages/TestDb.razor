@@ -2,7 +2,6 @@
 @rendermode InteractiveServer
 @inject IHttpClientFactory ClientFactory
 
-
 <h3>Database Connectivity Test</h3>
 
 <button @onclick="TestConnection">Test DB Connection</button>
@@ -12,20 +11,23 @@
 @code {
     private string Result = "";
 
-
-private async Task TestConnection()
+    private async Task TestConnection()
     {
         try
         {
             var client = ClientFactory.CreateClient("ServerAPI");
-            var response = await client.GetAsync("api/test-db");
-            Result = await response.Content.ReadAsStringAsync();
+
+            var response1 = await client.GetAsync("api/test-db");
+            var text1 = await response1.Content.ReadAsStringAsync();
+
+            var response2 = await client.GetAsync("api/test-db-users");
+            var text2 = await response2.Content.ReadAsStringAsync();
+
+            Result = $"Test DB:\n{text1}\n\nTest DB Users:\n{text2}";
         }
         catch (Exception ex)
         {
             Result = $"Error: {ex.Message}";
         }
-    
-
     }
 }
