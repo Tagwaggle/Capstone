@@ -43,4 +43,13 @@ public class UserService
 
         return user;
     }
+    public async Task<User?> GetUserByIdAsync(int id)
+    {
+        using var conn = _db.CreateConnection();
+
+        var sql = @"SELECT * FROM users WHERE userid = @id LIMIT 1;";
+
+        return await conn.QuerySingleOrDefaultAsync<User>(sql, new { id });
+    }
+
 }

@@ -2,11 +2,9 @@
 @layout MainLayout
 @rendermode InteractiveServer
 
+@using LanceMudCapstone.DTOs
 
-@using LanceMudCapstone.Services
-@using LanceMudCapstone.Models
-
-@inject UserService UserService
+@inject IHttpClientFactory HttpClientFactory
 @inject NavigationManager Nav
 
 <div class="login-wrapper">
@@ -49,7 +47,6 @@
                     <InputText @bind-Value="model.ConfirmPassword"
                                type="@(_showPassword ? "text" : "password")"
                                class="input" />
-                   
                 </div>
             </div>
 
@@ -62,6 +59,8 @@
     private CreateUserModel model = new();
     private string? Message;
     private bool _showPassword = false;
+
+    private HttpClient Api => HttpClientFactory.CreateClient("ServerAPI");
 
     public class CreateUserModel
     {
@@ -78,31 +77,32 @@
 
     private async Task HandleCreate()
     {
+        Message = null;
+
         if (model.Password != model.ConfirmPassword)
         {
             Message = "Passwords do not match.";
             return;
         }
 
-        try
+        var dto = new CreateUserDto
         {
-            var user = new User
-            {
-                Username = model.Username,
-                Email = model.Email,
-                PasswordHash = PasswordHelper.HashPassword(model.Password),
-                IsActive = true
-            };
+            Username = model.Username,
+            Email = model.Email,
+            Password = model.Password
+        };
 
-            int newId = await UserService.AddUserAsync(user);
+        var response = await Api.PostAsJsonAsync("/api/auth/register", dto);
 
-            Message = $"User created. Redirecting to login...";
-            await Task.Delay(1000);
-            Nav.NavigateTo("/login");
-        }
-        catch (Exception ex)
+        if (!response.IsSuccessStatusCode)
         {
-            Message = $"Error: {ex.Message}";
+            var error = await response.Content.ReadFromJsonAsync<ApiErrorDto>();
+            Message = error?.Message ?? "Account creation failed.";
+            return;
         }
+
+        Message = "User created. Redirecting to login...";
+        await Task.Delay(1000);
+        Nav.NavigateTo("/login");
     }
 }
