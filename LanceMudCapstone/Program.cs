@@ -46,4 +46,12 @@ app.MapGet("/api/test-db", async (DatabaseService db) =>
     return result ? Results.Ok("DB connection successful") : Results.Problem("DB connection failed");
 });
 
+app.MapGet("/api/users", async (DbHelper db) =>
+{
+    var sql = "SELECT userid, username, email, isactive FROM users ORDER BY userid;";
+    var users = await db.QuryListAsync<dynamic>(sql);
+    return Results.Ok(users);
+});
+
+
 app.Run();

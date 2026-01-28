@@ -1,0 +1,60 @@
+﻿@page "/users-list"
+@rendermode InteractiveServer
+
+<h3>Users Table</h3>
+
+<button @onclick="LoadUsers">Load Users</button>
+
+@if (Users is null)
+{
+    <p>No data loaded yet.</p>
+}
+else if (Users.Count == 0)
+{
+    <p>No users found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>UserID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Active</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Users)
+            {
+                <tr>
+                    <td>@u.userid</td>
+                    <td>@u.username</td>
+                    <td>@u.email</td>
+                    <td>@u.isactive</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<dynamic>? Users;
+
+    [Inject] HttpClient Http { get; set; } = default!;
+
+    private async Task LoadUsers()
+    {
+        try
+        {
+            Users = await Http.GetFromJsonAsync<List<dynamic>>("api/users");
+        }
+        catch (Exception ex)
+        {
+            Users = new List<dynamic>
+            {
+                new { userid = -1, username = $"Error: {ex.Message}", email = "", isactive = false }
+            };
+        }
+    }
+}
