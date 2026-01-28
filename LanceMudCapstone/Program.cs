@@ -112,7 +112,7 @@ app.MapGet("/api/test-db-users", async (IConfiguration config) =>
                 UserId = reader["userid"],
                 Username = reader["username"],
                 Email = reader["email"],
-                Active = reader["active"]
+                Active = reader["isactive"]
             });
         }
 
