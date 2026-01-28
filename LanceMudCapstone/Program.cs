@@ -1,6 +1,7 @@
 using LanceMudCapstone.Components;
 using LanceMudCapstone.Models;
 using LanceMudCapstone.Services;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,10 +76,20 @@ app.MapPost("/api/contact", async (
     await emailService.SendContactFormEmail(form.Name, form.Email, form.Message);
     return Results.Ok();
 });
-app.MapGet("/api/test-db", async (DatabaseService db) =>
+app.MapGet("/api/test-db", async (IConfiguration config) =>
 {
-    var result = await db.CanConnectAsync();
-    return result ? Results.Ok("DB connection successful") : Results.Problem("DB connection failed");
+    var connString = config["SupabaseDb"];
+
+    try
+    {
+        await using var conn = new NpgsqlConnection(connString);
+        await conn.OpenAsync();
+        return Results.Ok($"DB connection successful. ConnString={connString}");
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"DB connection failed. ConnString={connString}. Error={ex.Message}");
+    }
 });
 
 app.MapGet("/api/users", async (DbHelper db) =>
