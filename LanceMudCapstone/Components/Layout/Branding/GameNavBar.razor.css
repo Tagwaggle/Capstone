@@ -1,4 +1,4 @@
-﻿.main-nav {
+﻿.game-nav {
     width: 100%;
     padding: 0.75rem 0;
     background: #000000;
@@ -59,7 +59,7 @@
     }
 }
 
-.main-nav ul {
+.game-nav ul {
     list-style: none;
     display: flex;
     gap: 2rem;
@@ -67,7 +67,7 @@
     padding: 0;
 }
 
-.main-nav a {
+.game-nav a {
     color: #f8eaff;
     font-weight: 600;
     background: transparent;
@@ -78,7 +78,7 @@
     transition: color 0.3s ease;
 }
 
-    .main-nav a::after {
+    .game-nav a::after {
         content: "";
         position: absolute;
         left: 0;
@@ -90,12 +90,12 @@
         transition: width 0.3s ease;
     }
 
-    .main-nav a:hover {
+    .game-nav a:hover {
         color: #ffffff;
         text-shadow: 0 0 6px rgba(255, 0, 255, 0.7);
     }
 
-        .main-nav a:hover::after {
+        .game-nav a:hover::after {
             width: 100%;
         }
 

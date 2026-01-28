@@ -1,0 +1,77 @@
+﻿@page "/sessioncontact"
+@layout GameLayout
+@using Microsoft.AspNetCore.Components.Forms
+
+@using LanceMudCapstone.Models
+
+@inject HttpClient Http
+
+<div class="contact-container">
+    <h2 class="contact-title">Contact Us</h2>
+
+    <EditForm Model="@form" OnValidSubmit="HandleSubmit" FormName="contactForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label>Name</label>
+            <InputText @bind-Value="form.Name" class="form-control" />
+            <ValidationMessage For="@(() => form.Name)" />
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <InputText @bind-Value="form.Email" class="form-control" />
+            <ValidationMessage For="@(() => form.Email)" />
+        </div>
+
+        <div class="form-group">
+            <label>Message</label>
+            <InputTextArea @bind-Value="form.Message" class="form-control message-box" />
+            <ValidationMessage For="@(() => form.Message)" />
+        </div>
+
+        <button type="submit" class="submit-button">Send Message</button>
+    </EditForm>
+
+    @if (Success)
+    {
+        <p class="success-message">Your message has been sent successfully.</p>
+    }
+
+    @if (Error)
+    {
+        <p class="error-message">Something went wrong. Please try again.</p>
+    }
+</div>
+
+@code {
+    ContactFormModel form = new();
+    bool Success = false;
+    bool Error = false;
+
+    private async Task HandleSubmit()
+    {
+        Success = false;
+        Error = false;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("/api/contact", form);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Success = true;
+                form = new ContactFormModel();
+            }
+            else
+            {
+                Error = true;
+            }
+        }
+        catch
+        {
+            Error = true;
+        }
+    }
+}
