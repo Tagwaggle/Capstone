@@ -17,17 +17,16 @@ builder.Services.AddScoped<EmailService>();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpClient("ServerAPI", client =>
 {
-    
+    // Azure App Service
     var azureHost = builder.Configuration["WEBSITE_HOSTNAME"];
-
     if (!string.IsNullOrWhiteSpace(azureHost))
     {
         client.BaseAddress = new Uri($"https://{azureHost}/");
         return;
     }
 
+    // Local dev
     var urls = builder.Configuration["ASPNETCORE_URLS"];
-
     string? baseUrl = null;
 
     if (!string.IsNullOrWhiteSpace(urls))
@@ -41,6 +40,7 @@ builder.Services.AddHttpClient("ServerAPI", client =>
 
     client.BaseAddress = new Uri(baseUrl);
 });
+
 
 
 
