@@ -15,6 +15,27 @@ builder.Services.AddScoped<SessionState>();
 builder.Services.AddScoped<EmailService>();
 
 builder.Services.AddHttpClient();
+builder.Services.AddHttpClient("ServerAPI", client =>
+{
+    var urls = builder.Configuration["ASPNETCORE_URLS"];
+
+    string? baseUrl = null;
+
+    if (!string.IsNullOrWhiteSpace(urls))
+    {
+        // Split on semicolon, take the first valid URL
+        baseUrl = urls
+            .Split(';', StringSplitOptions.RemoveEmptyEntries)
+            .FirstOrDefault(u => Uri.IsWellFormedUriString(u, UriKind.Absolute));
+    }
+
+    // Fallback for local dev
+    baseUrl ??= "https://localhost:7038/";
+
+    client.BaseAddress = new Uri(baseUrl);
+});
+
+
 
 var app = builder.Build();
 
