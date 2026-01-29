@@ -1,5 +1,6 @@
 ﻿using Azure;
 using Azure.Communication.Email;
+using System.Data.Common;
 
 namespace LanceMudCapstone.Services;
 
@@ -13,6 +14,9 @@ public class EmailService
         // Pull connection string from appsettings.json
         _client = new EmailClient(config["ACS:ConnectionString"]);
 
+        var conn = config["ACS:ConnectionString"];
+        if (string.IsNullOrEmpty(conn))
+            throw new InvalidOperationException("ACS Key not found");
         // Your Azure-managed domain sender address
         _senderAddress = "donotreply@bcfdc616-edf8-4e7c-8e38-5298b289e9b2.azurecomm.net";
     }

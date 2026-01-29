@@ -67,11 +67,5 @@ app.MapContactApi();
 app.MapStaticAssets();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
-// Contact form
-app.MapPost("/api/contact", async (ContactFormModel form, EmailService emailService) =>
-{
-    await emailService.SendContactFormEmail(form.Name, form.Email, form.Message);
-    return Results.Ok();
-});
 
 app.Run();

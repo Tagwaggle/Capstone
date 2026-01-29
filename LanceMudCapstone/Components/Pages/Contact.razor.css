@@ -1,66 +1,109 @@
-﻿.contact-container {
+﻿.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: radial-gradient(circle at top, #0b0b14, #000000);
+    background-attachment: fixed;
+    background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 120px 120px;
+}
+
+.contact-container {
     max-width: 600px;
     margin: 3rem auto;
-    padding: 2rem;
-    background: rgba(255, 255, 255, 0.05);
+    padding: 2.5rem;
+    background: radial-gradient(circle at top, #0b0b14, #000000);
     border-radius: 12px;
-    backdrop-filter: blur(10px);
-    color: #e0e0f8;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 25px rgba(80, 0, 120, 0.4); /* arcane violet glow */
+    border: 1px solid rgba(120, 80, 200, 0.25);
+    color: #dcdcff;
 }
 
 .contact-title {
     text-align: center;
-    margin-bottom: 1.5rem;
-    font-size: 2rem;
-    color: #dcdcff;
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+    color: #b8aaff; /* moonlit violet */
+    text-shadow: 0 0 8px rgba(150, 100, 255, 0.6);
 }
 
 .form-group {
     margin-bottom: 1.2rem;
 }
 
+label {
+    display: block;
+    margin-bottom: 0.3rem;
+    color: #aaaaff;
+    font-size: 0.9rem;
+    text-shadow: 0 0 4px rgba(120, 120, 255, 0.4);
+}
+
 .form-control {
     width: 100%;
     padding: 0.6rem;
     border-radius: 6px;
-    border: 1px solid #666;
-    background: rgba(255, 255, 255, 0.1);
-    color: #f0f0ff;
+    border: 1px solid #333366;
+    background: rgba(20, 20, 40, 0.9);
+    color: #e0e0ff;
+    transition: 0.2s ease;
 }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #8a6aff;
+        box-shadow: 0 0 10px rgba(138, 106, 255, 0.6);
+        background: rgba(30, 30, 60, 0.95);
+    }
 
 .message-box {
     height: 150px;
+    resize: none;
 }
 
 .submit-button {
     width: 100%;
     padding: 0.8rem;
-    background: #6a5acd;
+    margin-top: 0.5rem;
+    background: linear-gradient(135deg, #3a2a6d, #6a5acd);
     border: none;
     border-radius: 6px;
-    color: white;
-    font-size: 1.1rem;
+    color: #f0f0ff;
+    font-weight: bold;
     cursor: pointer;
+    transition: 0.25s ease;
+    text-shadow: 0 0 6px rgba(200, 200, 255, 0.6);
 }
 
     .submit-button:hover {
-        background: #7b6fe0;
+        background: linear-gradient(135deg, #4b3a8d, #7d6fe0);
+        box-shadow: 0 0 15px rgba(125, 125, 255, 0.6);
     }
 
 .success-message {
     margin-top: 1rem;
     color: #9cffb0;
     text-align: center;
+    font-weight: 600;
+    text-shadow: 0 0 6px rgba(100, 255, 150, 0.6);
 }
 
 .error-message {
-    background: #dcdcff;
-    color: rgba(255, 0, 0, 0.4);
-    text-decoration-color: red;
+    margin-top: 1rem;
+    background: rgba(60, 0, 0, 0.6);
+    color: #ff6666;
     padding: 0.75rem 1rem;
     border-radius: 6px;
-    margin-bottom: 1rem;
     font-weight: 600;
     text-align: center;
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.4);
+    box-shadow: 0 0 12px rgba(255, 0, 0, 0.5);
+}
+body {
+    background: radial-gradient(circle at top, #0b0b14, #000000);
+    background-attachment: fixed;
+    background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 120px 120px;
+    color: #dcdcff;
 }

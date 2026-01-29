@@ -4,7 +4,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using LanceMudCapstone.Models
 
-@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
 
 <div class="contact-container">
     <h2 class="contact-title">Contact Us</h2>
@@ -54,7 +54,21 @@
     string messageSuccess = string.Empty;
     List<string> ValidationError = new();
 
-    private async Task SendContact()
+
+    @code {
+        private async Task SendContact()
+        {
+            Console.WriteLine($"{form.Name} {form.Email} {form.Message}");
+            var client = ClientFactory.CreateClient("ServerAPI");
+        var response = await client.PostAsJsonAsync("/api/contact", form);
+
+        Console.WriteLine($"Response status: {response.StatusCode}");
+        var content = await response.Content.ReadAsStringAsync();
+        Console.WriteLine($"Response body: {content}");
+    }
+}
+
+   /* private async Task SendContact()
     {
         Success = false;
         Error = false;
@@ -72,8 +86,9 @@
         }
         try
         {
-            var response = await Http.PostAsJsonAsync("/api/contact", form);
-
+            Console.WriteLine($"Message from {form.Name}");
+            var response = await ClientFactory.PostAsJsonAsync("/api/contact", form);
+            Console.WriteLine($"Response status: {response.StatusCode}");
             if (response.IsSuccessStatusCode)
             {
                 Success = true;
@@ -91,5 +106,5 @@
             ValidationError.Add("Something went wrong, try your message again");
             Error = true;
         }
-    }
+    }*/
 }
