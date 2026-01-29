@@ -61,6 +61,7 @@ app.MapTestApi();
 app.MapAuthApi();
 app.MapInventoryApi();
 app.MapWorldApi();
+app.MapContactApi();
 
 // Static + Razor
 app.MapStaticAssets();
