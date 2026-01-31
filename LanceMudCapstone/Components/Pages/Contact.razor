@@ -9,23 +9,23 @@
 <div class="contact-container">
     <h2 class="contact-title">Contact Us</h2>
 
-    
+
     <div class="form-group">
         <label>Name</label>
         <InputText @bind-Value="form.Name" class="form-control" />
-        
+
     </div>
 
     <div class="form-group">
         <label>Email</label>
         <InputText @bind-Value="form.Email" class="form-control" />
-        
+
     </div>
 
     <div class="form-group">
         <label>Message</label>
         <InputTextArea @bind-Value="form.Message" class="form-control message-box" />
-        
+
     </div>
 
     <button @onclick="SendContact" class="submit-button">Send Message</button>
@@ -55,56 +55,43 @@
     List<string> ValidationError = new();
 
 
-    @code {
-        private async Task SendContact()
-        {
-            Console.WriteLine($"{form.Name} {form.Email} {form.Message}");
-            var client = ClientFactory.CreateClient("ServerAPI");
-        var response = await client.PostAsJsonAsync("/api/contact", form);
 
-        Console.WriteLine($"Response status: {response.StatusCode}");
-        var content = await response.Content.ReadAsStringAsync();
-        Console.WriteLine($"Response body: {content}");
-    }
-}
-
-   /* private async Task SendContact()
+    private async Task SendContact()
     {
         Success = false;
         Error = false;
         ValidationError.Clear();
         messageSuccess = string.Empty;
 
+
+
         if (string.IsNullOrEmpty(form.Name)) ValidationError.Add("Name is required.");
         if (string.IsNullOrEmpty(form.Email)) ValidationError.Add("Email is required.");
         if (string.IsNullOrEmpty(form.Message)) ValidationError.Add("Message is required.");
+
 
         if (ValidationError.Any())
         {
             Error = true;
             return;
         }
+
         try
         {
-            Console.WriteLine($"Message from {form.Name}");
-            var response = await ClientFactory.PostAsJsonAsync("/api/contact", form);
+            var client = ClientFactory.CreateClient("ServerAPI");
+            var response = await client.PostAsJsonAsync("/api/contact", form);
+
             Console.WriteLine($"Response status: {response.StatusCode}");
-            if (response.IsSuccessStatusCode)
-            {
-                Success = true;
-                messageSuccess = "Message was sent";
-                form = new ContactFormModel(); // reset form
-            }
-            else
-            {
-                ValidationError.Add("Something went wrong, try your message again");
-                Error = true;
-            }
+            var content = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Response body: {content}");
+            Success = true;
+            messageSuccess = "Message Sent Successfuly";
         }
         catch
         {
-            ValidationError.Add("Something went wrong, try your message again");
             Error = true;
+            ValidationError.Add("Something went wrong.");
+            return;
         }
-    }*/
+    }
 }

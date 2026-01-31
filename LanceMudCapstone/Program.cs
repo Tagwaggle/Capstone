@@ -62,10 +62,17 @@ app.MapAuthApi();
 app.MapInventoryApi();
 app.MapWorldApi();
 app.MapContactApi();
+app.MapPlayerCharacterApi();
 
 // Static + Razor
 app.MapStaticAssets();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"Incoming {context.Request.Method} {context.Request.Path}, Content-Type: {context.Request.ContentType}");
+    await next();
+});
 
 
 app.Run();

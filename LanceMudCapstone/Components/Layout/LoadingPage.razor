@@ -1,0 +1,28 @@
+﻿@inherits ComponentBase
+@rendermode InteractiveServer
+
+@inject SessionState SessionState
+
+<div class="loading-wrapper">
+    <div class="loading-animation">
+        🔨 Little guys hammering away...
+    </div>
+    <p>Preparing your adventure...</p>
+</div>
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(1000);
+        Console.WriteLine($"[LoadingPage Init] UserId={SessionState.UserId}, UserName={SessionState.UserName}");
+        await OnFinished.InvokeAsync();
+    }
+
+    private void Test()
+    {
+        Console.WriteLine($"[LoadingPage Button] UserId={SessionState.UserId}, UserName={SessionState.UserName}");
+    }
+
+    [Parameter] public EventCallback OnFinished { get; set; }
+}

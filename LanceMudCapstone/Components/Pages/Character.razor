@@ -1,12 +1,70 @@
 ﻿@page "/character"
 @rendermode InteractiveServer
-
 @layout GameLayout
 
+@using LanceMudCapstone.DTOs
+@using LanceMudCapstone.Models
+@using LanceMudCapstone.API
+
+@inject IHttpClientFactory httpClientFactory
+@inject SessionState SessionState
+@inject NavigationManager Nav
+
+<h3>Character Select for @SessionState.UserName</h3>
 
 
-<h3>Character Select</h3>
+@if (SessionState.UserId == null)
+{
+    <h1>Please login in.....</h1>
+}
+else if (characters == null)
+{
+    <p>Loading Characters...</p>    
+    <p>@SessionState.UserName Waiting on load.</p>
+}
+else if (!characters.Any())
+{
+    <p> No Current Characters, please create a character to continue</p>
+}
+else
+{
+    <div class="character-list">
+        <InputRadioGroup @bind-Value="SelectedCharacterId" Name="characterChoice">
+        @foreach (var c in characters)
+        {
+            <div class="character-item">
+                <InputRadio Value="@c.CharacterId" />
+                <span>@c.Name (Level @c.Level, @c.Class)</span>
+            </div>
+        }
+        </InputRadioGroup>
+    </div>
+}
+
+<div class="character-action">
+    <button @onclick="LoginCharacter" disabled="@(!SelectedCharacterId.HasValue)">Login</button>
+    <button @onclick="CreateCharacter" >Create New Character</button>
+</div>
 
 @code {
+    private List<PlayerCharacterDto>? characters;
+    private int? SelectedCharacterId;
 
+    private HttpClient Api => httpClientFactory.CreateClient("ServerAPI");
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (SessionState.UserId != null)
+        {
+            characters = await Api.GetFromJsonAsync<List<PlayerCharacterDto>>($"/api/characters/user/{SessionState.UserId}");
+        }
+    }
+    private void LoginCharacter() { if (SelectedCharacterId.HasValue) { SessionState.SetCharacter(SelectedCharacterId.Value); Nav.NavigateTo("/play"); } }
+    private void CreateCharacter() { Nav.NavigateTo("/character/create"); }
+
+    async Task Redirect()
+    {
+        await Task.Delay(100);
+        Nav.NavigateTo("/login");
+    }
 }

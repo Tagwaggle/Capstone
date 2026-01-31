@@ -1,0 +1,56 @@
+﻿.create-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: radial-gradient(circle at top, #1a1a2e, #0f0f17);
+}
+
+.create-card {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(8px);
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(180, 180, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    width: 600px;
+}
+
+.form-entry {
+    width: 100%;
+    padding: 0.6rem;
+    border-radius: 6px;
+    border: 1px solid #333366;
+    background: rgba(20, 20, 40, 0.9);
+    color: #e0e0ff;
+    transition: 0.2s ease;
+}
+
+    .form-entry:focus {
+        outline: none;
+        border-color: #8a6aff;
+        box-shadow: 0 0 10px rgba(138, 106, 255, 0.6);
+        background: rgba(30, 30, 60, 0.95);
+    }
+
+.create-table {
+    width: 100%;
+    border-spacing: 12px;
+}
+hr {
+    border: none;
+    border-top: 1px solid rgb(96, 93, 8, 0.2);
+    margin: 1rem 0;
+}
+.divider {
+    height: 1px;
+    background: rgba(255,255,255,0.2);
+    margin: 1rem 0;
+}
+.divider-row td {
+    border-bottom: 10px solid rgba(96, 93, 8);
+    height: 1px;
+    padding: .5rem;
+    margin: 1rem;
+}

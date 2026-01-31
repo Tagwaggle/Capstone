@@ -7,4 +7,5 @@ public class CreateCharacterDto
     public string Race { get; set; } = string.Empty;
     public string Class { get; set; } = string.Empty;
     public string Alignment {  get; set; } = string.Empty;
+    public int RoomId { get; set; }
 }

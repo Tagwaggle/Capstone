@@ -1,47 +1,51 @@
 ﻿@page "/sessioncontact"
 @layout GameLayout
-@using Microsoft.AspNetCore.Components.Forms
 
 @using LanceMudCapstone.Models
 
 @inject HttpClient Http
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Forms
+
+@inject IHttpClientFactory ClientFactory
 
 <div class="contact-container">
     <h2 class="contact-title">Contact Us</h2>
 
-    <EditForm Model="@form" OnValidSubmit="HandleSubmit" FormName="contactForm">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
 
-        <div class="form-group">
-            <label>Name</label>
-            <InputText @bind-Value="form.Name" class="form-control" />
-            <ValidationMessage For="@(() => form.Name)" />
-        </div>
+    <div class="form-group">
+        <label>Name</label>
+        <InputText @bind-Value="form.Name" class="form-control" />
 
-        <div class="form-group">
-            <label>Email</label>
-            <InputText @bind-Value="form.Email" class="form-control" />
-            <ValidationMessage For="@(() => form.Email)" />
-        </div>
+    </div>
 
-        <div class="form-group">
-            <label>Message</label>
-            <InputTextArea @bind-Value="form.Message" class="form-control message-box" />
-            <ValidationMessage For="@(() => form.Message)" />
-        </div>
+    <div class="form-group">
+        <label>Email</label>
+        <InputText @bind-Value="form.Email" class="form-control" />
 
-        <button type="submit" class="submit-button">Send Message</button>
-    </EditForm>
+    </div>
+
+    <div class="form-group">
+        <label>Message</label>
+        <InputTextArea @bind-Value="form.Message" class="form-control message-box" />
+
+    </div>
+
+    <button @onclick="SendContact" class="submit-button">Send Message</button>
 
     @if (Success)
     {
-        <p class="success-message">Your message has been sent successfully.</p>
+        <p class="success-message">@messageSuccess</p>
     }
 
     @if (Error)
     {
-        <p class="error-message">Something went wrong. Please try again.</p>
+        <ul class="error-message">
+            @foreach (var err in ValidationError)
+            {
+                <li>@err</li>
+            }
+        </ul>
     }
 </div>
 
@@ -50,28 +54,47 @@
     bool Success = false;
     bool Error = false;
 
-    private async Task HandleSubmit()
+    string messageSuccess = string.Empty;
+    List<string> ValidationError = new();
+
+
+
+    private async Task SendContact()
     {
         Success = false;
         Error = false;
+        ValidationError.Clear();
+        messageSuccess = string.Empty;
+
+
+
+        if (string.IsNullOrEmpty(form.Name)) ValidationError.Add("Name is required.");
+        if (string.IsNullOrEmpty(form.Email)) ValidationError.Add("Email is required.");
+        if (string.IsNullOrEmpty(form.Message)) ValidationError.Add("Message is required.");
+
+
+        if (ValidationError.Any())
+        {
+            Error = true;
+            return;
+        }
 
         try
         {
-            var response = await Http.PostAsJsonAsync("/api/contact", form);
+            var client = ClientFactory.CreateClient("ServerAPI");
+            var response = await client.PostAsJsonAsync("/api/contact", form);
 
-            if (response.IsSuccessStatusCode)
-            {
-                Success = true;
-                form = new ContactFormModel();
-            }
-            else
-            {
-                Error = true;
-            }
+            Console.WriteLine($"Response status: {response.StatusCode}");
+            var content = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Response body: {content}");
+            Success = true;
+            messageSuccess = "Message Sent Successfuly";
         }
         catch
         {
             Error = true;
+            ValidationError.Add("Something went wrong.");
+            return;
         }
     }
 }

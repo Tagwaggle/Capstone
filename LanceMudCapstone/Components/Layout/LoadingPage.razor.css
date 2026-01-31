@@ -1,0 +1,21 @@
+﻿.loading-wrapper {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 1.5rem;
+}
+
+.loading-animation {
+    animation: hammer 1s infinite alternate;
+}
+
+@keyframes hammer {
+    from {
+        transform: rotate(-10deg);
+    }
+
+    to {
+        transform: rotate(10deg);
+    }
+}
+body {
+}

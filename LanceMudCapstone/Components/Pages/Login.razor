@@ -5,7 +5,7 @@
 @using LanceMudCapstone.DTOs
 
 @inject IHttpClientFactory HttpClientFactory
-@inject SessionState Session
+@inject SessionState SessionState
 @inject NavigationManager Nav
 
 <div class="login-wrapper">
@@ -29,7 +29,7 @@
 
         <button @onclick="HandleLogin" class="login-button">Log In</button>
 
-        <p>DEBUG: @loginModel.Username | @loginModel.Password</p>
+        
 
     </div>
 </div>
@@ -74,7 +74,7 @@
             return;
         }
 
-        Session.SetUser(user.UserId, user.Username);
+        SessionState.SetUser(user.UserId, user.Username);
         Nav.NavigateTo("/character");
     }
 

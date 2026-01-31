@@ -1,0 +1,282 @@
+﻿@page "/character/create"
+@layout GameLayout
+@using LanceMudCapstone.DTOs
+@using System.Text.Json
+@rendermode InteractiveServer
+
+@inject SessionState SessionState
+@inject IHttpClientFactory HttpClientFactory
+
+
+<div class="create-wrapper">
+    <div class="create-card">
+<h2>Create a Character: Current Level 1</h2>
+    <br />
+    <table class="create-table">
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        <tr>
+            <td><label>Name</label></td>
+            <td><InputText id="characterName" @bind-Value="form.Name" /></td>
+            <td><label>Class</label></td>
+            <td><InputSelect @bind-Value="form.Class">
+                        <option value="">-- Select Class--</option>
+                        @foreach (var option in _class)
+                        {
+                            <option value="@option">@option</option> 
+                        }
+            </InputSelect></td>
+        </tr>
+        <tr>
+            <td colspan="2"></td>
+            <td><label>Race</label></td>
+            <td><InputSelect @bind-Value="form.Race" >
+                        <option value="">-- Select Race--</option>
+                        @foreach (var option in _race)
+                        {
+                            <option value="@option">@option</option>
+                        }
+            </InputSelect></td>
+        </tr>
+        <tr>
+            <td><label>Alignment</label></td>
+            <td><InputSelect @bind-Value="alignLaw">
+                        <option value="">-- Select Alignment--</option>
+                        @foreach (var option in _alignment2)
+                {
+                        <option value="@option">@option</option>
+                    }
+            </InputSelect> </td>
+            <td></td>
+            <td><InputSelect @bind-Value="alignVal">
+                        <option value="">-- Select Alignment--</option>
+                        @foreach (var option in _alignment)
+                        {
+                            <option value="@option">@option</option>
+                        }
+            </InputSelect></td>
+        </tr>
+            <tr class="divider-row">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+            <td><label>Attributes</label></td>
+            <td></td>
+            <td>Skill Points Remaing</td>
+            <td><label>@Remaining</label></td>
+            </tr>
+            @foreach (var kvp in Stats)
+            {
+                <tr>
+                <td><label>@kvp.Key</label></td>
+                <td>@kvp.Value</td>
+                <td><button @onclick="() => AdjustStat(kvp.Key, -1)">-</button></td>
+                <td><button @onclick="() => AdjustStat(kvp.Key, +1)">+</button></td>
+                </tr>
+            }
+            <tr class="divider-row">
+                <td colspan="4"></td>
+            </tr>
+            <tr>
+                <td ><label>Max Health</label></td>
+                <td ><label>@Health</label></td>
+                <td><label>Starting Gold</label></td>
+                <td><label>@Gold</label></td>
+            </tr>
+            <tr colspan="4">
+                <button @onclick="SaveButton_Clicked">Save</button>
+            </tr>
+        </table>
+        
+</div>
+</div>
+
+@code{
+    int totalSkillPoints = 90;
+
+    Dictionary<string, int> Stats = new()
+    {
+        { "Strength", 12},
+        { "Wisdom", 12 },
+        { "Intelligence", 12 },
+        { "Dexterity", 12 },
+        { "Constitution", 12 },
+        { "Charisma", 12 }
+};
+
+    int Remaining => totalSkillPoints - Stats.Values.Sum();
+    int Health = 20;
+    int Gold => Remaining * 2;
+
+    PlayerCharacterDto form = new();
+    string alignLaw = string.Empty;
+    string alignVal = string.Empty;
+    string[] _race = { "Elf", "Human", "Dwarf", "Kender", "Half-Elf" };
+    string[] _class = { "Warrior", "Mage", "Cleric", "Rogue", "Hunter", "Paladin", "Knight"};
+    string[] _alignment = {"Good", "Neutral", "Evil"};
+    string[] _alignment2 = {"Lawful", "Neutral", "Chaotic" };
+
+
+    void AdjustStat(string stat, int delta)
+    {
+        if (Stats.ContainsKey(stat))
+        {
+            if (delta > 0 && Remaining <= 0) return;
+            if (Stats[stat] + delta < 3) return;
+            if (form.Race == "Elf" && (stat == "Wisdom" || stat == "Intelligence"))
+            {
+                if ((Stats[stat] + delta) > 19)
+                {
+                    return;
+                }
+            }
+            else if (form.Race == "Human" && (stat == "Charisma"))
+            {
+                if ((Stats[stat] + delta) > 20)
+                {
+                    return;
+                }
+            }
+            else if (form.Race == "Kender" && (stat == "Dexterity"))
+            {
+                if ((Stats[stat] + delta) > 20)
+                {
+                    return;
+                }
+            }
+            else if (form.Race == "Dwarf" && (stat == "Constitution"))
+            {
+                if ((Stats[stat] + delta) > 20)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                if ((Stats[stat] + delta) > 18) return;
+            }
+
+            if(stat == "Constitution")
+            {
+                int temp = (Stats[stat] + delta);
+
+                switch(temp)
+                {
+                    case 3:
+                        Health = 10;
+                        break;
+                    case 4:
+                        Health = 11;
+                        break;
+                    case 5:
+                        Health = 12;
+                        break;
+                    case 6:
+                        Health = 13;
+                        break;
+                    case 7:
+                        Health = 14;
+                        break;
+                    case 8:
+                        Health = 15;
+                        break;
+                    case 9:
+                        Health = 16;
+                        break;
+                    case 10:
+                        Health = 17;
+                        break;
+                    case 11:
+                        Health = 18;
+                        break;
+                    case 12:
+                        Health = 20;
+                        break;
+                    case 13:
+                        Health = 22;
+                        break;
+                    case 14:
+                        Health = 24;
+                        break;
+                    case 15:
+                        Health = 26;
+                        break;
+                    case 16:
+                        Health = 28;
+                        break;
+                    case 17:
+                        Health = 32;
+                        break;
+                    case 18:
+                        Health = 34;
+                        break;
+                    case 19:
+                        Health = 38;
+                        break;
+                    case 20:
+                        Health = 42;
+                        break;
+                }
+            }
+            Stats[stat] += delta;
+        }
+    }
+    async Task SaveButton_Clicked()
+    {
+        form.UserId = SessionState.UserId ?? 1;
+        if (alignLaw == "Neutral" && alignVal == "Neutral")
+            form.Alignment = "True Neutral";
+        else
+        {
+            form.Alignment = $"{alignLaw} {alignVal}";
+        }
+        form.Strength = Stats["Strength"];
+        form.Wisdom = Stats["Wisdom"];
+        form.Intelligence = Stats["Intelligence"];
+        form.Dexterity = Stats["Dexterity"];
+        form.Constitution = Stats["Constitution"];
+        form.Charisma = Stats["Charisma"];
+        form.MaxHealth = Health;
+        form.RoomId = 1;
+        form.Gold = Gold;
+        form.ActiveQuest = null;
+        form.LastOnline = null;
+
+        Console.WriteLine($"Saving {form.Name}, Player ID: {SessionState.UserId}");
+
+        var client = HttpClientFactory.CreateClient("ServerAPI");
+        var response = await client.PostAsJsonAsync("/api/characters/create", form);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<JsonElement>();
+            var charId = result.GetProperty("characterId").GetInt32();
+            Console.WriteLine($"Character saved with ID {charId}");
+            var createPc = new CreatePlayerCharacterDto
+                {
+                    UserId = form.UserId,
+                    CharacterId = charId,
+                    Gold = form.Gold,
+                    ActiveQuest = form.ActiveQuest,
+                    LastOnline = form.LastOnline
+                };
+            var pcResponse = await client.PostAsJsonAsync("/api/playercharacters/create", createPc);
+            if (pcResponse.IsSuccessStatusCode) Console.WriteLine("Pfile Saved");
+            else 
+            {
+                var errorContent = await pcResponse.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error saving pfile: {pcResponse.StatusCode} - {errorContent}");
+            }
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Eroor saving: {error}");
+        }
+    }
+
+}
