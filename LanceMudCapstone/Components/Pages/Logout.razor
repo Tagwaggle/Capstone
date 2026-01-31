@@ -1,0 +1,29 @@
+﻿@page "/logout"
+@inject SessionState SessionState
+@inject NavigationManager Nav
+@rendermode InteractiveServer
+
+@using LanceMudCapstone.Services
+
+@layout GameLayout
+<div class="root-element">
+<div class="login-wrapper">
+    <div class="login-card">
+<h3 class="login-title">Logout</h3>
+        <p> you sure you want to log out?</p>
+<button class="login-button" @onclick="Logout_clicked">Logout</button>
+        <button class="login-button" @onclick="Play">Back</button>
+    </div>
+    </div>
+</div>
+@code {
+    void Logout_clicked()
+    {
+        SessionState.Logout();
+        Nav.NavigateTo("/");
+    }
+    void Play()
+    {
+        Nav.NavigateTo("/character");
+    }
+}
