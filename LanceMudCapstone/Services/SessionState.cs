@@ -35,6 +35,6 @@ public class SessionState
     {
         RoomId = roomId;
         NotifyStateChange();
-    } 
+    }  
     private void NotifyStateChange() => Volatile.Read(ref OnChange)?.Invoke();
 }
