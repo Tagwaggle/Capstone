@@ -1,4 +1,7 @@
-﻿namespace LanceMudCapstone.Services;
+﻿using LanceMudCapstone.DTOs;
+using LanceMudCapstone.Models;
+
+namespace LanceMudCapstone.Services;
 
 public class SessionState
 {
@@ -7,6 +10,9 @@ public class SessionState
     public int? CharacterId { get; private set; }
     public int? RoomId { get; private set; }
     public bool IsLoggedIn => UserId.HasValue;
+
+    public PlayerCharacterDto Pfile = new PlayerCharacterDto();
+    
 
     public event Action? OnChange;
 
@@ -29,6 +35,6 @@ public class SessionState
     {
         RoomId = roomId;
         NotifyStateChange();
-    }
+    } 
     private void NotifyStateChange() => Volatile.Read(ref OnChange)?.Invoke();
 }
