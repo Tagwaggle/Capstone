@@ -22,7 +22,8 @@ public class PlayerCharacterDto
     public string? HitDice { get; set; }
     public int RoomId { get; set; }
     public bool IsAlive { get; set; }
-    public string CharacterType { get; set; } = string.Empty;
+
+    public string? CharacterType { get; set; }
     public int Gold { get; set; }
     public int? ActiveQuest { get; set; }
     public DateTime? LastOnline { get; set; }

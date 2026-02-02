@@ -147,51 +147,53 @@ public static class CharacterApi
 
                 var cmd = new NpgsqlCommand(
                     @"SELECT pc.playercharacterid, pc.userid, pc.characterid,
-                    c.name, c.race, c.class, c.level, c.alignment, c.health, c.maxhealth,
-                    c.armorclass, c.strength, c.dexterity, c.constitution, c.intelligence,
-                    c.wisdom, c.charisma, c.hitdice, c.roomid, c.isalive, c.charactertype,
-                    pc.gold, pc.activequest, pc.lastonline, pc.createdat
-                    FROM playercharacters pc
-                    JOIN characters c ON pc.characterid = c.characterid
-              WHERE pc.userid = @uid;", conn);
+                     c.name, c.race, c.class, c.level, c.alignment, c.health, c.maxhealth,
+                     c.armorclass, c.strength, c.dexterity, c.constitution, c.intelligence,
+                     c.wisdom, c.charisma, c.hitdice, c.roomid, c.isalive, c.charactertype,
+                     pc.gold, pc.activequest, pc.lastonline, pc.createdat
+              FROM playercharacters pc
+              JOIN characters c ON pc.characterid = c.characterid
+              WHERE pc.characterid = @cid;", conn);
 
-                cmd.Parameters.AddWithValue("@uid", id);
+                cmd.Parameters.AddWithValue("@cid", id);
 
-                var reader = await cmd.ExecuteReaderAsync();
-                PlayerCharacterDto _pfile = new PlayerCharacterDto();
+                await using var reader = await cmd.ExecuteReaderAsync();
+                PlayerCharacterDto? _pfile = null;
+
                 if (await reader.ReadAsync())
                 {
-                _pfile = new PlayerCharacterDto
-                {
-                    PlayerCharacterId = reader.GetInt32(reader.GetOrdinal("playercharacterid")),
-                    UserId = reader.GetInt32(reader.GetOrdinal("userid")),
-                    CharacterId = reader.GetInt32(reader.GetOrdinal("characterid")),
-                    Name = reader.GetString(reader.GetOrdinal("name")),
-                    Race = reader.IsDBNull(reader.GetOrdinal("race")) ? null : reader.GetString(reader.GetOrdinal("race")),
-                    Class = reader.IsDBNull(reader.GetOrdinal("class")) ? null : reader.GetString(reader.GetOrdinal("class")),
-                    Level = reader.GetInt32(reader.GetOrdinal("level")),
-                    Alignment = reader.IsDBNull(reader.GetOrdinal("alignment")) ? null : reader.GetString(reader.GetOrdinal("alignment")),
-                    Health = reader.GetInt32(reader.GetOrdinal("health")),
-                    MaxHealth = reader.GetInt32(reader.GetOrdinal("maxhealth")),
-                    ArmorClass = reader.GetInt32(reader.GetOrdinal("armorclass")),
-                    Strength = reader.GetInt32(reader.GetOrdinal("strength")),
-                    Dexterity = reader.GetInt32(reader.GetOrdinal("dexterity")),
-                    Constitution = reader.GetInt32(reader.GetOrdinal("constitution")),
-                    Intelligence = reader.GetInt32(reader.GetOrdinal("intelligence")),
-                    Wisdom = reader.GetInt32(reader.GetOrdinal("wisdom")),
-                    Charisma = reader.GetInt32(reader.GetOrdinal("charisma")),
-                    HitDice = reader.IsDBNull(reader.GetOrdinal("hitdice")) ? null : reader.GetString(reader.GetOrdinal("hitdice")),
-                    RoomId = reader.GetInt32(reader.GetOrdinal("roomid")),
-                    IsAlive = reader.GetBoolean(reader.GetOrdinal("isalive")),
-                    CharacterType = reader.GetString(reader.GetOrdinal("charactertype")),
-                    Gold = reader.GetInt32(reader.GetOrdinal("gold")),
-                    ActiveQuest = reader.IsDBNull(reader.GetOrdinal("activequest")) ? null : reader.GetInt32(reader.GetOrdinal("activequest")),
-                    LastOnline = reader.IsDBNull(reader.GetOrdinal("lastonline")) ? null : reader.GetDateTime(reader.GetOrdinal("lastonline")),
-                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("createdat"))
-                };
+                    _pfile = new PlayerCharacterDto
+                    {
+                        PlayerCharacterId = reader.GetInt32(reader.GetOrdinal("playercharacterid")),
+                        UserId = reader.GetInt32(reader.GetOrdinal("userid")),
+                        CharacterId = reader.GetInt32(reader.GetOrdinal("characterid")),
+                        Name = reader.GetString(reader.GetOrdinal("name")),
+                        Race = reader.IsDBNull(reader.GetOrdinal("race")) ? null : reader.GetString(reader.GetOrdinal("race")),
+                        Class = reader.IsDBNull(reader.GetOrdinal("class")) ? null : reader.GetString(reader.GetOrdinal("class")),
+                        Level = reader.GetInt32(reader.GetOrdinal("level")),
+                        Alignment = reader.IsDBNull(reader.GetOrdinal("alignment")) ? null : reader.GetString(reader.GetOrdinal("alignment")),
+                        Health = reader.GetInt32(reader.GetOrdinal("health")),
+                        MaxHealth = reader.GetInt32(reader.GetOrdinal("maxhealth")),
+                        ArmorClass = reader.GetInt32(reader.GetOrdinal("armorclass")),
+                        Strength = reader.GetInt32(reader.GetOrdinal("strength")),
+                        Dexterity = reader.GetInt32(reader.GetOrdinal("dexterity")),
+                        Constitution = reader.GetInt32(reader.GetOrdinal("constitution")),
+                        Intelligence = reader.GetInt32(reader.GetOrdinal("intelligence")),
+                        Wisdom = reader.GetInt32(reader.GetOrdinal("wisdom")),
+                        Charisma = reader.GetInt32(reader.GetOrdinal("charisma")),
+                        HitDice = reader.IsDBNull(reader.GetOrdinal("hitdice")) ? null : reader.GetString(reader.GetOrdinal("hitdice")),
+                        RoomId = reader.GetInt32(reader.GetOrdinal("roomid")),
+                        IsAlive = reader.GetBoolean(reader.GetOrdinal("isalive")),
+                        CharacterType = reader.IsDBNull(reader.GetOrdinal("charactertype")) ? null : reader.GetString(reader.GetOrdinal("charactertype")),
+                        Gold = reader.GetInt32(reader.GetOrdinal("gold")),
+                        ActiveQuest = reader.IsDBNull(reader.GetOrdinal("activequest")) ? null : reader.GetInt32(reader.GetOrdinal("activequest")),
+                        LastOnline = reader.IsDBNull(reader.GetOrdinal("lastonline")) ? null : reader.GetDateTime(reader.GetOrdinal("lastonline")),
+                        CreatedAt = reader.GetDateTime(reader.GetOrdinal("createdat"))
+                    };
 
                 }
-                return Results.Ok(_pfile);
+
+                return _pfile != null ? Results.Ok(_pfile) : Results.NotFound();
             }
             catch (Exception ex)
             {
