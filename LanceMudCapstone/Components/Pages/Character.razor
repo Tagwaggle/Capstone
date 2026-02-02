@@ -9,43 +9,44 @@
 @inject IHttpClientFactory httpClientFactory
 @inject SessionState SessionState
 @inject NavigationManager Nav
+
 <div class="main-container">
-<h3>Character Select for @SessionState.UserName</h3>
+    <h3>Character Select for @SessionState.UserName</h3>
 
+    @if (SessionState.UserId == null)
+    {
+        <h1>Please login in.....</h1>
+    }
+    else if (characters == null)
+    {
+        <p>Loading Characters...</p>
+        <p>@SessionState.UserName Waiting on load.</p>
+    }
+    else if (!characters.Any())
+    {
+        <p>No Current Characters, please create a character to continue</p>
+    }
+    else
+    {
+        <div class="character-list">
+            <InputRadioGroup @bind-Value="SelectedCharacterId" Name="characterChoice">
+                @foreach (var c in characters)
+                {
+                    <div class="character-item">
+                        <InputRadio Value="@c.CharacterId" />
+                        <span>@c.Name (Level @c.Level, @c.Class)</span>
+                    </div>
+                }
+            </InputRadioGroup>
+        </div>
+    }
 
-@if (SessionState.UserId == null)
-{
-    <h1>Please login in.....</h1>
-}
-else if (characters == null)
-{
-    <p>Loading Characters...</p>    
-    <p>@SessionState.UserName Waiting on load.</p>
-}
-else if (!characters.Any())
-{
-    <p> No Current Characters, please create a character to continue</p>
-}
-else
-{
-    <div class="character-list">
-        <InputRadioGroup @bind-Value="SelectedCharacterId" Name="characterChoice">
-        @foreach (var c in characters)
-        {
-            <div class="character-item">
-                <InputRadio Value="@c.CharacterId" />
-                <span>@c.Name (Level @c.Level, @c.Class)</span>
-            </div>
-        }
-        </InputRadioGroup>
+    <div class="character-action">
+        <button @onclick="LoginCharacter" disabled="@(!SelectedCharacterId.HasValue)">Login</button>
+        <button @onclick="CreateCharacter">Create New Character</button>
     </div>
-}
+</div>
 
-<div class="character-action">
-    <button @onclick="LoginCharacter" disabled="@(!SelectedCharacterId.HasValue)">Login</button>
-    <button @onclick="CreateCharacter" >Create New Character</button>
-</div>
-</div>
 @code {
     private List<PlayerCharacterDto>? characters;
     private int? SelectedCharacterId;
@@ -56,13 +57,40 @@ else
     {
         if (SessionState.UserId != null)
         {
-            characters = await Api.GetFromJsonAsync<List<PlayerCharacterDto>>($"/api/characters/user/{SessionState.UserId}");
+            characters = await Api.GetFromJsonAsync<List<PlayerCharacterDto>>(
+                $"/api/characters/user/{SessionState.UserId}");
         }
     }
-    private void LoginCharacter() { if (SelectedCharacterId.HasValue) { SessionState.SetCharacter(SelectedCharacterId.Value); Nav.NavigateTo("/play"); } }
-    private void CreateCharacter() { Nav.NavigateTo("/character/create"); }
 
-    async Task Redirect()
+    private async Task LoginCharacter()
+    {
+        if (SelectedCharacterId.HasValue)
+        {
+            var selected = characters?.FirstOrDefault(c => c.CharacterId == SelectedCharacterId.Value);
+            if (selected != null)
+            {
+
+                SessionState.Pfile = selected;
+                SessionState.SetCharacter(selected.CharacterId);
+
+
+                var fresh = await Api.GetFromJsonAsync<PlayerCharacterDto>(
+                    $"/api/characters/pfile/{selected.CharacterId}");
+
+                if (fresh != null)
+                {
+                    SessionState.Pfile = fresh;
+                }
+            }
+
+            Nav.NavigateTo("/play");
+        }
+    }
+
+
+    private void CreateCharacter() => Nav.NavigateTo("/character/create");
+
+    private async Task Redirect()
     {
         await Task.Delay(100);
         Nav.NavigateTo("/login");

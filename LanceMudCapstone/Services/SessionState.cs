@@ -10,8 +10,8 @@ public class SessionState
     public int? CharacterId { get; private set; }
     public int? RoomId { get; private set; }
     public bool IsLoggedIn => UserId.HasValue;
-
-    public PlayerCharacterDto Pfile = new PlayerCharacterDto();
+    public bool CommandBox = true;
+    public PlayerCharacterDto? Pfile {  get; set; }
     
 
     public event Action? OnChange;
@@ -36,5 +36,13 @@ public class SessionState
         RoomId = roomId;
         NotifyStateChange();
     }  
+    public void SetCharacter(PlayerCharacterDto character)
+    {
+        CharacterId = character.CharacterId;
+        Pfile = character;
+        RoomId = character.RoomId;
+        NotifyStateChange();
+        Console.WriteLine($"[SessionState] Character set: {character.Name}");
+    }
     private void NotifyStateChange() => Volatile.Read(ref OnChange)?.Invoke();
 }

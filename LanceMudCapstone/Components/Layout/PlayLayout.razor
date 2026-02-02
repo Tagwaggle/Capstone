@@ -5,16 +5,12 @@
 
 <div class="page">
     <header class="top-row">
-        <GameHeader />
-        
+        <LunitariHeader />
     </header>
 
     <div class="body">
         <nav class="sidebar">
-            @if (SessionState.CommandBox)
-            {            
-            <GameNavBar />
-            }
+            <CommandsSide />
         </nav>
 
         <main>
@@ -29,12 +25,14 @@
         </main>
     </div>
 
+    <footer>
+        <AppFooter />
+    </footer>
 </div>
 
 
 @code {
     private bool _hydrated = false;
-
 
     protected override void OnInitialized()
     {
@@ -45,5 +43,4 @@
     {
         SessionState.OnChange -= StateHasChanged;
     }
-
 }

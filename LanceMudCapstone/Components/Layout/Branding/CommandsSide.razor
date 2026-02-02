@@ -1,0 +1,39 @@
+﻿@rendermode InteractiveServer
+@inject SessionState SessionState
+@inject NavigationManager Nav
+
+<nav class="command-nav">
+    @if (SessionState.CommandBox)
+    {
+        <button @onclick="Sidebar">Commands Close 😒</button>
+        <button @onclick="Score">Score</button>
+        <table>
+            <tr>
+                <th>HP</th>
+                <th>Current</th>
+                <th>Max</th>
+            </tr>
+            <tr>
+                <td>HP</td>
+                <td>@(SessionState.Pfile?.Health ?? 10)</td>
+                <td>@(SessionState.Pfile != null ? SessionState.Pfile.MaxHealth.ToString() : "Waiting")</td>
+            </tr>
+        </table>
+    }
+    else
+    {
+        <button @onclick="Sidebar">Commands Open 😁</button>
+    }
+</nav>
+
+@code {
+    private void Sidebar()
+    {
+        SessionState.CommandBox = !SessionState.CommandBox;
+    }
+
+    private void Score()
+    {
+        Nav.NavigateTo("/play/score");
+    }
+}
