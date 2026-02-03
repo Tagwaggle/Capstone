@@ -40,9 +40,16 @@
             </InputRadioGroup>
         </div>
     }
-
     <div class="character-action">
-        <button @onclick="LoginCharacter" disabled="@(!SelectedCharacterId.HasValue)">Login</button>
+        @if (SelectedCharacterId.HasValue)
+        {
+            <button @onclick="LoginCharacter">Login</button>
+        }
+        else
+        {
+            <button disabled>Login</button>
+        }
+
         <button @onclick="CreateCharacter">Create New Character</button>
     </div>
 </div>
@@ -80,6 +87,7 @@
                 if (fresh != null)
                 {
                     SessionState.Pfile = fresh;
+                    await SessionState.MoveToRoom(SessionState.Pfile.RoomId);
                 }
             }
 

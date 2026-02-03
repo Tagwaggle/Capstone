@@ -21,14 +21,14 @@ main {
     align-items: center;
 }
 
+
 .sidebar {
     width: 250px;
-    position: sticky;
-    top: 3.5rem;
-    height: calc(100vh - 3.5rem);
+    height: calc(100vh - 2.5rem);
+    position: fixed;
+    top: 5rem; /* offset by header height */
     z-index: 0;
 }
-
 footer {
     margin-top: auto;
 }
@@ -76,13 +76,7 @@ footer {
         flex-direction: row; /* sidebar + main side by side */
     }
 
-    .sidebar {
-        width: 250px;
-        height: 100vh;
-        position: sticky;
-        top: 3.5rem; /* offset by header height */
-        z-index: 0;
-    }
+
 
     .top-row {
         position: sticky;

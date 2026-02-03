@@ -1,11 +1,67 @@
 ﻿@page "/play"
-
+@using System.Text
+@using LanceMudCapstone.Models
+@using LanceMudCapstone.DTOs
 @inject SessionState SessionState
 @layout PlayLayout
 @rendermode InteractiveServer
 
-<h3>Play</h3>
+<div class="ascii-monitor">
+    <pre>
+@BuildAsciiMonitor(SessionState.CurrentRoom,
+                                      SessionState.CurrentRoomMobs,
+                                      SessionState.CurrentRoomContainers)
+    </pre>
+</div>
 
 @code {
+    // If you kept CurrentRoomMobs as List<RoomNpcDto>
+    public static string BuildAsciiMonitor(Room? room,
+                                           IEnumerable<RoomNpcDto> mobs,
+                                           IEnumerable<Container> containers)
+    {
+        var lines = new List<string>();
 
+        if (room != null)
+        {
+            lines.Add(room.Name ?? "");
+            lines.Add(room.Description ?? "");
+        }
+
+        if (mobs?.Any() == true)
+        {
+            lines.Add("Mob:");
+            foreach (var m in mobs)
+            {
+                lines.Add("    " + m.Base.Name);
+            }
+        }
+
+        if (containers?.Any() == true)
+        {
+            lines.Add("Container:");
+            foreach (var c in containers)
+            {
+                lines.Add("    " + c.Name);
+            }
+        }
+
+
+        lines.Add(">"); // prompt line
+
+        int maxWidth = lines.Any() ? lines.Max(l => l.Length) : 1;
+
+        var sb = new StringBuilder();
+        sb.AppendLine("|" + new string('=', maxWidth + 2) + "|");
+
+        foreach (var line in lines)
+        {
+            string padded = line.PadRight(maxWidth, ' ');
+            sb.AppendLine($"| {padded} |");
+        }
+
+        sb.AppendLine("|" + new string('=', maxWidth + 2) + "|");
+
+        return sb.ToString();
+    }
 }

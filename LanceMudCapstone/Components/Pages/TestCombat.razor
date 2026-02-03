@@ -1,0 +1,45 @@
+﻿@page "/test-combat"
+@inject ICombatService CombatService
+
+<h3>Combat Test</h3>
+
+<MudButton Color="Color.Primary" OnClick="AttackSkeleton">Attack Skeleton</MudButton>
+
+<pre>@combatLog</pre>
+
+@code {
+    private string combatLog = string.Empty;
+
+    // For now, hardcode a player and skeleton DTO
+    private PlayerCharacterDto player = new PlayerCharacterDto
+    {
+        Name = "Test Player",
+        Strength = 5,
+        ArmorClass = 12,
+        Health = 20,
+        MaxHealth = 20,
+        IsAlive = true
+    };
+
+    private PlayerCharacterDto skeleton = new PlayerCharacterDto
+    {
+        Name = "Skeleton",
+        Strength = 2,
+        ArmorClass = 10,
+        Health = 8,
+        MaxHealth = 8,
+        IsAlive = true
+    };
+
+    private async Task AttackSkeleton()
+    {
+        var result = await CombatService.ResolveRoundAsync(player, skeleton);
+
+        // Append the round log to the display
+        combatLog += string.Join("\n", result.Log) + "\n";
+
+        // Optional: show current HP
+        combatLog += $"Player HP: {player.Health}/{player.MaxHealth}\n";
+        combatLog += $"Skeleton HP: {skeleton.Health}/{skeleton.MaxHealth}\n\n";
+    }
+}

@@ -3,37 +3,85 @@
 @inject NavigationManager Nav
 
 <nav class="command-nav">
-    @if (SessionState.CommandBox)
-    {
-        <button @onclick="Sidebar">Commands Close 😒</button>
-        <button @onclick="Score">Score</button>
-        <table>
-            <tr>
-                <th>HP</th>
-                <th>Current</th>
-                <th>Max</th>
-            </tr>
-            <tr>
-                <td>HP</td>
-                <td>@(SessionState.Pfile?.Health ?? 10)</td>
-                <td>@(SessionState.Pfile != null ? SessionState.Pfile.MaxHealth.ToString() : "Waiting")</td>
-            </tr>
-        </table>
-    }
-    else
-    {
-        <button @onclick="Sidebar">Commands Open 😁</button>
-    }
+    <div class="sidebar-buttons">
+        <button class="btn-primary" @onclick="() => SetSidebar(SidebarState.Commands)">Commands</button>
+        <button class="btn-primary" @onclick="() => SetSidebar(SidebarState.Score)">Score</button>
+        <button class="btn-primary" @onclick="() => SetSidebar(SidebarState.Stats)">Stats</button>
+        <button class="btn-primary" @onclick="() => SetSidebar(SidebarState.Movement)">Movement/Loot</button>
+    </div>
+
+    <div class="sidebar-content">
+        @switch(currentSidebar)
+        {
+            case SidebarState.Commands:
+                <div>
+                    <button class="btn-primary" @onclick="Sidebar">
+                        @(SessionState.CommandBox ? "Commands Close 😒" : "Commands Open 😁")
+                    </button>
+
+                    @if (SessionState.CommandBox)
+                    {
+                        <table>
+                            <tr>
+                                <th>HP</th>
+                                <th>Current</th>
+                                <th>Max</th>
+                            </tr>
+                            <tr>
+                                <td>HP</td>
+                                <td>@(SessionState.Pfile?.Health ?? 10)</td>
+                                <td>@(SessionState.Pfile?.MaxHealth ?? 0)</td>
+                            </tr>
+                        </table>
+                    }
+                </div>
+                break;
+
+            case SidebarState.Score:
+                <LanceMudCapstone.Components.Pages.PlayScore />
+                break;
+
+            case SidebarState.Stats:
+                <div>
+                    <h3>Stats Panel</h3>
+                    <p>Coming soon…</p>
+                </div>
+                break;
+
+            case SidebarState.Movement:
+                <div>
+                    <h3>Movement / Loot Panel</h3>
+                    <p>Coming soon…</p>
+                </div>
+                break;
+        }
+    </div>
 </nav>
 
 @code {
+    private SidebarState currentSidebar = SidebarState.Commands;
+
+    private void SetSidebar(SidebarState state)
+    {
+        currentSidebar = state;
+    }
+
+    private void LogoutCharacter()
+    {
+        SessionState.SetCharacter(0);
+        Nav.NavigateTo("/character");
+    }
+
     private void Sidebar()
     {
         SessionState.CommandBox = !SessionState.CommandBox;
     }
 
-    private void Score()
+    enum SidebarState
     {
-        Nav.NavigateTo("/play/score");
+        Commands,
+        Score,
+        Stats,
+        Movement
     }
 }

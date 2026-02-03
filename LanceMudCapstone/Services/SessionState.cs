@@ -1,6 +1,7 @@
 ﻿using LanceMudCapstone.DTOs;
 using LanceMudCapstone.Models;
 
+
 namespace LanceMudCapstone.Services;
 
 public class SessionState
@@ -12,9 +13,22 @@ public class SessionState
     public bool IsLoggedIn => UserId.HasValue;
     public bool CommandBox = true;
     public PlayerCharacterDto? Pfile {  get; set; }
-    
+
+    public Room? CurrentRoom { get; set; }
+    public List<Container> CurrentRoomContainers { get; set; } = new();
 
     public event Action? OnChange;
+    private readonly RoomService _roomService;
+    private readonly CharacterService _characterService;
+    private readonly ContainerService _containerService;
+    public List<RoomNpcDto> CurrentRoomMobs { get; set; } = new();
+
+    public SessionState(RoomService roomService,  CharacterService characterService, ContainerService containerService)
+    {
+        _roomService = roomService;
+        _characterService = characterService;
+        _containerService = containerService;
+    }
 
     public void SetUser(int userId, string username)
     {
@@ -44,5 +58,14 @@ public class SessionState
         NotifyStateChange();
         Console.WriteLine($"[SessionState] Character set: {character.Name}");
     }
+    public async Task MoveToRoom(int roomId)
+    {
+        CurrentRoom = await _roomService.GetRoomAsync(roomId);
+        var mobs = await _characterService.GetNpcsInRoom(roomId);
+        CurrentRoomMobs = mobs.ToList();
+        CurrentRoomContainers = (await _containerService.GetContainersInRoom(roomId)).ToList();
+        NotifyStateChange();
+    }
+
     private void NotifyStateChange() => Volatile.Read(ref OnChange)?.Invoke();
 }

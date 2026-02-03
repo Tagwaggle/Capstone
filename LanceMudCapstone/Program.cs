@@ -2,17 +2,23 @@ using LanceMudCapstone.Components;
 using LanceMudCapstone.Models;
 using LanceMudCapstone.Services;
 using LanceMudCapstone.API;
+using System.ComponentModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Razor Components
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
-// Only keep services you actually use
 builder.Services.AddScoped<SessionState>();
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<CharacterService>();
 
-// HttpClient
+var supabaseConnString = builder.Configuration.GetConnectionString("SupabaseDb") ??
+    throw new InvalidOperationException("Missing SupabaseDb connection string");
+
+builder.Services.AddScoped<DbHelper>();
+builder.Services.AddScoped(sp => new ContainerService(supabaseConnString));
+builder.Services.AddScoped(sp => new RoomService(supabaseConnString));
+
 builder.Services.AddHttpClient();
 builder.Services.AddHttpClient("ServerAPI", client =>
 {
@@ -41,9 +47,10 @@ builder.Services.AddHttpClient("ServerAPI", client =>
     client.BaseAddress = new Uri(baseUrl);
 });
 
+builder.Services.AddScoped<ICombatService, CombatService>();
+
 var app = builder.Build();
 
-// Pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
@@ -54,7 +61,6 @@ app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages:
 app.UseHttpsRedirection();
 app.UseAntiforgery();
 
-// API groups
 app.MapUserApi();
 app.MapCharacterApi();
 app.MapTestApi();
@@ -64,7 +70,6 @@ app.MapWorldApi();
 app.MapContactApi();
 app.MapPlayerCharacterApi();
 
-// Static + Razor
 app.MapStaticAssets();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 

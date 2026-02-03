@@ -19,10 +19,22 @@ a, .btn-link {
 }
 
 .btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    width: 100%;
+    padding: 0.7rem;
+    margin-top: 0.5rem;
+    background: #6a6aff;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s ease;
 }
+.btn-primary:hover {
+    background: #7d7dff;
+    box-shadow: 0 0 10px rgba(125, 125, 255, 0.5);
+}
+
 :root {
     --bs-body-bg: #0b0b14; /* Nuitari black */
     --bs-body-color: #dcdcff; /* moonlit text */
