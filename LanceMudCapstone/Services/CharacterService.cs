@@ -114,6 +114,23 @@ public class CharacterService
         return saveState;
     }
 
+    public async Task<IEnumerable<PlayerCharacterDto>> GetCharactersByUserAsync(int userid)
+    {
+        const string sql = @"
+        SELECT 
+            pc.playercharacterid, pc.userid, pc.characterid, pc.gold, pc.activequest, pc.lastonline, pc.createdat,
+            c.name, c.race, c.class, c.level, c.alignment, c.health, c.maxhealth, c.armorclass, c.strength, c.dexterity,
+            c.constitution, c.intelligence, c.wisdom, c.charisma, c.hitdice, c.roomid, c.isalive, c.charactertype, c.createdat AS character_createdat
+        FROM playercharacters pc
+        INNER JOIN characters c ON pc.characterid = c.characterid
+        WHERE pc.userid = @userid;
+    ";
+
+        using var conn = _db.CreateConnection();
+        var result = await conn.QueryAsync<PlayerCharacterDto>(sql, new { userid });
+        return result;
+    }
+
     public async Task<IEnumerable<RoomNpcDto>> GetNpcsInRoom(int roomId)
     {
         const string sql = @"

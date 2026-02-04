@@ -66,9 +66,9 @@
         currentSidebar = state;
     }
 
-    private void LogoutCharacter()
+    async private void LogoutCharacter()
     {
-        SessionState.SetCharacterAsync(0);
+        await SessionState.SetCharacterAsync(0);
         Nav.NavigateTo("/character");
     }
 

@@ -24,68 +24,97 @@
         </div>
     </div>
 
-    <div class="play-sidebar">
-        <h3>Commands</h3>
-        <div class="row">
+<div class="play-sidebar">
+    <h3>Commands</h3>
+
+        <div class="compass-rose">
+            <!-- Row 1 -->
+            <div></div>
+
             <div class="cell">
                 @if (HasExit("north"))
                 {
-                    <button @onclick='() => Move("north")'>North</button>
+                    <button @onclick='() => Move("north")'>N</button>
+                }
+                else
+                {
+                    <button disabled class="disabled-btn">N</button>
                 }
             </div>
+
             <div class="cell">
                 @if (HasExit("up"))
                 {
-                    <button @onclick='() => Move("up")'>Up</button>
+                    <button @onclick='() => Move("up")'>U</button>
+                }
+                else
+                {
+                    <button disabled class="disabled-btn">U</button>
+                }
+            </div>
+
+            <!-- Row 2 -->
+            <div class="cell">
+                @if (HasExit("west"))
+                {
+                    <button @onclick='() => Move("west")'>W</button>
+                }
+                else
+                {
+                    <button disabled class="disabled-btn">W</button>
+                }
+            </div>
+
+            <div></div>
+
+            <div class="cell">
+                @if (HasExit("east"))
+                {
+                    <button @onclick='() => Move("east")'>E</button>
+                }
+                else
+                {
+                    <button disabled class="disabled-btn">E</button>
+                }
+            </div>
+
+            <!-- Row 3 -->
+            <div></div>
+
+            <div class="cell">
+                @if (HasExit("south"))
+                {
+                    <button @onclick='() => Move("south")'>S</button>
+                }
+                else
+                {
+                    <button disabled class="disabled-btn">S</button>
+                }
+            </div>
+
+            <div class="cell">
+                @if (HasExit("down"))
+                {
+                    <button @onclick='() => Move("down")'>D</button>
+                }
+                else
+                {
+                    <button disabled class="disabled-btn">D</button>
                 }
             </div>
         </div>
 
-            <div class="row">
-                <div class="cell">
-                    @if (HasExit("west"))
-                    {
-                        <button @onclick='() => Move("west")'>West</button>
-                    }
-                </div>
 
-                <div class="cell spacer"></div>
 
-                <div class="cell">
-                    @if (HasExit("east"))
-                    {
-                        <button @onclick='() => Move("east")'>East</button>
-                    }
-                </div>
-            </div>
+    <button @onclick="GetLoot">Get Loot</button>
+    <button @onclick="Attack">Attack</button>
+        <button @onclick="() => showScoreModal = true">Score</button>    <button @onclick="ShowSpells">Spells/Skills</button>
+    <button @onclick="ChangeCharacter">Switch Character</button>
+</div>
 
-            <div class="row">
-                <div class="cell">
-                    @if (HasExit("south"))
-                    {
-                        <button @onclick='() => Move("south")'>South</button>
-                    }
-                </div>
-
-                <div class="cell">
-                    @if (HasExit("down"))
-                    {
-                        <button @onclick='() => Move("down")'>Down</button>
-                    }
-                </div>
-            </div>
-
-        
-
-        <button @onclick="GetLoot">Get Loot</button>
-        <button @onclick="Attack">Attack</button>
-        <button @onclick="ShowScore">Score</button>
-        <button @onclick="ShowSpells">Spells/Skills</button>
-        <button @onclick="ChangeCharacter">Switch Character</button>
-        <button @onclick="() => showScoreModal = true">Score</button>
 
     </div>
-</div>
+
 
 <PlayScore Show="@showScoreModal" ShowChanged="v => showScoreModal = v" />
 
