@@ -124,5 +124,9 @@ namespace LanceMudCapstone.Services
                 Log = log
             });
         }
+        public void ProcessCombatRounds()
+        {
+            // Placeholder for future combat round processing logic
+        }
     }
 }

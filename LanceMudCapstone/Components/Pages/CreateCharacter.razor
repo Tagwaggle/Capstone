@@ -229,7 +229,58 @@
     }
     async Task SaveButton_Clicked()
     {
+        switch (form.Class.ToLower())
+        {
+            case "mage":
+            case "wizard":
+            case "sorcerer":
+                form.MaxMana = 30;
+                form.Mana = 30;
+                form.MaxStamina = 10;
+                form.Stamina = 10;
+                break;
+
+            case "cleric":
+            case "paladin":
+                form.MaxMana = 20;
+                form.Mana = 20;
+                form.MaxStamina = 15;
+                form.Stamina = 15;
+                break;
+
+            case "warrior":
+            case "fighter":
+            case "knight":
+                form.MaxMana = 0;
+                form.Mana = 0;
+                form.MaxStamina = 25;
+                form.Stamina = 25;
+                break;
+
+            case "rogue":
+            case "ranger":
+            case "hunter":
+                form.MaxMana = 0;
+                form.Mana = 0;
+                form.MaxStamina = 30;
+                form.Stamina = 30;
+                break;
+
+            default:
+                form.MaxMana = 0;
+                form.Mana = 0;
+                form.MaxStamina = 20;
+                form.Stamina = 20;
+                break;
+        }
+
         form.UserId = SessionState.UserId ?? 1;
+        if (form.UserId == 1)
+        {
+            Console.WriteLine("Cannot save character: no active user session.");
+            return;
+        }
+
         if (alignLaw == "Neutral" && alignVal == "Neutral")
             form.Alignment = "True Neutral";
         else

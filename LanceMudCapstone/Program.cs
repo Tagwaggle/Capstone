@@ -11,6 +11,12 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddScoped<SessionState>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<CharacterService>();
+builder.Services.AddSingleton<MobService>();
+builder.Services.AddSingleton<EffectService>();
+builder.Services.AddSingleton<RespawnService>();
+builder.Services.AddSingleton<WorldEngine>();
+builder.Services.AddSingleton<AbilityEngine>();
+builder.Services.AddSingleton<ICombatService, CombatService>();
 
 var supabaseConnString = builder.Configuration.GetConnectionString("SupabaseDb") ??
     throw new InvalidOperationException("Missing SupabaseDb connection string");
@@ -47,9 +53,11 @@ builder.Services.AddHttpClient("ServerAPI", client =>
     client.BaseAddress = new Uri(baseUrl);
 });
 
-builder.Services.AddScoped<ICombatService, CombatService>();
 
 var app = builder.Build();
+
+var world = app.Services.GetRequiredService<WorldEngine>();
+world.Start();
 
 if (!app.Environment.IsDevelopment())
 {

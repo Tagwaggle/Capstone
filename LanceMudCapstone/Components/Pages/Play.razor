@@ -12,23 +12,9 @@
 @rendermode InteractiveServer
 
 <div class="play-screen">
-    <!-- Main ASCII monitor -->
-    <div class="play-main">
-        <div class="ascii-monitor">
-            <pre>
-@BuildAsciiMonitor(SessionState.CurrentRoom,
-                                      SessionState.CurrentRoomMobs,
-                                      SessionState.CurrentRoomContainers,
-                                      SessionState.CurrentRoomExits)
-            </pre>
-        </div>
-    </div>
-
-<div class="play-sidebar">
-    <h3>Commands</h3>
-
+    <div class="play-movement">
+        <h3>Movement</h3>
         <div class="compass-rose">
-            <!-- Row 1 -->
             <div></div>
 
             <div class="cell">
@@ -53,7 +39,6 @@
                 }
             </div>
 
-            <!-- Row 2 -->
             <div class="cell">
                 @if (HasExit("west"))
                 {
@@ -78,7 +63,6 @@
                 }
             </div>
 
-            <!-- Row 3 -->
             <div></div>
 
             <div class="cell">
@@ -103,12 +87,32 @@
                 }
             </div>
         </div>
+    </div>
+    <div class="play-main">
+        <div class="ascii-monitor">
+            <pre>
+@BuildAsciiMonitor(SessionState.CurrentRoom,
+                                      SessionState.CurrentRoomMobs,
+                                      SessionState.CurrentRoomContainers,
+                                      SessionState.CurrentRoomExits)
+            </pre>
+        </div>
+    </div>
 
+<div class="play-sidebar">
+    <h3>Commands</h3>
 
-
+        
     <button @onclick="GetLoot">Get Loot</button>
-    <button @onclick="Attack">Attack</button>
-        <button @onclick="() => showScoreModal = true">Score</button>    <button @onclick="ShowSpells">Spells/Skills</button>
+    @foreach (var child in SessionState.CurrentRoomMobs)
+    {
+        if(!nonAttackable.Contains(child.Base.CharacterType))
+        {
+        <button @onclick="() => Attack(child.Instance.NpcId)">Attack @child.Base.Name </button>
+        }
+    }
+    <button @onclick="() => showScoreModal = true">Score</button>
+    <button @onclick="ShowSpells">Spells/Skills</button>
     <button @onclick="ChangeCharacter">Switch Character</button>
 </div>
 
@@ -121,8 +125,9 @@
 
 @code {
     private bool showScoreModal = false;
+    private string[] nonAttackable = new[] { "shop", "guard", "safe", "pc" };
 
-    // ASCII monitor builder stays the same
+
     public static string BuildAsciiMonitor(Room? room,
                                            IEnumerable<RoomNpcDto> mobs,
                                            IEnumerable<Container> containers,
@@ -188,12 +193,10 @@
         return sb.ToString();
     }
 
-    // Placeholder command handlers
     private void GetLoot() => Console.WriteLine("Get Loot triggered");
-    private void Attack() => Console.WriteLine("Attack triggered");
-    private void ShowScore() => Console.WriteLine("Score triggered");
+    private void Attack(int id) => Console.WriteLine($"Attack triggered {id}");
     private void ShowSpells() => Console.WriteLine("Spells triggered");
-    async private void ChangeCharacter()
+    async private Task ChangeCharacter()
     {
         if (Nav != null)
         {

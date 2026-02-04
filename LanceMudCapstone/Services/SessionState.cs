@@ -86,7 +86,17 @@ public class SessionState
         Pfile.RoomId = roomId;
         CurrentRoomMobs = mobs.ToList();
         CurrentRoomContainers = (await _containerService.GetContainersInRoom(roomId)).ToList();
-        CurrentRoomExits = (await _roomService.GetExitsForRoomAsync(roomId)).ToList();
+        try
+        {
+            CurrentRoomExits = (await _roomService.GetExitsForRoomAsync(roomId))?.ToList()
+                    ?? new List<RoomExit>();
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching exits for room {roomId}: {ex.Message}");
+            CurrentRoomExits = new List<RoomExit>();
+        }
         NotifyStateChange();
     }
     public async Task<bool> TryMoveAsync(string direction)

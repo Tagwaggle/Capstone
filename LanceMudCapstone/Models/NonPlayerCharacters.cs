@@ -10,5 +10,7 @@ public class NonPlayerCharacters
     public int? LootTableId { get; set; }
     public DateTime CreatedAt { get; set; }
     public int? RoomId { get; set; }
+    public int XpReward { get; set; }
+
 
 }

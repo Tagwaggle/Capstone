@@ -28,4 +28,11 @@ public class PlayerCharacterDto
     public int? ActiveQuest { get; set; }
     public DateTime? LastOnline { get; set; }
     public DateTime CreatedAt { get; set; }
+    public int Mana { get; set; }
+    public int MaxMana { get; set; }
+    public int Stamina { get; set; }
+    public int MaxStamina { get; set; }
+    public int Xp { get; set; }
+    public int XpNeeded { get; set; }
+
 }

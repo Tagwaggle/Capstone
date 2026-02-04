@@ -17,8 +17,10 @@ public class CharacterService
     {
         await using var conn = await _db.CreateOpenConnectionAsync();
         await using var tx = await conn.BeginTransactionAsync();
-
-        // 1. Insert into characters
+        if((dto.RoomId == 1) && (dto.CharacterType != "IMM"))
+        {
+            dto.RoomId = 2;
+        }
         const string insertCharacterSql = @"
         INSERT INTO characters
         (
@@ -62,9 +64,9 @@ public class CharacterService
         // 2. Insert into playercharacters
         const string insertPlayerSql = @"
         INSERT INTO playercharacters
-        (characterid, userid, gold, activequest, lastonline)
+        (characterid, userid, gold, activequest, lastonline, mana, maxmana, stamina, maxstamina, xp, xpneeded)
         VALUES
-        (@CharacterId, @UserId, @Gold, @ActiveQuest, @LastOnline);
+        (@CharacterId, @UserId, @Gold, @ActiveQuest, @LastOnline, @Mana, @MaxMana, @Stamina, @MaxStamina, @Xp, @XpNeeded);
     ";
 
         await conn.ExecuteAsync(insertPlayerSql, new
@@ -73,7 +75,13 @@ public class CharacterService
             dto.UserId,
             dto.Gold,
             dto.ActiveQuest,
-            dto.LastOnline
+            dto.LastOnline,
+            dto.Mana,
+            dto.MaxMana,
+            dto.Stamina,
+            dto.MaxStamina,
+            dto.Xp,
+            dto.XpNeeded
         }, tx);
 
         await tx.CommitAsync();

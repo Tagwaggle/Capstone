@@ -8,4 +8,8 @@ public interface ICombatService
     Task<CombatResult> CastSpellAsync(PlayerCharacterDto caster, PlayerCharacterDto target, Spell spell);
     Task<CombatResult> UseItemAsync(PlayerCharacterDto user, Item item, PlayerCharacterDto? target = null);
     Task<CombatResult> RunAsync(PlayerCharacterDto runner, Room currentRoom);
+    public void ProcessCombatRounds()
+    {
+        // Placeholder for future combat round processing logic
+    }
 }
