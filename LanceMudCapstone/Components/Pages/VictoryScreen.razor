@@ -1,0 +1,19 @@
+﻿@using LanceMudCapstone.DTOs
+@rendermode InteractiveServer
+
+<div class="victory-screen">
+    <h2>Victory!</h2>
+    <p>You defeated the @LastDefeated!</p>
+
+    <button @onclick="Continue">Continue</button>
+</div>
+
+@code {
+    [Parameter] public string LastDefeated { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnContinue { get; set; }
+
+    private async Task Continue()
+    {
+        await OnContinue.InvokeAsync();
+    }
+}

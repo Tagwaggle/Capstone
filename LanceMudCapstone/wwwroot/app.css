@@ -13,6 +13,24 @@ html, body {
     background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
     background-size: 120px 120px;
 }
+button {
+    width: auto;
+    padding: 0.7rem;
+    margin-top: 0.5rem;
+    background: #6a6aff;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s ease;
+    display: block;
+}
+
+    button:hover {
+        background: #7d7dff;
+        box-shadow: 0 0 10px rgba(125, 125, 255, 0.5);
+    }
 
 a, .btn-link {
     color: #006bb7;

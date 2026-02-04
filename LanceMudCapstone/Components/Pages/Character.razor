@@ -78,7 +78,8 @@
             {
 
                 SessionState.Pfile = selected;
-                SessionState.SetCharacter(selected.CharacterId);
+                if(selected.CharacterId != 0)
+                    await SessionState.SetCharacterAsync(selected.CharacterId);
 
 
                 var fresh = await Api.GetFromJsonAsync<PlayerCharacterDto>(

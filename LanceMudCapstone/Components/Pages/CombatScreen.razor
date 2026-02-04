@@ -1,0 +1,45 @@
+﻿@using LanceMudCapstone.DTOs
+@inject ICombatService CombatService
+@rendermode InteractiveServer
+
+<div class="combat-screen">
+    <h3>Combat!</h3>
+    <pre>@combatLog</pre>
+
+    <button @onclick="AttackRound">Attack</button>
+    <button @onclick="RunAway">Run Away</button>
+</div>
+
+@code {
+    [Parameter] public PlayerCharacterDto Player { get; set; } = default!;
+    [Parameter] public PlayerCharacterDto Mob { get; set; } = default!;
+    [Parameter] public EventCallback<string> OnVictory { get; set; }
+    [Parameter] public EventCallback OnDefeat { get; set; }
+
+    private string combatLog = string.Empty;
+
+    private async Task AttackRound()
+    {
+        var result = await CombatService.ResolveRoundAsync(Player, Mob);
+        combatLog += string.Join("\n", result.Log) + "\n";
+        combatLog += $"Player HP: {Player.Health}/{Player.MaxHealth}\n";
+        combatLog += $"{Mob.Name} HP: {Mob.Health}/{Mob.MaxHealth}\n\n";
+
+        if (!Mob.IsAlive)
+        {
+            combatLog += $"The {Mob.Name} has fallen!\n";
+            await OnVictory.InvokeAsync(Mob.Name);
+        }
+        else if (!Player.IsAlive)
+        {
+            combatLog += $"You have been defeated...\n";
+            await OnDefeat.InvokeAsync();
+        }
+    }
+
+    private async Task RunAway()
+    {
+        combatLog += "You flee from combat!\n";
+        await OnDefeat.InvokeAsync();
+    }
+}

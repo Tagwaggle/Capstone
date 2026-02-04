@@ -1,7 +1,8 @@
-﻿using System.Data;
-using Dapper;
-using Npgsql;
+﻿using Dapper;
+using LanceMudCapstone.DTOs;
 using LanceMudCapstone.Models;
+using Npgsql;
+using System.Data;
 
 
 namespace LanceMudCapstone.Services;
@@ -19,6 +20,13 @@ public class DbHelper
     {
         var connString = _config.GetConnectionString("SupabaseDb");
         return new NpgsqlConnection(connString);
+    }
+    public async Task<NpgsqlConnection> CreateOpenConnectionAsync()
+    {
+        var connString = _config.GetConnectionString("SupabaseDb");
+        var conn = new NpgsqlConnection(connString);
+        await conn.OpenAsync();
+        return conn;
     }
 
     public async Task<T> QuerySingleAsync<T>(string sql, object? parameters = null)
@@ -48,6 +56,5 @@ public class DbHelper
 
         return result;
     }
-
 
 }

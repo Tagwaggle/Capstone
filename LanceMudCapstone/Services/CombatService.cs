@@ -23,6 +23,8 @@ namespace LanceMudCapstone.Services
             {
                 int damage = _rng.Next(1, 9); // 1d8 damage
                 defender.Health -= damage;
+                if (defender.Health < 0) defender.Health = 0;
+
                 log.Add($"{attacker.Name} hits {defender.Name} for {damage} damage!");
             }
             else
@@ -30,7 +32,7 @@ namespace LanceMudCapstone.Services
                 log.Add($"{attacker.Name} misses {defender.Name}.");
             }
 
-            if (defender.Health <= 0)
+            if (defender.Health <= 0 && defender.IsAlive)
             {
                 defender.IsAlive = false;
                 log.Add($"{defender.Name} has been defeated!");
@@ -44,10 +46,16 @@ namespace LanceMudCapstone.Services
             });
         }
 
+
         // Full round: player attacks mob, mob retaliates if alive
         public async Task<CombatRoundResult> ResolveRoundAsync(PlayerCharacterDto player, PlayerCharacterDto mob)
         {
             var roundLog = new List<string>();
+
+            Console.WriteLine($"Player HP before: {player.Health}");
+            Console.WriteLine($"Skeleton HP before: {mob.Health}");
+            Console.WriteLine($"Player attacks Skeleton (AC {mob.ArmorClass})");
+            Console.WriteLine($"Skeleton attacks Player (AC {player.ArmorClass})");
 
             var playerAttack = await AttackAsync(player, mob);
             roundLog.AddRange(playerAttack.Log);

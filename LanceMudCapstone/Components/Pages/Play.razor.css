@@ -1,0 +1,38 @@
+﻿.play-screen {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    gap: 2.5rem;
+}
+
+.play-main {
+    flex: 1;
+    padding: 1rem;
+}
+
+.play-sidebar {
+    width: 250px;
+    background: #111;
+    color: #fff;
+    padding: 1rem;
+    border-left: 2px solid #333;
+}
+.compass-rose {
+    display: grid;
+    gap: 8px;
+}
+
+    .compass-rose .row {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .compass-rose .cell {
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .compass-rose .spacer {
+        min-width: 40px;
+    }

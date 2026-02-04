@@ -1,5 +1,8 @@
 ﻿using LanceMudCapstone.DTOs;
+using LanceMudCapstone.Models;
 using Npgsql;
+using System.Diagnostics;
+using System.Security.Claims;
 
 namespace LanceMudCapstone.API;
 
@@ -10,7 +13,7 @@ public static class CharacterApi
     {
         var chars = app.MapGroup("/api/characters");
 
-        chars.MapPost("/create", async (CreateCharacterDto dto, IConfiguration config) =>
+        chars.MapPost("/create", async (CharacterDto dto, IConfiguration config) =>
         {
             var connString = config["SupabaseDb"];
             try
@@ -19,19 +22,39 @@ public static class CharacterApi
                 await conn.OpenAsync();
 
                 var cmd = new NpgsqlCommand(
-                    @"INSERT INTO characters 
-                      (name, race, class, alignment, roomid)
-                      VALUES (@name, @race, @class, @alignment, @roomid)
-                      RETURNING characterid;",
+                    @"INSERT INTO characters
+                    (
+                        name, race, class, alignment,
+                        strength, dexterity, constitution, intelligence, wisdom, charisma,
+                        maxhealth, health, armorclass,
+                        hitdice, roomid, isalive, charactertype, level
+                    )
+                    VALUES
+                    (
+                        @Name, @Race, @Class, @Alignment,
+                        @Strength, @Dexterity, @Constitution, @Intelligence, @Wisdom, @Charisma,
+                        @MaxHealth, @Health, @ArmorClass,
+                        @HitDice, @RoomId, true, 'pc', 1
+                    )
+                    RETURNING characterid;"
+                    ,
                     conn
                 );
 
-                
-                cmd.Parameters.AddWithValue("@name", dto.Name);
-                cmd.Parameters.AddWithValue("@race", dto.Race);
-                cmd.Parameters.AddWithValue("@class", dto.Class);
-                cmd.Parameters.AddWithValue("@alignment", dto.Alignment);
-                cmd.Parameters.AddWithValue("@roomid", dto.RoomId);
+
+                cmd.Parameters.AddWithValue("@Strength", dto.Strength);
+                cmd.Parameters.AddWithValue("@Dexterity", dto.Dexterity);
+                cmd.Parameters.AddWithValue("@Constitution", dto.Constitution);
+                cmd.Parameters.AddWithValue("@Intelligence", dto.Intelligence);
+                cmd.Parameters.AddWithValue("@Wisdom", dto.Wisdom);
+                cmd.Parameters.AddWithValue("@Charisma", dto.Charisma);
+
+                cmd.Parameters.AddWithValue("@MaxHealth", dto.MaxHealth);
+                cmd.Parameters.AddWithValue("@Health", dto.MaxHealth); // starting HP = max
+                cmd.Parameters.AddWithValue("@ArmorClass", dto.ArmorClass);
+                cmd.Parameters.AddWithValue("@HitDice", dto.HitDice);
+
+                cmd.Parameters.AddWithValue("@RoomId", dto.RoomId);
 
                 var result = await cmd.ExecuteScalarAsync();
 

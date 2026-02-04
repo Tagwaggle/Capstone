@@ -68,7 +68,7 @@
 
     private void LogoutCharacter()
     {
-        SessionState.SetCharacter(0);
+        SessionState.SetCharacterAsync(0);
         Nav.NavigateTo("/character");
     }
 

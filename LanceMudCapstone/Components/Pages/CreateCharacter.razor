@@ -1,12 +1,14 @@
 ﻿@page "/character/create"
 @layout GameLayout
 @using LanceMudCapstone.DTOs
+@using LanceMudCapstone.Services
 @using System.Text.Json
 @rendermode InteractiveServer
 
 @inject SessionState SessionState
 @inject IHttpClientFactory HttpClientFactory
-
+@inject NavigationManager Nav
+@inject CharacterService CharacterService
 
 <div class="create-wrapper">
     <div class="create-card">
@@ -248,35 +250,9 @@
 
         Console.WriteLine($"Saving {form.Name}, Player ID: {SessionState.UserId}");
 
-        var client = HttpClientFactory.CreateClient("ServerAPI");
-        var response = await client.PostAsJsonAsync("/api/characters/create", form);
+        var charId = await CharacterService.CreateCharacterAsync(form);
+        Nav.NavigateTo("/character");
 
-        if (response.IsSuccessStatusCode)
-        {
-            var result = await response.Content.ReadFromJsonAsync<JsonElement>();
-            var charId = result.GetProperty("characterId").GetInt32();
-            Console.WriteLine($"Character saved with ID {charId}");
-            var createPc = new CreatePlayerCharacterDto
-                {
-                    UserId = form.UserId,
-                    CharacterId = charId,
-                    Gold = form.Gold,
-                    ActiveQuest = form.ActiveQuest,
-                    LastOnline = form.LastOnline
-                };
-            var pcResponse = await client.PostAsJsonAsync("/api/playercharacters/create", createPc);
-            if (pcResponse.IsSuccessStatusCode) Console.WriteLine("Pfile Saved");
-            else 
-            {
-                var errorContent = await pcResponse.Content.ReadAsStringAsync();
-                Console.WriteLine($"Error saving pfile: {pcResponse.StatusCode} - {errorContent}");
-            }
-        }
-        else
-        {
-            var error = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Eroor saving: {error}");
-        }
     }
 
 }

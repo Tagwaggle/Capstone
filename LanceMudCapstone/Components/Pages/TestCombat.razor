@@ -1,19 +1,36 @@
 ﻿@page "/test-combat"
 @inject ICombatService CombatService
+@rendermode InteractiveServer
 
-<h3>Combat Test</h3>
+@if (!inCombat && !victoryScreen)
+{
+    <h3>Adventure Screen</h3>
+    <p>You are in a dark room. A skeleton lurks here...</p>
+    <button @onclick="StartCombat">Attack Skeleton</button>
+}
+else if (inCombat)
+{
+    <h3>Combat Screen</h3>
+    <pre>@combatText</pre>
 
-<MudButton Color="Color.Primary" OnClick="AttackSkeleton">Attack Skeleton</MudButton>
-
-<pre>@combatLog</pre>
-
+    <button @onclick="AttackRound">Attack</button>
+    <button @onclick="RunAway">Run Away</button>
+}
+else if (victoryScreen)
+{
+    <h3>Victory!</h3>
+    <p>You defeated the @lastDefeated!</p>
+    <button @onclick="ReturnToAdventure">Continue</button>
+}
 @code {
-    private string combatLog = string.Empty;
+    private bool inCombat = false;
+    private bool victoryScreen = false;
+    private string combatText = string.Empty;
+    private string lastDefeated = string.Empty;
 
-    // For now, hardcode a player and skeleton DTO
-    private PlayerCharacterDto player = new PlayerCharacterDto
+    private PlayerCharacterDto player = new()
     {
-        Name = "Test Player",
+        Name = "Hero",
         Strength = 5,
         ArmorClass = 12,
         Health = 20,
@@ -21,25 +38,60 @@
         IsAlive = true
     };
 
-    private PlayerCharacterDto skeleton = new PlayerCharacterDto
+    private PlayerCharacterDto skeleton = new()
     {
         Name = "Skeleton",
         Strength = 2,
         ArmorClass = 10,
-        Health = 8,
-        MaxHealth = 8,
+        Health = 20,
+        MaxHealth = 20,
         IsAlive = true
     };
 
-    private async Task AttackSkeleton()
+    private void StartCombat()
     {
+        inCombat = true;
+        skeleton.Health = 20;
+        skeleton.IsAlive = true;
+        combatText = $"You engage the {skeleton.Name}!\n";
+    }
+
+    private async Task AttackRound()
+    {
+        combatText = string.Empty;
         var result = await CombatService.ResolveRoundAsync(player, skeleton);
 
-        // Append the round log to the display
-        combatLog += string.Join("\n", result.Log) + "\n";
+        combatText += string.Join("\n", result.Log) + "\n";
+        combatText += $"Player HP: {player.Health}/{player.MaxHealth}\n";
+        combatText += $"Skeleton HP: {skeleton.Health}/{skeleton.MaxHealth}\n\n";
 
-        // Optional: show current HP
-        combatLog += $"Player HP: {player.Health}/{player.MaxHealth}\n";
-        combatLog += $"Skeleton HP: {skeleton.Health}/{skeleton.MaxHealth}\n\n";
+
+
+        if (!skeleton.IsAlive)
+        {
+            combatText += $"The {skeleton.Name} has fallen!\n";
+            lastDefeated = skeleton.Name;
+            inCombat = false;
+            victoryScreen = true; // show victory pause
+        }
+        if (!player.IsAlive)
+        {
+            combatText += $"You have been defeated...\n";
+            await Task.Delay(3000);
+            inCombat = false;
+            victoryScreen = false; // skip victory screen
+        }
+    }
+
+    private void RunAway()
+    {
+        combatText += "You flee from combat!\n";
+        inCombat = false;
+    }
+
+    private void ReturnToAdventure()
+    {
+        victoryScreen = false;
+        combatText = string.Empty;
     }
 }

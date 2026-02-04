@@ -1,63 +1,74 @@
-﻿@page "/play/score"
+﻿@inject SessionState SessionState
 @rendermode InteractiveServer
-@layout PlayLayout
 
-@inject SessionState SessionState
+@if (Show)
+{
+    <div class="modal-backdrop" @onclick="Close"></div>
 
-<div class="score-container">
-    <h2>Score for @SessionState.Pfile?.Name</h2>
+    <div class="modal-window">
+        <h2>Score for @SessionState.Pfile?.Name</h2>
 
-    @if (SessionState.Pfile == null)
-    {
-        <p>No character loaded. Please login first.</p>
-    }
-    else
-    {
-        <table class="score-table">
-            <tr><th>Level</th><td>@SessionState.Pfile.Level</td></tr>
-            <tr><th>Class</th><td>@SessionState.Pfile.Class</td></tr>
-            <tr><th>Race</th><td>@SessionState.Pfile.Race</td></tr>
-            <tr><th>Alignment</th><td>@SessionState.Pfile.Alignment</td></tr>
-            <tr><th>HP</th><td>@SessionState.Pfile.Health / @SessionState.Pfile.MaxHealth</td></tr>
-            <tr><th>Armor Class</th><td>@SessionState.Pfile.ArmorClass</td></tr>
-            <tr><th>Strength</th><td>@SessionState.Pfile.Strength</td></tr>
-            <tr><th>Dexterity</th><td>@SessionState.Pfile.Dexterity</td></tr>
-            <tr><th>Constitution</th><td>@SessionState.Pfile.Constitution</td></tr>
-            <tr><th>Intelligence</th><td>@SessionState.Pfile.Intelligence</td></tr>
-            <tr><th>Wisdom</th><td>@SessionState.Pfile.Wisdom</td></tr>
-            <tr><th>Charisma</th><td>@SessionState.Pfile.Charisma</td></tr>
-            <tr><th>Gold</th><td>@SessionState.Pfile.Gold</td></tr>
-            <tr><th>Active Quest</th><td>@(SessionState.Pfile.ActiveQuest?.ToString() ?? "None")</td></tr>
-            <tr><th>Last Online</th><td>@(SessionState.Pfile.LastOnline?.ToString("g") ?? "Never")</td></tr>
-            <tr><th>Created At</th><td>@SessionState.Pfile.CreatedAt.ToString("g")</td></tr>
-        </table>
-    }
-</div>
+        @if (SessionState.Pfile == null)
+        {
+            <p>No character loaded.</p>
+        }
+        else
+        {
+            <table class="score-table">
+                <tr><th>Level</th><td>@SessionState.Pfile.Level</td></tr>
+                <tr><th>Class</th><td>@SessionState.Pfile.Class</td></tr>
+                <tr><th>Race</th><td>@SessionState.Pfile.Race</td></tr>
+                <tr><th>Alignment</th><td>@SessionState.Pfile.Alignment</td></tr>
+                <tr><th>HP</th><td>@SessionState.Pfile.Health / @SessionState.Pfile.MaxHealth</td></tr>
+                <tr><th>Armor Class</th><td>@SessionState.Pfile.ArmorClass</td></tr>
+                <tr><th>Strength</th><td>@SessionState.Pfile.Strength</td></tr>
+                <tr><th>Dexterity</th><td>@SessionState.Pfile.Dexterity</td></tr>
+                <tr><th>Constitution</th><td>@SessionState.Pfile.Constitution</td></tr>
+                <tr><th>Intelligence</th><td>@SessionState.Pfile.Intelligence</td></tr>
+                <tr><th>Wisdom</th><td>@SessionState.Pfile.Wisdom</td></tr>
+                <tr><th>Charisma</th><td>@SessionState.Pfile.Charisma</td></tr>
+                <tr><th>Gold</th><td>@SessionState.Pfile.Gold</td></tr>
+                <tr><th>Active Quest</th><td>@(SessionState.Pfile.ActiveQuest?.ToString() ?? "None")</td></tr>
+                <tr><th>Last Online</th><td>@(SessionState.Pfile.LastOnline?.ToString("g") ?? "Never")</td></tr>
+                <tr><th>Created At</th><td>@SessionState.Pfile.CreatedAt.ToString("g")</td></tr>
+            </table>
+        }
+
+        <button class="close-btn" @onclick="Close">Close</button>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Show { get; set; }
+    [Parameter] public EventCallback<bool> ShowChanged { get; set; }
+
+    private Task Close() => ShowChanged.InvokeAsync(false);
+}
+
 
 <style>
-    .score-container {
-        margin: 2rem;
-        padding: 1rem;
+    .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+    }
+
+    .modal-window {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         background: #111;
-        color: #eee;
+        padding: 1.5rem;
         border: 2px solid #444;
         border-radius: 8px;
+        color: #eee;
+        width: 400px;
+        max-height: 80vh;
+        overflow-y: auto;
     }
 
-    .score-table {
-        width: 100%;
-        border-collapse: collapse;
+    .close-btn {
+        margin-top: 1rem;
     }
-
-        .score-table th {
-            text-align: left;
-            padding: 4px 8px;
-            background: #222;
-            width: 150px;
-        }
-
-        .score-table td {
-            padding: 4px 8px;
-            background: #1a1a1a;
-        }
 </style>

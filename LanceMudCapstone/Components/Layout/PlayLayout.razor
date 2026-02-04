@@ -2,34 +2,27 @@
 @inject SessionState SessionState
 @inject NavigationManager Nav
 
-
 <div class="page">
     <header class="top-row">
         <LunitariHeader />
+        <!-- Optional: add a navbar here for basic in-game links -->
     </header>
 
-    <div class="body">
-        <nav class="sidebar">
-            <CommandsSide />
-        </nav>
+    <main class="play-body">
+        @if (!_hydrated)
+        {
+            <LoadingPage OnFinished="@(() => _hydrated = true)" />
+        }
+        else
+        {
+            @Body
+        }
+    </main>
 
-        <main>
-            @if (!_hydrated)
-            {
-                <LoadingPage OnFinished="@(() => _hydrated = true)" />
-            }
-            else
-            {
-                @Body
-            }
-        </main>
-    </div>
-
-    <footer>
+    <footer class="play-footer">
         <AppFooter />
     </footer>
 </div>
-
 
 @code {
     private bool _hydrated = false;

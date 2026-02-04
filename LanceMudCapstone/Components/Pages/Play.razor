@@ -2,30 +2,112 @@
 @using System.Text
 @using LanceMudCapstone.Models
 @using LanceMudCapstone.DTOs
+@using LanceMudCapstone.Services
+
 @inject SessionState SessionState
+@inject CharacterService CharacterService
+@inject NavigationManager Nav
+
 @layout PlayLayout
 @rendermode InteractiveServer
 
-<div class="ascii-monitor">
-    <pre>
+<div class="play-screen">
+    <!-- Main ASCII monitor -->
+    <div class="play-main">
+        <div class="ascii-monitor">
+            <pre>
 @BuildAsciiMonitor(SessionState.CurrentRoom,
                                       SessionState.CurrentRoomMobs,
-                                      SessionState.CurrentRoomContainers)
-    </pre>
+                                      SessionState.CurrentRoomContainers,
+                                      SessionState.CurrentRoomExits)
+            </pre>
+        </div>
+    </div>
+
+    <div class="play-sidebar">
+        <h3>Commands</h3>
+        <div class="row">
+            <div class="cell">
+                @if (HasExit("north"))
+                {
+                    <button @onclick='() => Move("north")'>North</button>
+                }
+            </div>
+            <div class="cell">
+                @if (HasExit("up"))
+                {
+                    <button @onclick='() => Move("up")'>Up</button>
+                }
+            </div>
+        </div>
+
+            <div class="row">
+                <div class="cell">
+                    @if (HasExit("west"))
+                    {
+                        <button @onclick='() => Move("west")'>West</button>
+                    }
+                </div>
+
+                <div class="cell spacer"></div>
+
+                <div class="cell">
+                    @if (HasExit("east"))
+                    {
+                        <button @onclick='() => Move("east")'>East</button>
+                    }
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="cell">
+                    @if (HasExit("south"))
+                    {
+                        <button @onclick='() => Move("south")'>South</button>
+                    }
+                </div>
+
+                <div class="cell">
+                    @if (HasExit("down"))
+                    {
+                        <button @onclick='() => Move("down")'>Down</button>
+                    }
+                </div>
+            </div>
+
+        
+
+        <button @onclick="GetLoot">Get Loot</button>
+        <button @onclick="Attack">Attack</button>
+        <button @onclick="ShowScore">Score</button>
+        <button @onclick="ShowSpells">Spells/Skills</button>
+        <button @onclick="ChangeCharacter">Switch Character</button>
+        <button @onclick="() => showScoreModal = true">Score</button>
+
+    </div>
 </div>
 
+<PlayScore Show="@showScoreModal" ShowChanged="v => showScoreModal = v" />
+
+
 @code {
-    // If you kept CurrentRoomMobs as List<RoomNpcDto>
+    private bool showScoreModal = false;
+
+    // ASCII monitor builder stays the same
     public static string BuildAsciiMonitor(Room? room,
                                            IEnumerable<RoomNpcDto> mobs,
-                                           IEnumerable<Container> containers)
+                                           IEnumerable<Container> containers,
+                                            IEnumerable<RoomExit> roomExits)
     {
         var lines = new List<string>();
 
         if (room != null)
         {
             lines.Add(room.Name ?? "");
-            lines.Add(room.Description ?? "");
+            foreach (var wrappedLine in RoomService.WordWrap(room.Description ?? "", 40))
+            {
+                lines.Add(wrappedLine);                
+            }
         }
 
         if (mobs?.Any() == true)
@@ -45,7 +127,19 @@
                 lines.Add("    " + c.Name);
             }
         }
-
+        if (roomExits?.Any() == true)
+        {
+            lines.Add("Exits:");
+            foreach (var e in roomExits)
+            {
+                lines.Add("    " + e.Direction);
+            }
+        }
+        else
+        {
+            lines.Add("Exits:");
+            lines.Add("YOU'RE TRAPPED");
+        }
 
         lines.Add(">"); // prompt line
 
@@ -63,5 +157,35 @@
         sb.AppendLine("|" + new string('=', maxWidth + 2) + "|");
 
         return sb.ToString();
+    }
+
+    // Placeholder command handlers
+    private void GetLoot() => Console.WriteLine("Get Loot triggered");
+    private void Attack() => Console.WriteLine("Attack triggered");
+    private void ShowScore() => Console.WriteLine("Score triggered");
+    private void ShowSpells() => Console.WriteLine("Spells triggered");
+    async private void ChangeCharacter()
+    {
+        if (Nav != null)
+        {
+            if (SessionState.Pfile == null)
+            {
+                Console.WriteLine("No character loaded, skipping save.");
+                Nav.NavigateTo("/character");
+                return;
+            }
+
+            await CharacterService.SavePlayer(SessionState.Pfile);
+            Nav.NavigateTo("/character");
+        }        
+        else
+            Console.WriteLine("NavigationManager not available");
+    }
+
+    private bool HasExit(string dir) => SessionState.CurrentRoomExits?.Any(e => e.Direction.Equals(dir, StringComparison.OrdinalIgnoreCase)) == true;
+
+    private async Task Move(string dir)
+    {
+        await SessionState.TryMoveAsync(dir);
     }
 }

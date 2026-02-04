@@ -10,6 +10,7 @@ public class PasswordDto
 }
 public class CharacterDto
 {
+    public int? UserId { get; set; }
     public int CharacterId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Race { get; set; } = string.Empty;
