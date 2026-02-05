@@ -1,0 +1,81 @@
+﻿.inventory-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.inventory-card {
+    background: #1e1e1e;
+    color: white;
+    padding: 20px;
+    width: 900px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+
+.inventory-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.equip-column,
+.inventory-column,
+.action-column {
+    background: rgba(255,255,255,0.05);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.equip-slot,
+.inventory-item {
+    padding: 6px;
+    margin-bottom: 6px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+}
+
+    .equip-slot:hover,
+    .inventory-item:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+.selected {
+    background: rgba(100,150,255,0.3);
+    border: 1px solid rgba(100,150,255,0.6);
+}
+
+.inventory-scroll {
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.action-column button {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 5px;
+    background: #333;
+    color: white;
+    border: 1px solid #555;
+}
+
+    .action-column button:disabled {
+        opacity: 0.4;
+    }
+
+.close-btn {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    background: #444;
+    color: white;
+    border-radius: 5px;
+}

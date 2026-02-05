@@ -112,6 +112,7 @@
         }
     }
     <button @onclick="() => showScoreModal = true">Score</button>
+    <button @onclick="() => showInventoryModal = true">Inventory</button>
     <button @onclick="ShowSpells">Spells/Skills</button>
     <button @onclick="ChangeCharacter">Switch Character</button>
 </div>
@@ -120,11 +121,14 @@
     </div>
 
 
+<InventoryModal Show="@showInventoryModal"
+                ShowChanged="v => showInventoryModal = v" />
 <PlayScore Show="@showScoreModal" ShowChanged="v => showScoreModal = v" />
 
 
 @code {
     private bool showScoreModal = false;
+    private bool showInventoryModal = false;
     private string[] nonAttackable = new[] { "shop", "guard", "safe", "pc" };
 
 
