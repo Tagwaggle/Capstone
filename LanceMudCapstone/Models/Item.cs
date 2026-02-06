@@ -13,6 +13,7 @@ public class Item
     public string? effect {  get; set; }
     public bool Stackable { get; set; }
     public int? MaxStack { get; set; }
+    public string ItemCategory { get; set; } = "Misc";
     public DateTime CreatedAt { get; set; }
 
 }

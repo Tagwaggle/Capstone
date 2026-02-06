@@ -23,5 +23,6 @@ namespace LanceMudCapstone.DTOs
         public string? EffectJson { get; set; }
 
         public bool IsEquipped { get; set; }
+        public ItemCategory ItemCategory { get; set; }
     }
 }

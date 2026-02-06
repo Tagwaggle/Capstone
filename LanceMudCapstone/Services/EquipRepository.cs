@@ -40,6 +40,8 @@ namespace LanceMudCapstone.Services
 
         public async Task<EquippedItem?> GetEquippedItemAsync(int playerId, EquipSlot slot)
         {
+            Console.WriteLine("InventoryService.GetEquipped called");
+
             const string sql = @"
                 SELECT *
                 FROM equippeditems
@@ -48,7 +50,7 @@ namespace LanceMudCapstone.Services
             ";
 
             using var conn = await _db.CreateOpenConnectionAsync();
-            return await conn.QueryFirstOrDefaultAsync<EquippedItem>(sql, new { playerId, slot });
+            return await conn.QueryFirstOrDefaultAsync<EquippedItem>(sql, new { playerId, slot = slot.ToString() });
         }
 
         public async Task EquipAsync(int playerId, int itemId, EquipSlot slot)
@@ -59,8 +61,9 @@ namespace LanceMudCapstone.Services
             ";
 
             using var conn = await _db.CreateOpenConnectionAsync();
-            await conn.ExecuteAsync(sql, new { playerId, itemId, slot });
+            await conn.ExecuteAsync(sql, new { playerId, itemId, slot = slot.ToString() });
         }
+
 
         public async Task UnequipAsync(int equippedItemId)
         {

@@ -1,4 +1,6 @@
-﻿namespace LanceMudCapstone.DTOs
+﻿using LanceMudCapstone.Enums;
+
+namespace LanceMudCapstone.DTOs
 {
     public class ItemDtoRaw
     {
@@ -12,5 +14,7 @@
         public bool Stackable { get; set; }
         public int Quantity { get; set; }
         public int? MaxStack { get; set; }
+        public ItemCategory ItemCategory { get; set; }
+
     }
 }
