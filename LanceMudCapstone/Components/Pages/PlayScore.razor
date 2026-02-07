@@ -14,24 +14,76 @@
         }
         else
         {
-            <table class="score-table">
-                <tr><th>Level</th><td>@SessionState.Pfile.Level</td></tr>
-                <tr><th>Class</th><td>@SessionState.Pfile.Class</td></tr>
-                <tr><th>Race</th><td>@SessionState.Pfile.Race</td></tr>
-                <tr><th>Alignment</th><td>@SessionState.Pfile.Alignment</td></tr>
-                <tr><th>HP</th><td>@SessionState.Pfile.Health / @SessionState.Pfile.MaxHealth</td></tr>
-                <tr><th>Armor Class</th><td>@SessionState.Pfile.ArmorClass</td></tr>
-                <tr><th>Strength</th><td>@SessionState.Pfile.Strength</td></tr>
-                <tr><th>Dexterity</th><td>@SessionState.Pfile.Dexterity</td></tr>
-                <tr><th>Constitution</th><td>@SessionState.Pfile.Constitution</td></tr>
-                <tr><th>Intelligence</th><td>@SessionState.Pfile.Intelligence</td></tr>
-                <tr><th>Wisdom</th><td>@SessionState.Pfile.Wisdom</td></tr>
-                <tr><th>Charisma</th><td>@SessionState.Pfile.Charisma</td></tr>
-                <tr><th>Gold</th><td>@SessionState.Pfile.Gold</td></tr>
-                <tr><th>Active Quest</th><td>@(SessionState.Pfile.ActiveQuest?.ToString() ?? "None")</td></tr>
-                <tr><th>Last Online</th><td>@(SessionState.Pfile.LastOnline?.ToString("g") ?? "Never")</td></tr>
-                <tr><th>Created At</th><td>@SessionState.Pfile.CreatedAt.ToString("g")</td></tr>
+            <table class="score-table spaced">
+                <tr>
+                    <th>Level</th>
+                    <td>@SessionState.Pfile.Level</td>
+                    <th>Class</th>
+                    <td>@SessionState.Pfile.Class</td>
+                </tr>
+
+                <tr>
+                    <th>Race</th>
+                    <td>@SessionState.Pfile.Race</td>
+                    <th>Alignment</th>
+                    <td>@SessionState.Pfile.Alignment</td>
+                </tr>
+
+                <tr>
+                    <th>HP</th>
+                    <td>@SessionState.Pfile.Health / @SessionState.Pfile.MaxHealth</td>
+                    <th>Armor Class</th>
+                    <td>@SessionState.Pfile.ArmorClass</td>
+                </tr>
+
+                <tr>
+                    <th>Mana</th>
+                    <td>@SessionState.Pfile.Mana / @SessionState.Pfile.MaxMana</td>
+                    <th>Stamina</th>
+                    <td>@SessionState.Pfile.Stamina / @SessionState.Pfile.MaxStamina</td>
+                </tr>
+
+                <tr>
+                    <th>Strength</th>
+                    <td>@SessionState.Pfile.Strength</td>
+                    <th>Dexterity</th>
+                    <td>@SessionState.Pfile.Dexterity</td>
+                </tr>
+
+                <tr>
+                    <th>Constitution</th>
+                    <td>@SessionState.Pfile.Constitution</td>
+                    <th>Intelligence</th>
+                    <td>@SessionState.Pfile.Intelligence</td>
+                </tr>
+
+                <tr>
+                    <th>Wisdom</th>
+                    <td>@SessionState.Pfile.Wisdom</td>
+                    <th>Charisma</th>
+                    <td>@SessionState.Pfile.Charisma</td>
+                </tr>
+
+                <tr>
+                    <th>XP</th>
+                    <td>@SessionState.Pfile.Xp / @SessionState.Pfile.XpNeeded</td>
+                    <th>Gold</th>
+                    <td>@SessionState.Pfile.Gold</td>
+                </tr>
+
+                <tr>
+                    <th>Active Quest</th>
+                    <td>@(SessionState.Pfile.ActiveQuest?.ToString() ?? "None")</td>
+                    <th>Last Online</th>
+                    <td>@(SessionState.Pfile.LastOnline?.ToString("g") ?? "Never")</td>
+                </tr>
+
+                <tr>
+                    <th>Created At</th>
+                    <td colspan="3">@SessionState.Pfile.CreatedAt.ToString("g")</td>
+                </tr>
             </table>
+
         }
 
         <button class="close-btn" @onclick="Close">Close</button>
@@ -47,6 +99,15 @@
 
 
 <style>
+    .score-table.spaced tr {
+        padding-bottom: 8px;
+    }
+
+    .score-table.spaced th,
+    .score-table.spaced td {
+        padding: 4px 10px;
+    }
+
     .modal-backdrop {
         position: fixed;
         inset: 0;

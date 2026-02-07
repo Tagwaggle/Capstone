@@ -1,10 +1,11 @@
 ﻿using Dapper;
 using LanceMudCapstone.DTOs;
 using LanceMudCapstone.Models;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace LanceMudCapstone.Services;
 
-public class CharacterService
+public class CharacterService : ICharacterService
 {
     private readonly DbHelper _db;
 
@@ -17,7 +18,7 @@ public class CharacterService
     {
         await using var conn = await _db.CreateOpenConnectionAsync();
         await using var tx = await conn.BeginTransactionAsync();
-        if((dto.RoomId == 1) && (dto.CharacterType != "IMM"))
+        if ((dto.RoomId == 1) && (dto.CharacterType != "IMM"))
         {
             dto.RoomId = 2;
         }
@@ -88,6 +89,10 @@ public class CharacterService
         return characterId;
     }
 
+    public Task RecalculateStats(int playerCharacterId)
+    {
+        return Task.CompletedTask;
+    }
 
 
     public Task<bool> UpdateCharacterAsync(UpdateCharacterDto dto)
@@ -116,7 +121,7 @@ public class CharacterService
         //         playercharacterid = @PlayerCharacterId;";
         Console.WriteLine(updateCharacterSql);
         await conn.ExecuteAsync(updateCharacterSql, saveState, tx);
-    //    await conn.ExecuteAsync(updatePlayerSql, saveState, tx);
+        //    await conn.ExecuteAsync(updatePlayerSql, saveState, tx);
 
         tx.Commit();
         return saveState;

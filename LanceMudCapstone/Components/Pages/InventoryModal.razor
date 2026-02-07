@@ -1,0 +1,153 @@
+﻿@using LanceMudCapstone.Enums
+@using LanceMudCapstone.DTOs
+@using System.Threading.Tasks
+@inject SessionState SessionState
+@inject InventoryService InventoryService
+
+
+
+@if (Show)
+{
+    <div class="inventory-overlay" @onclick="CloseIfClickedOutside">
+        <div class="inventory-card" @onclick:stopPropagation="true">
+            <h2>Inventory</h2>
+
+            <div class="inventory-grid">
+
+                <div class="equip-column">
+                    <h3>Equipped</h3>
+
+                    @foreach (var slot in Enum.GetValues<EquipSlot>())
+                    {
+                        <div class="equip-slot @(SelectedSlot == slot ? "selected" : "")"
+                             @onclick="() => SelectSlot(slot)">
+                            <strong>@slot</strong>
+                            <span>@GetEquippedItemName(slot)</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="inventory-column">
+                    <h3>Inventory</h3>
+
+                    <div class="inventory-scroll">
+                        @foreach (var item in InventoryItems)
+                        {
+                            <div class="inventory-item @(SelectedItem == item ? "selected" : "")"
+                                 @onclick="() => SelectItem(item)">
+                                <strong>@item.Name</strong>
+                                <span>@item.ItemType</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="action-column">
+                    <h3>Actions</h3>
+
+                    <button @onclick="() => EquipSelected()" disabled="@(!CanEquip)">Equip</button>
+                    <button @onclick="() => UnequipSelected()" disabled="@(!CanUnequip)">Unequip</button>
+                    <button class="btn btn-primary" @onclick="UseSelected" disabled="@(!CanUseSelected)">Use</button>
+                    <button @onclick="() => DropSelected()" disabled="@(!CanDrop)">Drop</button>
+                </div>
+
+            </div>
+
+            <button class="close-btn" @onclick="Close">Close</button>
+
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Show { get; set; }
+    [Parameter] public EventCallback<bool> ShowChanged { get; set; }
+
+
+
+    EquipSlot? SelectedSlot = null;
+    ItemDto? SelectedItem = null;
+
+    public List<ItemDto> InventoryItems { get; set; } = new();
+    public Dictionary<EquipSlot, ItemDto?> Equipped { get; set; } = new();
+    bool CanUseSelected => SelectedItem?.ItemCategory == ItemCategory.Consumable;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Show)
+        {
+            Equipped = Enum.GetValues<EquipSlot>()
+                .ToDictionary(slot => slot, slot => (ItemDto?)null);
+
+            if (SessionState.Pfile?.PlayerCharacterId == null) return;
+
+            InventoryItems = await InventoryService.GetInventory(SessionState.Pfile.PlayerCharacterId);
+
+            var equippedItems = await InventoryService.GetEquipped(SessionState.Pfile.PlayerCharacterId);
+
+            foreach (var eq in equippedItems)
+                Equipped[eq.Slot] = eq.Item;
+        }
+    }
+
+    void Close() => ShowChanged.InvokeAsync(false);
+    void CloseIfClickedOutside() => Close();
+
+    void SelectSlot(EquipSlot slot)
+    {
+        SelectedSlot = slot;
+        SelectedItem = null;
+    }
+
+    void SelectItem(ItemDto item)
+    {
+        SelectedItem = item;
+        SelectedSlot = null;
+    }
+
+    string GetEquippedItemName(EquipSlot slot)
+        => Equipped.ContainsKey(slot) && Equipped[slot] != null
+            ? Equipped[slot]!.Name
+            : "Empty";
+
+    bool CanEquip => SelectedItem != null && SelectedItem.Slot != null;
+    bool CanUnequip => SelectedSlot != null && Equipped[SelectedSlot.Value] != null;
+    bool CanUse => SelectedItem != null && SelectedItem.ItemType == "Consumable";
+    bool CanDrop => SelectedItem != null;
+
+    async void EquipSelected()
+    {
+        if (SelectedItem == null || SelectedItem.Slot == null)
+            return;
+
+        await InventoryService.EquipAsync(
+            SessionState.Pfile.PlayerCharacterId,
+            SelectedItem.ItemId,
+            SelectedItem.Slot.Value
+        );
+
+        await OnParametersSetAsync();
+        StateHasChanged();
+    }
+    async Task UnequipSelected()
+    {
+        if (SelectedSlot == null) return;
+
+        await InventoryService.UnequipAsync(SessionState.Pfile.PlayerCharacterId, SelectedSlot.Value);
+
+        await OnParametersSetAsync();
+        StateHasChanged();
+    }
+    async Task UseSelected()
+    {
+        if (SelectedItem == null || SelectedItem.ItemType != "Consumable") return;
+
+        var msg = await InventoryService.UseAsync(SessionState.Pfile.PlayerCharacterId, SelectedItem.ItemId);
+
+
+        await OnParametersSetAsync();
+        StateHasChanged();
+    }
+
+    void DropSelected() { }
+}

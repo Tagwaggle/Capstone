@@ -229,6 +229,10 @@
     }
     async Task SaveButton_Clicked()
     {
+        if (string.IsNullOrWhiteSpace(form.Name) ||
+            string.IsNullOrWhiteSpace(form.Class) ||
+            string.IsNullOrWhiteSpace(form.Race)) return;
+
         switch (form.Class.ToLower())
         {
             case "mage":

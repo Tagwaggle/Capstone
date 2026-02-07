@@ -17,6 +17,10 @@ builder.Services.AddSingleton<RespawnService>();
 builder.Services.AddSingleton<WorldEngine>();
 builder.Services.AddSingleton<AbilityEngine>();
 builder.Services.AddSingleton<ICombatService, CombatService>();
+builder.Services.AddScoped<IItemRepository, ItemRepository>();
+builder.Services.AddScoped<IEquipRepository, EquipRepository>();
+builder.Services.AddScoped<InventoryService>();
+
 
 var supabaseConnString = builder.Configuration.GetConnectionString("SupabaseDb") ??
     throw new InvalidOperationException("Missing SupabaseDb connection string");
