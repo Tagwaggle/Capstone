@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @inject SessionState SessionState
+@inject NavigationManager Nav
 
 <div class="page">
     <header class="top-row">
@@ -15,9 +16,9 @@
         </nav>
 
         <main>
-            @if (!SessionState.Ready)
+            @if (!_readyToRender)
             {
-                <LoadingPage OnFinished="SessionState.InitializeAsync" />
+                <LoadingPage OnFinished="OnLoadingFinished" />
             }
             else
             {
@@ -28,19 +29,45 @@
 </div>
 
 @code {
+    private bool _readyToRender = false;
+    private bool _alreadyInitialized = false;
+
     protected override void OnInitialized()
     {
-        // Listen for session changes and trigger UI refresh
+        // Listen to session changes
         SessionState.OnChange += StateHasChanged;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && !SessionState.Ready)
+        if (firstRender && !_alreadyInitialized)
         {
-            // Trigger session initialization after first render to avoid prerender JS issues
+            _alreadyInitialized = true;
+
+            // Ensure hydration occurs after the UI is interactive (important for Azure)
             await SessionState.InitializeAsync();
-            StateHasChanged();
+            await SessionState.TryHydrateCharacterAsync();
+
+            StateHasChanged(); // re-render to check if LoadingPage should fire
+        }
+    }
+
+    private async Task OnLoadingFinished()
+    {
+        // Extra delay for cinematic effect (2.5s total)
+        await Task.Delay(1500);
+
+        // Re-hydrate session to make sure localStorage reads complete
+        await SessionState.InitializeAsync();
+        await SessionState.TryHydrateCharacterAsync();
+
+        _readyToRender = true;
+        StateHasChanged();
+
+        // Optional: redirect if still no logged-in user
+        if (!SessionState.IsLoggedIn)
+        {
+            //Nav.NavigateTo("/character", true);
         }
     }
 

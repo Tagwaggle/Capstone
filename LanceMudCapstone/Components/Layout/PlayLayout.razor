@@ -6,18 +6,19 @@
     <header class="top-row">
         <LunitariHeader />
     </header>
-    @if (!_readyToRender)
-    {
-                <LoadingPage OnFinished="() => _readyToRender = true" />
-    }
-    else
-    {
-    <main class="play-body">
-        @Body
-    </main>
-    }
-    
-    
+
+    <div class="body">
+        <main>
+            @if (!_readyToRender || !SessionState.CharacterReady)
+            {
+                <LoadingPage OnFinished="OnLoadingFinished" />
+            }
+            else
+            {
+                @Body
+            }
+        </main>
+    </div>
 
     <footer class="play-footer">
         <AppFooter />
@@ -27,29 +28,29 @@
 @code {
     private bool _readyToRender = false;
 
- /*   protected override void OnInitialized()
+    protected override void OnInitialized()
     {
-        // Guard: no active session → back to character select
-        if (!SessionState.IsLoggedIn || SessionState.Pfile == null)
+        SessionState.OnChange += StateHasChanged;
+    }
+
+    private async Task OnLoadingFinished()
+    {
+        Console.WriteLine("[PlayLayout] LoadingPage finished");
+
+        await SessionState.EnsureInitializedAsync();
+
+        _readyToRender = true;
+        StateHasChanged();
+
+        if (!SessionState.CharacterReady)
         {
+            Console.WriteLine("[PlayLayout] No character found, redirecting to /character");
             Nav.NavigateTo("/character", true);
         }
     }
-    */
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+
+    public void Dispose()
     {
-        if (firstRender)
-        {
-            await SessionState.InitializeAsync();
-            await SessionState.TryHydrateCharacterAsync();
-
-            _readyToRender = true;
-            StateHasChanged();
-        }
-
-        if (_readyToRender && SessionState.Pfile == null)
-        {
-            Nav.NavigateTo("/character", true);
-        }
+        SessionState.OnChange -= StateHasChanged;
     }
 }

@@ -19,7 +19,7 @@
 @code {
     async Task Logout_clicked()
     {
-        await SessionState.Logout();
+        await SessionState.LogoutAsync();
         Nav.NavigateTo("/");
     }
     void Play()

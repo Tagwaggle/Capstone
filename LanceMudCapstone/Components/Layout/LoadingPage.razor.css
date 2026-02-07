@@ -4,18 +4,73 @@
     font-size: 1.5rem;
 }
 
-.loading-animation {
+.walkout {
+    animation: walk 1s forwards;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.guy {
+    display: inline-block;
+}
+
+.hammering {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 3rem;
+    animation: hammer 1s infinite alternate 1s; /* starts after walk */
+}
+
+.hammer {
     animation: hammer 1s infinite alternate;
 }
 
-@keyframes hammer {
-    from {
-        transform: rotate(-10deg);
+.dust {
+    animation: dust 1s infinite alternate;
+}
+
+p {
+    margin-top: 1rem;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+@keyframes walk {
+    0% {
+        transform: translateX(-150px);
+        opacity: 0;
     }
 
-    to {
-        transform: rotate(10deg);
+    100% {
+        transform: translateX(0);
+        opacity: 1;
     }
 }
-body {
+
+@keyframes hammer {
+    0% {
+        transform: rotate(-15deg);
+    }
+
+    100% {
+        transform: rotate(15deg);
+    }
+}
+
+@keyframes dust {
+    0% {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
 }

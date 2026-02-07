@@ -1,28 +1,37 @@
-﻿@inherits ComponentBase
-@rendermode InteractiveServer
-
-@inject SessionState SessionState
+﻿@page "/loading"
+@inherits ComponentBase
 
 <div class="loading-wrapper">
-    <div class="loading-animation">
-        🔨 Little guys hammering away...
+    <div class="walkout">
+        <span class="guy">🧑‍🔧</span>
+    </div>
+    <div class="hammering">
+        <span class="hammer">🔨</span>
+        <span class="dust">💨</span>
     </div>
     <p>Preparing your adventure...</p>
 </div>
 
-
 @code {
+    [Parameter] public EventCallback OnFinished { get; set; }
+
+    [Inject] private SessionState SessionState { get; set; } = default!;
+
     protected override async Task OnInitializedAsync()
     {
-        await Task.Delay(1000);
-        Console.WriteLine($"[LoadingPage Init] UserId={SessionState.UserId}, UserName={SessionState.UserName}");
-        await OnFinished.InvokeAsync();
-    }
+        // Wait a little so user sees the animation
+        await Task.Delay(800);
 
-    private void Test()
-    {
-        Console.WriteLine($"[LoadingPage Button] UserId={SessionState.UserId}, UserName={SessionState.UserName}");
-    }
+        // Hydrate session (user + character)
+        if (!SessionState.FirstLoadComplete)
+        {
+            await SessionState.EnsureInitializedAsync();
+        }
 
-    [Parameter] public EventCallback OnFinished { get; set; }
+        // Keep cinematic visible for at least 2.5 seconds
+        await Task.Delay(1700);
+
+        if (OnFinished.HasDelegate)
+            await OnFinished.InvokeAsync();
+    }
 }

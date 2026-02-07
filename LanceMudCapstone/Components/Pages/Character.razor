@@ -63,6 +63,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Console.WriteLine($"Character Select Initialized. UserId: {SessionState.UserId}");
+        Console.WriteLine($"SessionState UserName: {SessionState.UserName}");
         if (SessionState.UserId != null)
         {
             characters = (await CharacterService.GetCharactersByUserAsync(SessionState.UserId.Value))
@@ -85,6 +87,18 @@
 
         await SessionState.SetCharacterAsync(selected);
 
+        Console.WriteLine($"Selected character: {selected.Name} (ID: {selected.CharacterId})");
+
+        var stored = await LocalStorage.GetAsync<SessionState.CharacterSession>("session.character");
+
+        if (stored != null)
+        {
+            Console.WriteLine($"SessionState LocalStorage: CharacterId={stored.CharacterId}, RoomId={stored.RoomId}");
+        }
+        else
+        {
+            Console.WriteLine("SessionState LocalStorage: nothing found");
+        }
         Nav.NavigateTo("/play");
     }
 

@@ -96,7 +96,7 @@ public class CharacterService : ICharacterService
     public async Task<PlayerCharacterDto?> LoadCharacterAsync(int userId, int characterId)
     {
         if (userId <= 0) return null;
-
+        Console.WriteLine($"Loading character for userId: {userId}, characterId: {characterId}");
         var all = await GetCharactersByUserAsync(userId);
         return all.FirstOrDefault(c => c.CharacterId == characterId);
     }
