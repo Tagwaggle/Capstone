@@ -68,7 +68,7 @@
 
     async private void LogoutCharacter()
     {
-        await SessionState.SetCharacterAsync(0);
+        await SessionState.ClearCharacterAsync();
         Nav.NavigateTo("/character");
     }
 

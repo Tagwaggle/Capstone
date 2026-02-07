@@ -27,7 +27,7 @@
             <InputText id="passwordInput" @bind-Value="loginModel.Password" type="password" class="input" />
         </div>
 
-        <button @onclick="HandleLogin" class="login-button">Log In</button>
+        <button @onclick="HandleLogin" disabled="@_loading" class="login-button">@(_loading ? "Logging in..." : "Log In")</button>
 
         
 
@@ -37,6 +37,7 @@
 @code {
     private LoginModel loginModel = new();
     private string? ErrorMessage;
+    private bool _loading = false;
 
     private HttpClient Api => HttpClientFactory.CreateClient("ServerAPI");
 
@@ -48,33 +49,37 @@
 
     private async Task HandleLogin()
     {
+        _loading = true;
         ErrorMessage = null;
 
-        var dto = new LoginDto
+        try
         {
-            Username = loginModel.Username.Trim(),
-            Password = loginModel.Password
-        };
+            var dto = new LoginDto
+                {
+                    Username = loginModel.Username.Trim(),
+                    Password = loginModel.Password
+                };
 
-        var response = await Api.PostAsJsonAsync("/api/auth/login", dto);
+            var response = await Api.PostAsJsonAsync("/api/auth/login", dto);
 
-        if (!response.IsSuccessStatusCode)
-        {
-            var error = await response.Content.ReadFromJsonAsync<ApiErrorDto>();
-            ErrorMessage = error?.Message ?? "Login failed.";
-            return;
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadFromJsonAsync<ApiErrorDto>();
+                ErrorMessage = error?.Message ?? "Login failed.";
+                return;
+            }
+
+            var user = await response.Content.ReadFromJsonAsync<UserDto>();
+
+            if (user is null)
+            {
+                ErrorMessage = "Unexpected server response.";
+                return;
+            }
+
+            await SessionState.SetUser(user.UserId, user.Username);
+            Nav.NavigateTo("/character");
         }
-
-        var user = await response.Content.ReadFromJsonAsync<UserDto>();
-
-        if (user is null)
-        {
-            ErrorMessage = "Unexpected server response.";
-            return;
-        }
-
-        SessionState.SetUser(user.UserId, user.Username);
-        Nav.NavigateTo("/character");
+        finally { _loading = false; }
     }
-
 }

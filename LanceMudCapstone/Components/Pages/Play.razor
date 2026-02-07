@@ -131,7 +131,7 @@
     private bool showInventoryModal = false;
     private string[] nonAttackable = new[] { "shop", "guard", "safe", "pc" };
 
-
+ 
     public static string BuildAsciiMonitor(Room? room,
                                            IEnumerable<RoomNpcDto> mobs,
                                            IEnumerable<Container> containers,
@@ -200,23 +200,21 @@
     private void GetLoot() => Console.WriteLine("Get Loot triggered");
     private void Attack(int id) => Console.WriteLine($"Attack triggered {id}");
     private void ShowSpells() => Console.WriteLine("Spells triggered");
+
     async private Task ChangeCharacter()
     {
-        if (Nav != null)
+        if (SessionState.Pfile == null)
         {
-            if (SessionState.Pfile == null)
-            {
-                Console.WriteLine("No character loaded, skipping save.");
-                Nav.NavigateTo("/character");
-                return;
-            }
+            Nav.NavigateTo("/character", true);
+            return;
+        }
 
-            await CharacterService.SavePlayer(SessionState.Pfile);
-            Nav.NavigateTo("/character");
-        }        
-        else
-            Console.WriteLine("NavigationManager not available");
+        await CharacterService.SavePlayer(SessionState.Pfile);
+
+        await SessionState.ClearCharacterAsync(); // we’ll add this
+        Nav.NavigateTo("/character", true);
     }
+
 
     private bool HasExit(string dir) => SessionState.CurrentRoomExits?.Any(e => e.Direction.Equals(dir, StringComparison.OrdinalIgnoreCase)) == true;
 

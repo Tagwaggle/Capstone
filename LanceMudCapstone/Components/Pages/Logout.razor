@@ -17,9 +17,9 @@
     </div>
 </div>
 @code {
-    void Logout_clicked()
+    async Task Logout_clicked()
     {
-        SessionState.Logout();
+        await SessionState.Logout();
         Nav.NavigateTo("/");
     }
     void Play()

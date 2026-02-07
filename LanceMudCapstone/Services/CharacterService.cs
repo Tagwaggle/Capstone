@@ -93,6 +93,13 @@ public class CharacterService : ICharacterService
     {
         return Task.CompletedTask;
     }
+    public async Task<PlayerCharacterDto?> LoadCharacterAsync(int userId, int characterId)
+    {
+        if (userId <= 0) return null;
+
+        var all = await GetCharactersByUserAsync(userId);
+        return all.FirstOrDefault(c => c.CharacterId == characterId);
+    }
 
 
     public Task<bool> UpdateCharacterAsync(UpdateCharacterDto dto)

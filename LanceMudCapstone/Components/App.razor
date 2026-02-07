@@ -21,3 +21,13 @@
 </body>
 
 </html>
+
+@code {
+    [Inject] SessionState SessionState { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SessionState.InitializeAsync();
+    }
+
+}

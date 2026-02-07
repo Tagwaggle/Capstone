@@ -5,10 +5,12 @@
 @using LanceMudCapstone.DTOs
 @using LanceMudCapstone.Models
 @using LanceMudCapstone.API
+@using LanceMudCapstone.Services
 
 @inject IHttpClientFactory httpClientFactory
+@inject LocalStorageService LocalStorage
 @inject SessionState SessionState
-@inject CharacterService CharacterService;
+@inject CharacterService CharacterService
 @inject NavigationManager Nav
 
 <div class="main-container">
@@ -70,21 +72,18 @@
 
     private async Task LoginCharacter()
     {
-        if (!SelectedCharacterId.HasValue)
-            return;
+
+        if (!SelectedCharacterId.HasValue) return;
 
         var selected = characters?.FirstOrDefault(c => c.CharacterId == SelectedCharacterId.Value);
-        if (selected == null)
-            return;
+        if (selected == null) return;
 
-        // Set session state
-        SessionState.Pfile = selected;
+        await LocalStorage.SetAsync("session.character", new{
+            selected.CharacterId,
+            selected.RoomId
+        });
 
-        if (selected.CharacterId != 0)
-            await SessionState.SetCharacterAsync(selected.CharacterId);
-
-        // Move player to their room
-        await SessionState.MoveToRoom(selected.RoomId);
+        await SessionState.SetCharacterAsync(selected);
 
         Nav.NavigateTo("/play");
     }

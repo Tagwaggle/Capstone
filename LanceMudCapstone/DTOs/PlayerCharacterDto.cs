@@ -20,7 +20,7 @@ public class PlayerCharacterDto
     public int Wisdom { get; set; }
     public int Charisma { get; set; }
     public string? HitDice { get; set; }
-    public int RoomId { get; set; }
+    public int? RoomId { get; set; }
     public bool IsAlive { get; set; }
 
     public string? CharacterType { get; set; }

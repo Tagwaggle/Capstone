@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 builder.Services.AddScoped<SessionState>();
+builder.Services.AddScoped<LocalStorageService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<CharacterService>();
 builder.Services.AddSingleton<MobService>();

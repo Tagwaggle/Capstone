@@ -5,19 +5,19 @@
 <div class="page">
     <header class="top-row">
         <LunitariHeader />
-        <!-- Optional: add a navbar here for basic in-game links -->
     </header>
-
+    @if (!_readyToRender)
+    {
+                <LoadingPage OnFinished="() => _readyToRender = true" />
+    }
+    else
+    {
     <main class="play-body">
-        @if (!_hydrated)
-        {
-            <LoadingPage OnFinished="@(() => _hydrated = true)" />
-        }
-        else
-        {
-            @Body
-        }
+        @Body
     </main>
+    }
+    
+    
 
     <footer class="play-footer">
         <AppFooter />
@@ -25,15 +25,31 @@
 </div>
 
 @code {
-    private bool _hydrated = false;
+    private bool _readyToRender = false;
 
-    protected override void OnInitialized()
+ /*   protected override void OnInitialized()
     {
-        SessionState.OnChange += StateHasChanged;
+        // Guard: no active session → back to character select
+        if (!SessionState.IsLoggedIn || SessionState.Pfile == null)
+        {
+            Nav.NavigateTo("/character", true);
+        }
     }
-
-    public void Dispose()
+    */
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        SessionState.OnChange -= StateHasChanged;
+        if (firstRender)
+        {
+            await SessionState.InitializeAsync();
+            await SessionState.TryHydrateCharacterAsync();
+
+            _readyToRender = true;
+            StateHasChanged();
+        }
+
+        if (_readyToRender && SessionState.Pfile == null)
+        {
+            Nav.NavigateTo("/character", true);
+        }
     }
 }
