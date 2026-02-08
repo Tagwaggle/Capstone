@@ -35,6 +35,7 @@ builder.Services.AddHttpClient("ServerAPI", client =>
 {
     string? baseUrl = null;
 
+    // Azure App Service
     var azureHost = builder.Configuration["WEBSITE_HOSTNAME"];
     if (!string.IsNullOrWhiteSpace(azureHost))
     {
@@ -43,18 +44,17 @@ builder.Services.AddHttpClient("ServerAPI", client =>
             baseUrl = fullUrl;
     }
 
+    // Render or Docker
     if (baseUrl is null)
     {
-        var urls = builder.Configuration["ASPNETCORE_URLS"];
-        if (!string.IsNullOrWhiteSpace(urls))
-        {
-            baseUrl = urls
-                .Split(';', StringSplitOptions.RemoveEmptyEntries)
-                .FirstOrDefault(u => Uri.IsWellFormedUriString(u, UriKind.Absolute));
-        }
+        var publicUrl = builder.Configuration["PUBLIC_URL"];
+        if (!string.IsNullOrWhiteSpace(publicUrl))
+            baseUrl = publicUrl;
     }
 
+    // Local dev fallback
     baseUrl ??= "https://localhost:7038/";
+
     client.BaseAddress = new Uri(baseUrl);
 });
 
