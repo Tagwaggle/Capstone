@@ -19,6 +19,8 @@
     else if (!_loaded)
     {
         <p>Loading Characters…</p>
+        <p>If reload does not happen click button.</p>
+        <button @onclick="TryLoadCharactersAsync">Retry</button>
     }
     else if (!characters.Any())
     {
