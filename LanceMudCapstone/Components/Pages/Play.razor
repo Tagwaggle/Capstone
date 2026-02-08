@@ -1,6 +1,6 @@
 ﻿@page "/play"
 @rendermode InteractiveServer
-@layout GameLayout
+@layout PlayLayout
 
 @using System.Text
 @using LanceMudCapstone.Models
@@ -25,22 +25,25 @@ else
                 <div></div>
 
                 <div class="cell">
-                    <button disabled="@(!HasExit("north"))"
-                            @onclick='() => Move("north")'>
+                    <button @onclick='() => Move("north")'
+                            disabled="@(!HasExit("north"))"
+                            class="@(!HasExit("north") ? "disabled-btn" : null)">
                         N
                     </button>
                 </div>
 
                 <div class="cell">
-                    <button disabled="@(!HasExit("up"))"
-                            @onclick='() => Move("up")'>
+                    <button @onclick='() => Move("up")'
+                            disabled="@(!HasExit("up"))"
+                            class="@(!HasExit("up") ? "disabled-btn" : null)">
                         U
                     </button>
                 </div>
 
                 <div class="cell">
-                    <button disabled="@(!HasExit("west"))"
-                            @onclick='() => Move("west")'>
+                    <button @onclick='() => Move("west")'
+                            disabled="@(!HasExit("west"))"
+                            class="@(!HasExit("west") ? "disabled-btn" : null)">
                         W
                     </button>
                 </div>
@@ -48,8 +51,9 @@ else
                 <div></div>
 
                 <div class="cell">
-                    <button disabled="@(!HasExit("east"))"
-                            @onclick='() => Move("east")'>
+                    <button @onclick='() => Move("east")'
+                            disabled="@(!HasExit("east"))"
+                            class="@(!HasExit("east") ? "disabled-btn" : null)">
                         E
                     </button>
                 </div>
@@ -57,15 +61,17 @@ else
                 <div></div>
 
                 <div class="cell">
-                    <button disabled="@(!HasExit("south"))"
-                            @onclick='() => Move("south")'>
+                    <button @onclick='() => Move("south")'
+                            disabled="@(!HasExit("south"))"
+                            class="@(!HasExit("south") ? "disabled-btn" : null)">
                         S
                     </button>
                 </div>
 
                 <div class="cell">
-                    <button disabled="@(!HasExit("down"))"
-                            @onclick='() => Move("down")'>
+                    <button @onclick='() => Move("down")'
+                            disabled="@(!HasExit("down"))"
+                            class="@(!HasExit("down") ? "disabled-btn" : null)">
                         D
                     </button>
                 </div>
@@ -135,10 +141,13 @@ else
         await TryInitializePlayAsync();
     }
 
-    private async void HandleSessionChanged()
+    private void HandleSessionChanged()
     {
-        await TryInitializePlayAsync();
-        await InvokeAsync(StateHasChanged);
+        _ = InvokeAsync(async () =>
+        {
+            await TryInitializePlayAsync();
+            StateHasChanged();
+        });
     }
 
     private async Task TryInitializePlayAsync()
@@ -153,7 +162,7 @@ else
         // Logged in but no character = bounce
         if (!SessionState.CharacterReady)
         {
-//            Nav.NavigateTo("/character", true);
+            //            Nav.NavigateTo("/character", true);
             return;
         }
 
@@ -168,12 +177,14 @@ else
         // Still missing = invalid state
         if (SessionState.CurrentRoom == null)
         {
-  //          Nav.NavigateTo("/character", true);
+            //          Nav.NavigateTo("/character", true);
             return;
         }
 
         _loaded = true;
         _loadInProgress = false;
+
+        StateHasChanged();
     }
 
     public void Dispose()
