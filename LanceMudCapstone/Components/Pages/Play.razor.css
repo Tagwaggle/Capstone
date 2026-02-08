@@ -1,7 +1,7 @@
 ﻿.play-screen {
     display: flex;
     flex-direction: row;
-    height: 100%;
+    height: auto;
     gap: 2rem;
     border: dashed;
 }

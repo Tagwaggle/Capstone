@@ -1,6 +1,5 @@
 ﻿@inherits LayoutComponentBase
 @inject SessionState SessionState
-@inject NavigationManager Nav
 
 <div class="page">
     <header class="top-row">
@@ -9,14 +8,7 @@
 
     <div class="body">
         <main>
-            @if (!_readyToRender || !SessionState.CharacterReady)
-            {
-                <LoadingPage OnFinished="OnLoadingFinished" />
-            }
-            else
-            {
-                @Body
-            }
+            @Body
         </main>
     </div>
 
@@ -26,27 +18,9 @@
 </div>
 
 @code {
-    private bool _readyToRender = false;
-
     protected override void OnInitialized()
     {
         SessionState.OnChange += StateHasChanged;
-    }
-
-    private async Task OnLoadingFinished()
-    {
-        Console.WriteLine("[PlayLayout] LoadingPage finished");
-
-        await SessionState.EnsureInitializedAsync();
-
-        _readyToRender = true;
-        StateHasChanged();
-
-        if (!SessionState.CharacterReady)
-        {
-            Console.WriteLine("[PlayLayout] No character found, redirecting to /character");
-            Nav.NavigateTo("/character", true);
-        }
     }
 
     public void Dispose()

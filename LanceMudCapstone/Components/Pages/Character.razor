@@ -2,15 +2,9 @@
 @rendermode InteractiveServer
 @layout GameLayout
 
-@using LanceMudCapstone.DTOs
-@using LanceMudCapstone.Models
-@using LanceMudCapstone.API
-@using LanceMudCapstone.Services
-
-@inject IHttpClientFactory httpClientFactory
-@inject LocalStorageService LocalStorage
 @inject SessionState SessionState
 @inject CharacterService CharacterService
+@inject LocalStorageService LocalStorage
 @inject NavigationManager Nav
 
 <div class="main-container">
@@ -18,21 +12,20 @@
 
     @if (SessionState.UserId == null)
     {
-        <h1>Please login in.....</h1>
+        <p>Waiting for session…</p>
     }
-    else if (characters == null)
+    else if (!_loaded)
     {
-        <p>Loading Characters...</p>
-        <p>@SessionState.UserName Waiting on load.</p>
+        <p>Loading Characters…</p>
     }
     else if (!characters.Any())
     {
-        <p>No Current Characters, please create a character to continue</p>
+        <p>No characters found. Create one to continue.</p>
     }
     else
     {
         <div class="character-list">
-            <InputRadioGroup @bind-Value="SelectedCharacterId" Name="characterChoice">
+            <InputRadioGroup @bind-Value="SelectedCharacterId">
                 @foreach (var c in characters)
                 {
                     <div class="character-item">
@@ -43,64 +36,85 @@
             </InputRadioGroup>
         </div>
     }
+
     <div class="character-action">
-        @if (SelectedCharacterId.HasValue)
-        {
-            <button @onclick="LoginCharacter">Login</button>
-        }
-        else
-        {
-            <button disabled>Login</button>
-        }
+        <button @onclick="LoginCharacter" disabled="@(!SelectedCharacterId.HasValue)">
+            Login
+        </button>
 
         <button @onclick="CreateCharacter">Create New Character</button>
     </div>
 </div>
-
 @code {
     private List<PlayerCharacterDto>? characters;
     private int? SelectedCharacterId;
+    private bool _loaded, _loadInProgress;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        Console.WriteLine($"Character Select Initialized. UserId: {SessionState.UserId}");
-        Console.WriteLine($"SessionState UserName: {SessionState.UserName}");
-        if (SessionState.UserId != null)
-        {
-            characters = (await CharacterService.GetCharactersByUserAsync(SessionState.UserId.Value))
-                         .ToList();
-        }
+        SessionState.OnChange += HandleSessionChanged;
+        Console.WriteLine("OnInitialized Called Called");
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _loaded)
+            return;
+        Console.WriteLine("AfterRender Called");
+        await TryLoadCharactersAsync();
+    }
+
+    private async void HandleSessionChanged()
+    {
+        Console.WriteLine("HandleSessionChange Called");
+        await TryLoadCharactersAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task TryLoadCharactersAsync()
+    {
+        if (_loaded || _loadInProgress)
+            return;
+
+        if (SessionState.UserId == null)
+            return;
+
+        _loadInProgress = true;
+
+        characters = (await CharacterService
+            .GetCharactersByUserAsync(SessionState.UserId.Value))
+            .ToList();
+
+        _loaded = true;
+        _loadInProgress = false;
+
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task LoginCharacter()
     {
+        if (!SelectedCharacterId.HasValue || characters == null)
+            return;
 
-        if (!SelectedCharacterId.HasValue) return;
+        var selected = characters.First(c => c.CharacterId == SelectedCharacterId.Value);
 
-        var selected = characters?.FirstOrDefault(c => c.CharacterId == SelectedCharacterId.Value);
-        if (selected == null) return;
-
-        await LocalStorage.SetAsync("session.character", new{
+        await LocalStorage.SetAsync("session.character", new
+        {
             selected.CharacterId,
             selected.RoomId
         });
 
         await SessionState.SetCharacterAsync(selected);
 
-        Console.WriteLine($"Selected character: {selected.Name} (ID: {selected.CharacterId})");
-
-        var stored = await LocalStorage.GetAsync<SessionState.CharacterSession>("session.character");
-
-        if (stored != null)
-        {
-            Console.WriteLine($"SessionState LocalStorage: CharacterId={stored.CharacterId}, RoomId={stored.RoomId}");
-        }
-        else
-        {
-            Console.WriteLine("SessionState LocalStorage: nothing found");
-        }
         Nav.NavigateTo("/play");
     }
 
-    private void CreateCharacter() => Nav.NavigateTo("/character/create");
+    private void CreateCharacter()
+        => Nav.NavigateTo("/character/create");
+
+    public void Dispose()
+    {
+        SessionState.OnChange -= HandleSessionChanged;
+    }
 }

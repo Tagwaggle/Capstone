@@ -1,4 +1,7 @@
-﻿@page "/GameLayout"
+﻿@page "/play"
+@rendermode InteractiveServer
+@layout GameLayout
+
 @using System.Text
 @using LanceMudCapstone.Models
 @using LanceMudCapstone.DTOs
@@ -8,170 +11,235 @@
 @inject CharacterService CharacterService
 @inject NavigationManager Nav
 
-@layout PlayLayout
-@rendermode InteractiveServer
+@if (!_loaded)
+{
+    <p>Entering the world…</p>
+}
+else
+{
+    <div class="play-screen">
+        <div class="play-movement">
+            <h3>Movement</h3>
 
-<div class="play-screen">
-    <div class="play-movement">
-        <h3>Movement</h3>
-        <div class="compass-rose">
-            <div></div>
+            <div class="compass-rose">
+                <div></div>
 
-            <div class="cell">
-                @if (HasExit("north"))
-                {
-                    <button @onclick='() => Move("north")'>N</button>
-                }
-                else
-                {
-                    <button disabled class="disabled-btn">N</button>
-                }
-            </div>
+                <div class="cell">
+                    <button disabled="@(!HasExit("north"))"
+                            @onclick='() => Move("north")'>
+                        N
+                    </button>
+                </div>
 
-            <div class="cell">
-                @if (HasExit("up"))
-                {
-                    <button @onclick='() => Move("up")'>U</button>
-                }
-                else
-                {
-                    <button disabled class="disabled-btn">U</button>
-                }
-            </div>
+                <div class="cell">
+                    <button disabled="@(!HasExit("up"))"
+                            @onclick='() => Move("up")'>
+                        U
+                    </button>
+                </div>
 
-            <div class="cell">
-                @if (HasExit("west"))
-                {
-                    <button @onclick='() => Move("west")'>W</button>
-                }
-                else
-                {
-                    <button disabled class="disabled-btn">W</button>
-                }
-            </div>
+                <div class="cell">
+                    <button disabled="@(!HasExit("west"))"
+                            @onclick='() => Move("west")'>
+                        W
+                    </button>
+                </div>
 
-            <div></div>
+                <div></div>
 
-            <div class="cell">
-                @if (HasExit("east"))
-                {
-                    <button @onclick='() => Move("east")'>E</button>
-                }
-                else
-                {
-                    <button disabled class="disabled-btn">E</button>
-                }
-            </div>
+                <div class="cell">
+                    <button disabled="@(!HasExit("east"))"
+                            @onclick='() => Move("east")'>
+                        E
+                    </button>
+                </div>
 
-            <div></div>
+                <div></div>
 
-            <div class="cell">
-                @if (HasExit("south"))
-                {
-                    <button @onclick='() => Move("south")'>S</button>
-                }
-                else
-                {
-                    <button disabled class="disabled-btn">S</button>
-                }
-            </div>
+                <div class="cell">
+                    <button disabled="@(!HasExit("south"))"
+                            @onclick='() => Move("south")'>
+                        S
+                    </button>
+                </div>
 
-            <div class="cell">
-                @if (HasExit("down"))
-                {
-                    <button @onclick='() => Move("down")'>D</button>
-                }
-                else
-                {
-                    <button disabled class="disabled-btn">D</button>
-                }
+                <div class="cell">
+                    <button disabled="@(!HasExit("down"))"
+                            @onclick='() => Move("down")'>
+                        D
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="play-main">
-        <div class="ascii-monitor">
-            <pre>
-@BuildAsciiMonitor(SessionState.CurrentRoom,
-                                      SessionState.CurrentRoomMobs,
-                                      SessionState.CurrentRoomContainers,
-                                      SessionState.CurrentRoomExits)
-            </pre>
+
+        <div class="play-main">
+            <div class="ascii-monitor">
+                <pre>
+    @BuildAsciiMonitor(
+        SessionState.CurrentRoom,
+        SessionState.CurrentRoomMobs,
+        SessionState.CurrentRoomContainers,
+        SessionState.CurrentRoomExits)
+                </pre>
         </div>
     </div>
 
-<div class="play-sidebar">
-    <h3>Commands</h3>
+    <div class="play-sidebar">
+        <h3>Commands</h3>
 
-        
-    <button @onclick="GetLoot">Get Loot</button>
-    @foreach (var child in SessionState.CurrentRoomMobs)
-    {
-        if(!nonAttackable.Contains(child.Base.CharacterType))
-        {
-        <button @onclick="() => Attack(child.Instance.NpcId)">Attack @child.Base.Name </button>
-        }
-    }
-    <button @onclick="() => showScoreModal = true">Score</button>
-    <button @onclick="() => showInventoryModal = true">Inventory</button>
-    <button @onclick="ShowSpells">Spells/Skills</button>
-    <button @onclick="ChangeCharacter">Switch Character</button>
-</div>
+        <button @onclick="GetLoot">Get Loot</button>
 
+        @foreach (var mob in SessionState.CurrentRoomMobs)
+            {
+                if (!nonAttackable.Contains(mob.Base.CharacterType))
+                {
+                    <button @onclick="() => Attack(mob.Instance.NpcId)">
+                        Attack @mob.Base.Name
+                    </button>
+                }
+            }
 
+            <button @onclick="() => showScoreModal = true">Score</button>
+            <button @onclick="() => showInventoryModal = true">Inventory</button>
+            <button @onclick="ShowSpells">Spells / Skills</button>
+            <button @onclick="ChangeCharacter">Switch Character</button>
+        </div>
     </div>
 
+    <InventoryModal Show="@showInventoryModal"
+                    ShowChanged="v => showInventoryModal = v" />
 
-<InventoryModal Show="@showInventoryModal"
-                ShowChanged="v => showInventoryModal = v" />
-<PlayScore Show="@showScoreModal" ShowChanged="v => showScoreModal = v" />
-
+    <PlayScore Show="@showScoreModal"
+               ShowChanged="v => showScoreModal = v" />
+}
 
 @code {
-    private bool showScoreModal = false;
-    private bool showInventoryModal = false;
-    private string[] nonAttackable = new[] { "shop", "guard", "safe", "pc" };
+    private bool _loaded;
+    private bool _loadInProgress;
 
- 
-    public static string BuildAsciiMonitor(Room? room,
-                                           IEnumerable<RoomNpcDto> mobs,
-                                           IEnumerable<Container> containers,
-                                            IEnumerable<RoomExit> roomExits)
+    private bool showScoreModal;
+    private bool showInventoryModal;
+
+    private readonly string[] nonAttackable = { "shop", "guard", "safe", "pc" };
+
+    protected override void OnInitialized()
+    {
+        SessionState.OnChange += HandleSessionChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _loaded)
+            return;
+
+        await TryInitializePlayAsync();
+    }
+
+    private async void HandleSessionChanged()
+    {
+        await TryInitializePlayAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task TryInitializePlayAsync()
+    {
+        if (_loaded || _loadInProgress)
+            return;
+
+        // Wait for session hydration
+        if (!SessionState.IsLoggedIn)
+            return;
+
+        // Logged in but no character = bounce
+        if (!SessionState.CharacterReady)
+        {
+//            Nav.NavigateTo("/character", true);
+            return;
+        }
+
+        _loadInProgress = true;
+
+        // Refresh-safe: room may be missing
+        if (SessionState.CurrentRoom == null)
+        {
+            await SessionState.MoveToRoom(2);
+        }
+
+        // Still missing = invalid state
+        if (SessionState.CurrentRoom == null)
+        {
+  //          Nav.NavigateTo("/character", true);
+            return;
+        }
+
+        _loaded = true;
+        _loadInProgress = false;
+    }
+
+    public void Dispose()
+    {
+        SessionState.OnChange -= HandleSessionChanged;
+    }
+
+    private bool HasExit(string dir)
+        => SessionState.CurrentRoomExits?
+            .Any(e => e.Direction.Equals(dir, StringComparison.OrdinalIgnoreCase)) == true;
+
+    private async Task Move(string dir)
+        => await SessionState.TryMoveAsync(dir);
+
+    private void GetLoot()
+        => Console.WriteLine("Get Loot triggered");
+
+    private void Attack(int id)
+        => Console.WriteLine($"Attack triggered {id}");
+
+    private void ShowSpells()
+        => Console.WriteLine("Spells triggered");
+
+    private async Task ChangeCharacter()
+    {
+        if (SessionState.Pfile != null)
+            await CharacterService.SavePlayer(SessionState.Pfile);
+
+        await SessionState.ClearCharacterAsync();
+        Nav.NavigateTo("/character", true);
+    }
+
+    public static string BuildAsciiMonitor(
+        Room? room,
+        IEnumerable<RoomNpcDto> mobs,
+        IEnumerable<Container> containers,
+        IEnumerable<RoomExit> exits)
     {
         var lines = new List<string>();
 
         if (room != null)
         {
             lines.Add(room.Name ?? "");
-            foreach (var wrappedLine in RoomService.WordWrap(room.Description ?? "", 40))
-            {
-                lines.Add(wrappedLine);                
-            }
+            foreach (var l in RoomService.WordWrap(room.Description ?? "", 40))
+                lines.Add(l);
         }
 
-        if (mobs?.Any() == true)
+        if (mobs.Any())
         {
             lines.Add("Mob:");
             foreach (var m in mobs)
-            {
                 lines.Add("    " + m.Base.Name);
-            }
         }
 
-        if (containers?.Any() == true)
+        if (containers.Any())
         {
             lines.Add("Container:");
             foreach (var c in containers)
-            {
                 lines.Add("    " + c.Name);
-            }
         }
-        if (roomExits?.Any() == true)
+
+        if (exits.Any())
         {
             lines.Add("Exits:");
-            foreach (var e in roomExits)
-            {
+            foreach (var e in exits)
                 lines.Add("    " + e.Direction);
-            }
         }
         else
         {
@@ -179,47 +247,16 @@
             lines.Add("YOU'RE TRAPPED");
         }
 
-        lines.Add(">"); // prompt line
+        lines.Add(">");
 
-        int maxWidth = lines.Any() ? lines.Max(l => l.Length) : 1;
-
+        int max = lines.Max(l => l.Length);
         var sb = new StringBuilder();
-        sb.AppendLine("|" + new string('=', maxWidth + 2) + "|");
 
-        foreach (var line in lines)
-        {
-            string padded = line.PadRight(maxWidth, ' ');
-            sb.AppendLine($"| {padded} |");
-        }
-
-        sb.AppendLine("|" + new string('=', maxWidth + 2) + "|");
+        sb.AppendLine("|" + new string('=', max + 2) + "|");
+        foreach (var l in lines)
+            sb.AppendLine($"| {l.PadRight(max)} |");
+        sb.AppendLine("|" + new string('=', max + 2) + "|");
 
         return sb.ToString();
-    }
-
-    private void GetLoot() => Console.WriteLine("Get Loot triggered");
-    private void Attack(int id) => Console.WriteLine($"Attack triggered {id}");
-    private void ShowSpells() => Console.WriteLine("Spells triggered");
-
-    async private Task ChangeCharacter()
-    {
-        if (SessionState.Pfile == null)
-        {
-            Nav.NavigateTo("/character", true);
-            return;
-        }
-
-        await CharacterService.SavePlayer(SessionState.Pfile);
-
-        await SessionState.ClearCharacterAsync(); // we’ll add this
-        Nav.NavigateTo("/character", true);
-    }
-
-
-    private bool HasExit(string dir) => SessionState.CurrentRoomExits?.Any(e => e.Direction.Equals(dir, StringComparison.OrdinalIgnoreCase)) == true;
-
-    private async Task Move(string dir)
-    {
-        await SessionState.TryMoveAsync(dir);
     }
 }
