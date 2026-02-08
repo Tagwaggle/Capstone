@@ -13,6 +13,8 @@
     @if (SessionState.UserId == null)
     {
         <p>Waiting for session…</p>
+        <p>If reload does not happen click button.</p>
+        <button @onclick="TryLoadCharactersAsync">Retry</button>
     }
     else if (!_loaded)
     {
