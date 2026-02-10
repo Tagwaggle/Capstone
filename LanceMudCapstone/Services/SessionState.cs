@@ -26,9 +26,9 @@ public class SessionState
     public PlayerCharacterDto? Pfile { get; private set; }
 
     public Room? CurrentRoom { get; private set; }
-    public List<Container> CurrentRoomContainers { get; private set; } = new();
-    public List<RoomExit> CurrentRoomExits { get; private set; } = new();
-    public List<RoomNpcDto> CurrentRoomMobs { get; private set; } = new();
+    public List<Container> CurrentRoomContainers { get; set; } = new();
+    public List<RoomExit> CurrentRoomExits { get; set; } = new();
+    public List<RoomNpcDto> CurrentRoomMobs { get; set; } = new();
 
     public bool Ready { get; private set; } = false;
     public bool FirstLoadComplete { get; private set; } = false;

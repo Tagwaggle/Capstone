@@ -5,6 +5,21 @@ namespace LanceMudCapstone.Models
 {
     public class AbilityBook
     {
+        public static List<AbilityDto> GetByClass(string className)
+        {
+            return className.ToLower() switch
+            {
+                "paladin" => Paladin,
+                "mage" => Mage,
+                "warrior" => Warrior,
+                "cleric" => Cleric,
+                "rogue" => Rogue,
+                "hunter" => Hunter,
+                "knight" => Knight,
+                _ => new List<AbilityDto>()
+            };
+        }
+
         public static readonly List<AbilityDto> Warrior = new()
         {
             new AbilityDto { Name="Kick", LevelRequirement=1, DamageFormula="2d10", CooldownSeconds=3, StaminaCost=5, Description="Enzuigiri kick to defender.name", Type="Physical" },

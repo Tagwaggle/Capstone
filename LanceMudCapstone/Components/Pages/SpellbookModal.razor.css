@@ -1,0 +1,61 @@
+﻿.spellbook-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+}
+
+.spellbook-card {
+    background: #1e1e1e;
+    color: white;
+    padding: 20px;
+    width: 700px;
+    max-height: 80vh;
+    overflow-y: auto;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+
+.spell-list {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.spell-row {
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.spell-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.spell-meta {
+    font-size: 0.9rem;
+    opacity: 0.85;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.spell-desc {
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+.close-btn {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    background: #444;
+    color: white;
+    border-radius: 5px;
+}

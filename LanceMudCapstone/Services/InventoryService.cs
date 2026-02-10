@@ -1,4 +1,5 @@
-﻿using LanceMudCapstone.DTOs;
+﻿using Dapper;
+using LanceMudCapstone.DTOs;
 using LanceMudCapstone.Enums;
 using LanceMudCapstone.Models;
 
@@ -10,15 +11,18 @@ namespace LanceMudCapstone.Services
         private readonly IItemRepository _itemRepo;
         private readonly IEquipRepository _equipRepo;
         private readonly CharacterService _characterService;
+        private readonly DbHelper _db;
 
         public InventoryService(
             IItemRepository itemRepo,
             IEquipRepository equipRepo,
-            CharacterService characterService)
+            CharacterService characterService,
+            DbHelper db)
         {
             _itemRepo = itemRepo;
             _equipRepo = equipRepo;
             _characterService = characterService;
+            _db = db;
         }
 
         public async Task<List<ItemDto>> GetInventory(int playerCharacterId)
@@ -141,6 +145,54 @@ namespace LanceMudCapstone.Services
             await _characterService.UpdateCharacterAsync(updateDto);
 
             return message.Trim();
+        }
+
+        public async Task MoveToContainerAsync(int playerCharacterId, int itemId, int containerId)
+        { 
+            using var conn = await _db.CreateOpenConnectionAsync();
+
+            string sql = @"
+                INSERT INTO containeritems (itemid, containerid, quantity, droppeddateitem)
+                VALUES (@ItemId, @ContainerId, 1, NOW());";
+            await conn.ExecuteAsync(sql, new
+            {
+               
+                ItemId = itemId,
+                ContainerId = containerId
+            });
+
+
+        }
+        public async Task DeleteItemAsync(int playerCharacterId, int itemId)
+        {
+            using var conn = await _db.CreateOpenConnectionAsync();
+
+            string sql = @"
+                DELETE FROM playerinventory
+                WHERE playercharacterid = @PlayerId AND itemid = @ItemId
+                LIMIT 1;";
+            await conn.ExecuteAsync(sql, new
+            {
+                PlayerId = playerCharacterId,
+                ItemId = itemId
+            });
+        }
+        public async Task<List<LootItemDto>> GetLootForMobAsync(int npcId)
+        {
+            using var conn = await _db.CreateOpenConnectionAsync();
+
+            string sql = @"
+                    SELECT 
+                        lti.itemid, lti.quantity, i.name, i.description, i.itemtype, i.itemcategory
+                    FROM nonplayercharacters npc
+                    INNER JOIN loottables lt ON lt.loottableid = npc.loottableid
+                    INNER JOIN loottableitems lti ON lti.loottableid = lt.loottableid
+                    INNER JOIN items i ON i.itemid = lti.itemid
+                    WHERE npc.npcid = @NpcId;
+                ";
+
+            var results = await conn.QueryAsync<LootItemDto>(sql, new { NpcId = npcId });
+            return results.ToList();
         }
 
     }

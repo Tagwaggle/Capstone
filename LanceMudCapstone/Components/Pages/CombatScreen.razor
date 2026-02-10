@@ -1,13 +1,86 @@
 ﻿@using LanceMudCapstone.DTOs
+@using LanceMudCapstone.Enums
 @inject ICombatService CombatService
 @rendermode InteractiveServer
 
 <div class="combat-screen">
     <h3>Combat!</h3>
-    <pre>@combatLog</pre>
 
-    <button @onclick="AttackRound">Attack</button>
-    <button @onclick="RunAway">Run Away</button>
+    <div class="combat-header">
+        <h2>@Player.Name vs @Mob.Name</h2>
+    </div>
+    <div class="combat-log">
+        <pre>@combatLog</pre>
+    </div>
+    <div style="display: inline-block">
+        @if (UsableAbilities.Any())
+        {
+            <div class="ability-buttons">
+                @foreach (var ability in UsableAbilities)
+                {
+                    <button @onclick="() => UseAbility(ability)">
+                        @ability.Name
+                    </button>
+                }
+            </div>
+        }
+
+        <button @onclick="AttackRound">Attack</button>
+        <button @onclick="RunAway">Run Away</button>
+    </div>
+    <br />
+
+
+
+    <br />
+
+    <div class="combat-bars">
+
+        <div class="stat-row">
+            <span class="stat-label">HP:</span>
+            <div class="bar health-bar">
+                <div class="fill" style="width:@($"{GetPercent(Player.Health, Player.MaxHealth)}%")"></div>
+            </div>
+        </div>
+
+        @if (Player.MaxMana != 0)
+        {
+            <div class="stat-row">
+                <span class="stat-label">Mana:</span>
+                <div class="bar mana-bar">
+                    <div class="fill" style="width:@($"{GetPercent(Player.Mana, Player.MaxMana)}%")"></div>
+                </div>
+            </div>
+        }
+
+        @if (Player.MaxStamina != 0)
+        {
+            <div class="stat-row">
+                <span class="stat-label">Stamina:</span>
+                <div class="bar stamina-bar">
+                    <div class="fill" style="width:@($"{GetPercent(Player.Stamina, Player.MaxStamina)}%")"></div>
+                </div>
+            </div>
+        }
+
+    </div>
+    @if (endState != CombatEndState.None)
+    {
+        <div class="combat-end-overlay">
+            <div class="combat-end-card">
+                @if (endState == CombatEndState.Victory)
+                {
+                    <h2>You defeated @Mob.Name!</h2>
+                }
+                else
+                {
+                    <h2>You have been defeated...</h2>
+                }
+
+                <button @onclick="FinishCombat">Continue</button>
+            </div>
+        </div>
+    }
 </div>
 
 @code {
@@ -17,10 +90,22 @@
     [Parameter] public EventCallback OnDefeat { get; set; }
 
     private string combatLog = string.Empty;
+    private bool showEndScreen = false;
+    private string endMessage = "";
+    private CombatEndState endState;
 
-    private async Task AttackRound()
+    private List<AbilityDto> UsableAbilities = new();
+
+    protected override void OnParametersSet()
     {
-        var result = await CombatService.ResolveRoundAsync(Player, Mob);
+        LoadUsableAbilities();
+    }
+    private async Task UseAbility(AbilityDto ability)
+    {
+        combatLog = "";
+
+        var result = await CombatService.ResolveAbilityAsync(Player, Mob, ability);
+
         combatLog += string.Join("\n", result.Log) + "\n";
         combatLog += $"Player HP: {Player.Health}/{Player.MaxHealth}\n";
         combatLog += $"{Mob.Name} HP: {Mob.Health}/{Mob.MaxHealth}\n\n";
@@ -28,12 +113,46 @@
         if (!Mob.IsAlive)
         {
             combatLog += $"The {Mob.Name} has fallen!\n";
-            await OnVictory.InvokeAsync(Mob.Name);
+            showEndScreen = true;
+            return;
         }
         else if (!Player.IsAlive)
         {
             combatLog += $"You have been defeated...\n";
-            await OnDefeat.InvokeAsync();
+            showEndScreen = true;
+            return;
+        }
+
+        LoadUsableAbilities(); // refresh after mana/stamina changes
+    }
+
+    private void LoadUsableAbilities() 
+    { 
+        var all = AbilityBook.GetByClass(Player.Class);
+        UsableAbilities = all
+        .Where(a => a.LevelRequirement <= Player.Level)
+        .Where(a => a.ManaCost == null || Player.Mana >= a.ManaCost)
+        .Where(a => a.StaminaCost == null || Player.Stamina >= a.StaminaCost)
+        .OrderBy(a => a.LevelRequirement).ToList(); }
+
+    private async Task AttackRound()
+    {
+        combatLog = "";
+        var result = await CombatService.ResolveRoundAsync(Player, Mob);
+
+        combatLog += string.Join("\n", result.Log) + "\n";
+        combatLog += $"Player HP: {Player.Health}/{Player.MaxHealth}\n";
+        combatLog += $"{Mob.Name} HP: {Mob.Health}/{Mob.MaxHealth}\n\n";
+
+        if (!Mob.IsAlive)
+        {
+            endState = CombatEndState.Victory;
+            return;
+        }
+        else if (!Player.IsAlive)
+        {
+            endState = CombatEndState.Defeat;
+            return;
         }
     }
 
@@ -42,4 +161,22 @@
         combatLog += "You flee from combat!\n";
         await OnDefeat.InvokeAsync();
     }
+
+    private int GetPercent(int value, int max)
+    {
+        if (max <= 0)
+            return 0;
+
+        return (int)(value * 100 / max);
+    }
+
+    private async Task FinishCombat()
+    {
+        if (endState == CombatEndState.Victory) await OnVictory.InvokeAsync(Mob.Name);
+        else
+            await OnDefeat.InvokeAsync();
+
+        endState = CombatEndState.None;
+    }
+
 }

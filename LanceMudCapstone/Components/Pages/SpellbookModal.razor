@@ -1,0 +1,67 @@
+﻿@using LanceMudCapstone.DTOs
+@using LanceMudCapstone.Models
+
+@inherits ComponentBase
+
+@if (Show)
+{
+    <div class="spellbook-overlay" @onclick="Close">
+        <div class="spellbook-card" @onclick:stopPropagation()">
+
+            <h2>@Player.Class Spellbook</h2>
+
+            <div class="spell-list">
+                @foreach (var ability in Abilities)
+                {
+                    <div class="spell-row">
+                        <div class="spell-name">@ability.Name</div>
+
+                        <div class="spell-meta">
+                            <span class="level">Lvl @ability.LevelRequirement</span>
+
+                            @if (ability.ManaCost.HasValue)
+                            {
+                                <span class="mana">Mana: @ability.ManaCost</span>
+                            }
+
+                            @if (ability.StaminaCost.HasValue)
+                            {
+                                <span class="stamina">Stamina: @ability.StaminaCost</span>
+                            }
+
+                            <span class="cooldown">CD: @ability.CooldownSeconds s</span>
+                            <span class="type">@ability.Type</span>
+                        </div>
+
+                        <div class="spell-desc">@ability.Description</div>
+                    </div>
+                }
+            </div>
+
+            <button class="close-btn" @onclick="Close">Close</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Show { get; set; }
+    [Parameter] public EventCallback<bool> ShowChanged { get; set; }
+    [Parameter] public PlayerCharacterDto Player { get; set; } = default!;
+
+    private List<AbilityDto> Abilities = new();
+
+    protected override void OnParametersSet()
+    {
+        if (Player is null) return;
+
+        Abilities = AbilityBook.GetByClass(Player.Class)
+            .Where(a => a.LevelRequirement <= Player.Level)
+            .OrderBy(a => a.LevelRequirement)
+            .ToList();
+    }
+
+    private async Task Close()
+    {
+        await ShowChanged.InvokeAsync(false);
+    }
+}

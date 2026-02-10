@@ -12,12 +12,14 @@ builder.Services.AddScoped<SessionState>();
 builder.Services.AddScoped<LocalStorageService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<CharacterService>();
-builder.Services.AddSingleton<MobService>();
-builder.Services.AddSingleton<EffectService>();
-builder.Services.AddSingleton<RespawnService>();
-builder.Services.AddSingleton<WorldEngine>();
-builder.Services.AddSingleton<AbilityEngine>();
-builder.Services.AddSingleton<ICombatService, CombatService>();
+
+builder.Services.AddScoped<MobService>();
+builder.Services.AddScoped<EffectService>();
+builder.Services.AddScoped<RespawnService>();
+builder.Services.AddScoped<WorldEngine>();
+builder.Services.AddScoped<AbilityEngine>();
+
+builder.Services.AddScoped<ICombatService, CombatService>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IEquipRepository, EquipRepository>();
 builder.Services.AddScoped<InventoryService>();
@@ -27,7 +29,7 @@ var supabaseConnString = builder.Configuration.GetConnectionString("SupabaseDb")
     throw new InvalidOperationException("Missing SupabaseDb connection string");
 
 builder.Services.AddScoped<DbHelper>();
-builder.Services.AddScoped(sp => new ContainerService(supabaseConnString));
+builder.Services.AddScoped<ContainerService>();
 builder.Services.AddScoped(sp => new RoomService(supabaseConnString));
 
 builder.Services.AddHttpClient();
@@ -60,9 +62,12 @@ builder.Services.AddHttpClient("ServerAPI", client =>
 
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var world = scope.ServiceProvider.GetRequiredService<WorldEngine>();
+    world.Start();
+}
 
-var world = app.Services.GetRequiredService<WorldEngine>();
-world.Start();
 
 if (!app.Environment.IsDevelopment())
 {

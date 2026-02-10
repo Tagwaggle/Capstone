@@ -20,6 +20,15 @@ namespace LanceMudCapstone.Services
 
         public AbilityResult ExecuteAbility(PlayerCharacterDto caster, PlayerCharacterDto target, AbilityDto ability)
         {
+            if (ability.ManaCost > 0)
+            {
+                caster.Mana = Math.Max(0, caster.Mana - ability.ManaCost.Value);
+            }
+            if (ability.StaminaCost > 0)
+            {
+                caster.Stamina = Math.Max(0, caster.Stamina - ability.StaminaCost.Value);
+
+            }
             var result = ParseFormula(ability.DamageFormula, caster, target);
 
             string msg = ability.Description.Replace("defender.name", target.Name)
@@ -27,6 +36,21 @@ namespace LanceMudCapstone.Services
                                             .Replace("{damage}", result.Damage.ToString())
                                             .Replace("{healing}", result.Healing.ToString());
 
+
+            if (result.Healing > 0)
+            {
+                target.Health = Math.Min(target.MaxHealth, target.Health + result.Healing);
+            }
+            if (result.Damage > 0)
+            {
+                target.Health -= result.Damage;
+                if (target.Health <= 0)
+                {
+                    target.IsAlive = false;
+                    target.Health = 0;
+                    msg += $" {target.Name} has been defeated!";
+                }
+            }
             return new AbilityResult
             {
                 Message = msg,

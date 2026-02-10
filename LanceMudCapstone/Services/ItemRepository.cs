@@ -97,6 +97,19 @@ namespace LanceMudCapstone.Services
         }
 
 
-    }
 
+
+        public async Task<List<LootItemDto>> GetLootForMobAsync(int npcId)
+        {
+            using var conn = await _db.CreateOpenConnectionAsync();
+            string sql = @"
+                    SELECT lt.itemid, lt.quantity, i.name, i.description
+                    FROM loottables lt
+                    INNER JOIN items i ON i.itemid = lt.itemid
+                    WHERE lt.npcid = @NpcId;";
+
+            var result = await conn.QueryAsync<LootItemDto>(sql, new { NpcId = npcId });
+            return result.ToList();
+        }
+    }
 }

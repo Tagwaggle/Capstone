@@ -1,24 +1,102 @@
 ﻿.modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    inset: 0; 
+    background-color: rgba(0, 0, 0, 0.65);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 200000;
 }
 
 .modal {
-        background-color: #1a1a1a;
+    background-color: #1a1a1a;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    width: 90%;
-    max-width: 500px;
     padding: 1.5rem;
+    max-width: 500px;
+    width: 90%;
     color: #f0f0f0;
+    z-index: 210000;
+}
+
+.combat-bars {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bar {
+    height: 20px;
+    border-radius: 6px;
+    background: #333;
+    overflow: hidden;
     position: relative;
 }
 
+    .bar .fill {
+        height: 100%;
+        transition: width 0.3s ease;
+    }
+
+.health-bar .fill {
+    background: linear-gradient(90deg, #8b0000, #ff3b3b);
+}
+
+.mana-bar .fill {
+    background: linear-gradient(90deg, #0033aa, #3399ff);
+}
+
+.stamina-bar .fill {
+    background: linear-gradient(90deg, #006600, #33cc33);
+}
+.combat-header {
+    text-align: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #444;
+}
+
+    .combat-header h2 {
+        margin: 0;
+        font-size: 1.4rem;
+        letter-spacing: 1px;
+    }
+
+.combat-log {
+    background: #0f0f0f;
+    border: 1px solid #333;
+    padding: 10px;
+    height: auto;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+.ability-buttons {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+    .ability-buttons button {
+        background: #333;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 4px;
+    }
+.combat-end-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 5000;
+}
+
+.combat-end-card {
+    background: #222;
+    padding: 20px;
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+}
