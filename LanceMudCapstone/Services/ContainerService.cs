@@ -48,7 +48,6 @@ public class ContainerService
         if (container == null)
             return new List<ItemDto>();
 
-        // 2. Load items inside container
         string itemsSql = @"
             SELECT ri.itemid, ri.quantity,
                    i.name, i.description, i.itemtype, i.itemcategory
@@ -59,13 +58,14 @@ public class ContainerService
 
         var items = (await conn.QueryAsync<ItemDto>(itemsSql, new { ContainerId = containerId })).ToList();
 
-        // 3. Move items to player inventory
         foreach (var item in items)
         {
             string insertSql = @"
-                INSERT INTO playerinventory (playercharacterid, itemid, quantity)
-                VALUES (@PlayerId, @ItemId, @Quantity);
-            ";
+                    INSERT INTO playerinventory (playercharacterid, itemid, quantity)
+                    VALUES (@PlayerId, @ItemId, @Quantity)
+                    ON CONFLICT (playercharacterid, itemid)
+                    DO UPDATE SET quantity = playerinventory.quantity + EXCLUDED.quantity;
+                ";
 
             await conn.ExecuteAsync(insertSql, new
             {
@@ -75,7 +75,6 @@ public class ContainerService
             });
         }
 
-        // 4. Delete items from corpse
         string deleteItemsSql = @"
             DELETE FROM roomitems
             WHERE containerid = @ContainerId;
@@ -83,9 +82,9 @@ public class ContainerService
 
         await conn.ExecuteAsync(deleteItemsSql, new { ContainerId = containerId });
 
-        // 5. Delete corpse container
-        if (container.Name.Contains("corpse", StringComparison.OrdinalIgnoreCase))
+        if (container.Name.Contains("Corpse", StringComparison.OrdinalIgnoreCase))
         {
+            Console.WriteLine("Corpse Delete");
             string deleteContainerSql = @"
                 DELETE FROM containers
                 WHERE containerid = @ContainerId;

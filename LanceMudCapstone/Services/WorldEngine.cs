@@ -13,6 +13,7 @@ namespace LanceMudCapstone.Services
 
         private Timer? _timer;
         private readonly int _tickRateMs = 10000; // updated to 10
+        private bool _isTicking = false;
 
         public WorldEngine(
             ICombatService combat,
@@ -31,13 +32,22 @@ namespace LanceMudCapstone.Services
             _timer = new Timer(Tick, null, 0, _tickRateMs);
         }
 
-        private void Tick(object? state)
+        private async void Tick(object? state)
         {
-            Console.WriteLine($"[WorldEngine] Tick at {DateTime.Now}");
-            _effects.ProcessEffects();
-            _combat.ProcessCombatRounds();
-            _mobs.ProcessMobAI();
-            _respawn.ProcessRespawns();
+            if(_isTicking) return;
+            _isTicking = true;
+            try
+            {
+                Console.WriteLine($"[WorldEngine] Tick at {DateTime.Now}");
+                _effects.ProcessEffects();
+                _combat.ProcessCombatRounds();
+                _mobs.ProcessMobAI();
+                await _respawn.ProcessRespawns();
+            }
+            finally
+            {
+                _isTicking = false;
+            }
         }
     }
 }

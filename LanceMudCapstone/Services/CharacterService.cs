@@ -2,11 +2,13 @@
 using LanceMudCapstone.DTOs;
 using LanceMudCapstone.Models;
 
+
 namespace LanceMudCapstone.Services;
 
 public class CharacterService : ICharacterService
 {
     private readonly DbHelper _db;
+    private readonly Random _rng = new();
 
     public CharacterService(DbHelper db)
     {
@@ -112,14 +114,22 @@ public class CharacterService : ICharacterService
             SET
                 name = @Name, race = @Race, alignment = @Alignment, health = @Health, maxhealth = @MaxHealth, armorclass = @ArmorClass,
                 strength = @Strength, dexterity = @Dexterity, constitution = @Constitution, intelligence = @Intelligence, wisdom = @Wisdom,
-                charisma = @Charisma, roomid = @RoomId
+                charisma = @Charisma, roomid = @RoomId, level = @Level, isalive = @IsAlive
             WHERE
                 characterid = @CharacterId;
         ";
-
+        const string updatePlayerSql = @"
+            UPDATE playercharacters
+            SET
+                gold = @Gold, activequest = @ActiveQuest, lastonline = @LastOnline,
+                mana = @Mana, maxmana = @MaxMana, stamina = @Stamina, maxstamina = @MaxStamina,
+                xp = @Xp, xpneeded = @XpNeeded
+            WHERE
+                characterid = @CharacterId;";
         await conn.ExecuteAsync(updateCharacterSql, saveState, tx);
-
-        tx.Commit();
+        await conn.ExecuteAsync(updatePlayerSql, saveState, tx);
+        
+        await tx.CommitAsync();
         return saveState;
     }
 
@@ -151,10 +161,10 @@ public class CharacterService : ICharacterService
                    c.health, c.maxhealth, c.armorclass, c.strength, c.dexterity,
                    c.constitution, c.intelligence, c.wisdom, c.charisma, c.createdat,
                    npc.npcid, npc.behaviortype, npc.ishostile, npc.respawntime,
-                   npc.loottableid, npc.roomid, npc.createdat as npc_createdat
+                   npc.loottableid, npc.roomid, npc.createdat as npc_createdat, npc.lastkilled, npc.respawnat
             FROM nonplayercharacters npc
             INNER JOIN characters c ON npc.characterid = c.characterid
-            WHERE npc.roomid = @roomId AND c.health > 0
+            WHERE npc.roomid = @roomId AND c.isalive = true;
         ";
 
         using var conn = _db.CreateConnection();

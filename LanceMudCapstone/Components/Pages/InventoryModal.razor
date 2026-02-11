@@ -37,6 +37,7 @@
                                  @onclick="() => SelectItem(item)">
                                 <strong>@item.Name</strong>
                                 <span>@item.ItemType</span>
+                                <span>@item.Quantity</span>
                             </div>
                         }
                     </div>
@@ -81,9 +82,9 @@
 
             if (SessionState.Pfile?.PlayerCharacterId == null) return;
 
-            InventoryItems = await InventoryService.GetInventory(SessionState.Pfile.PlayerCharacterId);
+            InventoryItems = await InventoryService.GetInventory(SessionState.Pfile.PlayerCharacterId!.Value);
 
-            var equippedItems = await InventoryService.GetEquipped(SessionState.Pfile.PlayerCharacterId);
+            var equippedItems = await InventoryService.GetEquipped(SessionState.Pfile.PlayerCharacterId!.Value);
 
             foreach (var eq in equippedItems)
                 Equipped[eq.Slot] = eq.Item;
@@ -121,7 +122,7 @@
             return;
 
         await InventoryService.EquipAsync(
-            SessionState.Pfile.PlayerCharacterId,
+            SessionState.Pfile.PlayerCharacterId!.Value,
             SelectedItem.ItemId,
             SelectedItem.Slot.Value
         );
@@ -133,7 +134,7 @@
     {
         if (SelectedSlot == null) return;
 
-        await InventoryService.UnequipAsync(SessionState.Pfile.PlayerCharacterId, SelectedSlot.Value);
+        await InventoryService.UnequipAsync(SessionState.Pfile.PlayerCharacterId!.Value, SelectedSlot.Value);
 
         await OnParametersSetAsync();
         StateHasChanged();
@@ -142,7 +143,7 @@
     {
         if (SelectedItem == null || SelectedItem.ItemType != "Consumable") return;
 
-        var msg = await InventoryService.UseAsync(SessionState.Pfile.PlayerCharacterId, SelectedItem.ItemId);
+        var msg = await InventoryService.UseAsync(SessionState.Pfile.PlayerCharacterId!.Value, SelectedItem.ItemId);
 
 
         await OnParametersSetAsync();

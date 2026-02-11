@@ -10,7 +10,7 @@
 @inject SessionState SessionState
 @inject CharacterService CharacterService
 @inject NavigationManager Nav
-@inject ContainerService ContainerService;
+@inject ContainerService ContainerService
 
 @if (!_loaded)
 {
@@ -86,7 +86,8 @@ else
         SessionState.CurrentRoom,
         SessionState.CurrentRoomMobs,
         SessionState.CurrentRoomContainers,
-        SessionState.CurrentRoomExits)
+        SessionState.CurrentRoomExits,
+        SessionState.EventLog)
                 </pre>
         </div>
     </div>
@@ -94,9 +95,14 @@ else
     <div class="play-sidebar">
         <h3>Commands</h3>
 
-        <button @onclick="GetLoot">Get Loot</button>
+        @foreach (var c in SessionState.CurrentRoomContainers)
+            {
+                <button @onclick="() => GetLoot(c.ContainerId)">
+                    Loot @c.Name
+                </button>
+            }
 
-        @foreach (var mob in SessionState.CurrentRoomMobs)
+            @foreach (var mob in SessionState.CurrentRoomMobs)
             {
                 if (!nonAttackable.Contains(mob.Base.CharacterType))
                 {
@@ -112,7 +118,8 @@ else
             <button @onclick="ChangeCharacter">Logout</button>
         </div>
     </div>
-    @if (showCombat)
+
+    @if (SessionState.InCombat)
     {
         <div class="combat-slide">
             <CombatScreen Player="@player"
@@ -121,6 +128,7 @@ else
                           OnDefeat="HandleDefeat" />
         </div>
     }
+
     @if (showSpellBook)
     {
         <SpellbookModal Show="@showSpellBook"
@@ -142,32 +150,29 @@ else
     private bool showSpellBook;
     private bool showScoreModal;
     private bool showInventoryModal;
-    private bool showCombat = false;
+
 
     private PlayerCharacterDto player;
     private PlayerCharacterDto currentMob;
 
     private readonly string[] nonAttackable = { "shop", "guard", "safe", "pc" };
-
-    private void StartCombat(PlayerCharacterDto mob)
+    private async Task RefreshAfterCombat()
     {
-        currentMob = mob;
-        Console.WriteLine($"[StartCombat]:{currentMob.Name} is being attacked");
-        Console.WriteLine($"[ShowCombat]:{showCombat} before");
-        showCombat = true;
-        Console.WriteLine($"[ShowCombat]:{showCombat} after");
+        await SessionState.MoveToRoom(SessionState.CurrentRoom.RoomId);
+        await InvokeAsync(StateHasChanged);
     }
-
     private async Task HandleVictory(string mobName)
     {
-        showCombat = false;
-        // dont forget to show all the fun stuff you won from the mob and remove it from the room
+        SessionState.SetCombat(false);
+        await RefreshAfterCombat();
+        //        showCombat = false;
     }
 
     private async Task HandleDefeat()
     {
-        showCombat = false;
-        // bounce to character room 2 with a "you died" message
+        SessionState.SetCombat(false);
+        await RefreshAfterCombat();
+        //        showCombat = false;
     }
 
     protected override void OnInitialized()
@@ -198,31 +203,19 @@ else
         if (_loaded || _loadInProgress)
             return;
 
-        // Wait for session hydration
         if (!SessionState.IsLoggedIn)
             return;
 
-        // Logged in but no character = bounce
         if (!SessionState.CharacterReady)
-        {
-            //            Nav.NavigateTo("/character", true);
             return;
-        }
 
         _loadInProgress = true;
 
-        // Refresh-safe: room may be missing
         if (SessionState.CurrentRoom == null)
-        {
             await SessionState.MoveToRoom(2);
-        }
 
-        // Still missing = invalid state
         if (SessionState.CurrentRoom == null)
-        {
-            //          Nav.NavigateTo("/character", true);
             return;
-        }
 
         _loaded = true;
         _loadInProgress = false;
@@ -242,19 +235,27 @@ else
     private async Task Move(string dir)
         => await SessionState.TryMoveAsync(dir);
 
-    private void GetLoot()
+    private async Task GetLoot(int containerId)
     {
-        var container = SessionState.CurrentRoomContainers?.FirstOrDefault();
 
-        if (container == null)
-        { // add too display
-            return;
+        var lootedItems = await ContainerService.GetLootAsync(SessionState.Pfile.PlayerCharacterId!.Value, containerId);
+
+        if(lootedItems.Any())
+        {
+            foreach (var item in lootedItems)
+            { SessionState.PushEvent($"You loot {string.Join(", ", lootedItems.Select(i => i.Name))} from the container."); }
         }
+        else
+        {
+            SessionState.PushEvent("Nothing there but cobwebs and entrails.");
+        }
+        SessionState.CurrentRoomContainers =
+            SessionState.CurrentRoomContainers
+                .Where(c => c.ContainerId != containerId)
+                .ToList();
 
-        var items = ContainerService.GetLootAsync(SessionState.Pfile.PlayerCharacterId, container.ContainerId);
-
-        SessionState.CurrentRoomContainers = SessionState.CurrentRoomContainers
-                    .Where(c => c.ContainerId != container.ContainerId).ToList();
+        SessionState.NotifyStateChange();
+        await InvokeAsync(StateHasChanged);
     }
 
     private async void Attack(int id)
@@ -265,24 +266,28 @@ else
 
         currentMob = new PlayerCharacterDto
         {
+            CharacterId = mob.Base.CharacterId,
+            NpcId = mob.Instance.NpcId,
+            CharacterType = mob.Base.CharacterType,
+
             Name = mob.Base.Name,
-            Health = mob.Base.Health,
+            Health = mob.Base.MaxHealth,
             MaxHealth = mob.Base.MaxHealth,
             Level = mob.Base.Level,
             Strength = mob.Base.Strength,
             Dexterity = mob.Base.Dexterity,
-            ArmorClass = mob.Base.ArmorClass,
+            Constitution = mob.Base.Constitution,
             Intelligence = mob.Base.Intelligence,
+            Wisdom = mob.Base.Wisdom,
+            Charisma = mob.Base.Charisma,
+            ArmorClass = mob.Base.ArmorClass,
             IsAlive = mob.Base.Health > 0
         };
-        Console.WriteLine($"[Attack:]{currentMob.Name} is being attacked");
-        StartCombat(currentMob);
-
+        
+        SessionState.SetCombat(true);
+        //StartCombat(currentMob);
         await InvokeAsync(StateHasChanged);
     }
-
-    private void ShowSpells()
-        => Console.WriteLine("Spells triggered");
 
     private async Task ChangeCharacter()
     {
@@ -294,10 +299,33 @@ else
         Room? room,
         IEnumerable<RoomNpcDto> mobs,
         IEnumerable<Container> containers,
-        IEnumerable<RoomExit> exits)
+        IEnumerable<RoomExit> exits,
+        IEnumerable<string> eventLog)
     {
         var lines = new List<string>();
 
+        if (eventLog.Any())
+        {
+//            Console.WriteLine("eventLog Triggered:");
+            int totalCount = eventLog.Count();
+            if (totalCount > 5)
+            {
+  //              Console.WriteLine($"Max line reach {totalCount}");
+                lines.Add($"Showing {Math.Min(5, totalCount)} of {totalCount} recent events:");
+                eventLog = eventLog.TakeLast(5);
+            }
+            else
+            {
+                lines.Add("Recent events:");
+            }
+            foreach (var e in eventLog)
+                lines.Add("    " + e);
+
+        }
+        else
+        {
+            Console.WriteLine("eventLog skipped");
+        }
         if (room != null)
         {
             lines.Add(room.Name ?? "");

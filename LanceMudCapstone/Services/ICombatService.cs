@@ -15,7 +15,7 @@ namespace LanceMudCapstone.Services
             PlayerCharacterDto defender,
             AbilityDto ability);
 
-        Task<CombatRoundResult> CastSpellAsync(PlayerCharacterDto caster, PlayerCharacterDto target, Spell spell);
+        //Task<CombatRoundResult> CastSpellAsync(PlayerCharacterDto caster, PlayerCharacterDto target, Spell spell);
 
         Task<CombatRoundResult> UseItemAsync(PlayerCharacterDto user, Item item, PlayerCharacterDto? target = null);
 

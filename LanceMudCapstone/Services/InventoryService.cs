@@ -148,29 +148,31 @@ namespace LanceMudCapstone.Services
         }
 
         public async Task MoveToContainerAsync(int playerCharacterId, int itemId, int containerId)
-        { 
+        {
             using var conn = await _db.CreateOpenConnectionAsync();
 
             string sql = @"
-                INSERT INTO containeritems (itemid, containerid, quantity, droppeddateitem)
-                VALUES (@ItemId, @ContainerId, 1, NOW());";
+        INSERT INTO roomitems (itemid, containerid, quantity, droppeddatetime)
+        VALUES (@ItemId, @ContainerId, 1, NOW());
+    ";
+
             await conn.ExecuteAsync(sql, new
             {
-               
                 ItemId = itemId,
                 ContainerId = containerId
             });
-
-
         }
+
         public async Task DeleteItemAsync(int playerCharacterId, int itemId)
         {
             using var conn = await _db.CreateOpenConnectionAsync();
 
             string sql = @"
                 DELETE FROM playerinventory
+                WHERE ctid IN (
+                SELECT ctid FROM playerinventory
                 WHERE playercharacterid = @PlayerId AND itemid = @ItemId
-                LIMIT 1;";
+                LIMIT 1);";
             await conn.ExecuteAsync(sql, new
             {
                 PlayerId = playerCharacterId,
@@ -193,6 +195,10 @@ namespace LanceMudCapstone.Services
 
             var results = await conn.QueryAsync<LootItemDto>(sql, new { NpcId = npcId });
             return results.ToList();
+        }
+        public async Task<ItemDtoRaw?> GetItemById(int itemId)
+        {
+            return await _itemRepo.GetItemById(itemId);
         }
 
     }

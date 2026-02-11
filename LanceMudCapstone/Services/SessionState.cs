@@ -17,6 +17,8 @@ public class SessionState
     private readonly ContainerService _containerService;
 
     public int? UserId { get; private set; }
+    public string LastEventMessage { get; set; } = string.Empty;
+    public List<string> EventLog { get; set; } = new();
     public string? UserName { get; private set; }
     public int? CharacterId { get; private set; }
     public int? RoomId { get; private set; }
@@ -33,6 +35,8 @@ public class SessionState
     public bool Ready { get; private set; } = false;
     public bool FirstLoadComplete { get; private set; } = false;
     public bool CharacterReady { get; private set; } = false;
+    public bool InCombat { get; set; }
+
 
     public event Action? OnChange;
 
@@ -57,7 +61,24 @@ public class SessionState
         Console.WriteLine($"[SessionState] Verified localStorage: UserId={verify?.UserId}, UserName={verify?.UserName}");
         NotifyStateChange();
     }
+    public void SetCombat(bool value)
+    {
+        InCombat = value;
+        NotifyStateChange();
+    }
+    public void SetEvent(string message)
+    {
+        LastEventMessage = message;
+        NotifyStateChange();
+    }
 
+    public void PushEvent(string message)
+    {
+        EventLog.Add(message);
+        if (EventLog.Count > 10) EventLog.RemoveAt(0);
+
+        NotifyStateChange();
+    }
     public async Task LogoutAsync()
     {
         UserId = null;
@@ -110,6 +131,8 @@ public class SessionState
 
     public async Task MoveToRoom(int roomId)
     {
+        if (!(CurrentRoom != null && CurrentRoom.RoomId == roomId))
+            EventLog.Clear();
         CurrentRoom = await _roomService.GetRoomAsync(roomId);
         CurrentRoomMobs = (await _characterService.GetNpcsInRoom(roomId)).ToList();
         CurrentRoomContainers = (await _containerService.GetContainersInRoom(roomId)).ToList();
@@ -213,7 +236,7 @@ public class SessionState
         FirstLoadComplete = true;
     }
 
-    private void NotifyStateChange() => OnChange?.Invoke();
+    public void NotifyStateChange() => OnChange?.Invoke();
 
     public record UserSession(int UserId, string UserName);
     public record CharacterSession(int CharacterId, int RoomId);

@@ -2,7 +2,8 @@
 
 public class PlayerCharacterDto
 {
-    public int PlayerCharacterId { get; set; }
+    public int? PlayerCharacterId { get; set; }
+    public int? NpcId { get; set; }
     public int UserId { get; set; }
     public int CharacterId { get; set; }
     public string Name { get; set; } = string.Empty;
@@ -34,5 +35,8 @@ public class PlayerCharacterDto
     public int MaxStamina { get; set; }
     public int Xp { get; set; }
     public int XpNeeded { get; set; }
+    public DateTime? LastKilled { get; set; }
+    public DateTime? RespawnAt { get; set; }
+
 
 }

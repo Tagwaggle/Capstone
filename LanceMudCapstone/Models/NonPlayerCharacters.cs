@@ -11,6 +11,9 @@ public class NonPlayerCharacters
     public DateTime CreatedAt { get; set; }
     public int? RoomId { get; set; }
     public int XpReward { get; set; }
+    public DateTime? LastKilled { get; set; }
+    public DateTime? RespawnAt { get; set; }
+
 
 
 }

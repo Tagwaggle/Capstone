@@ -15,7 +15,13 @@ namespace LanceMudCapstone.Services
         {
             _db = db;
         }
+        public async Task<ItemDtoRaw?> GetItemById(int itemId)
+        {
+            using var conn = await _db.CreateOpenConnectionAsync();
 
+            string sql = "SELECT itemid, name, description, itemtype, slot, value, effect AS EffectJson, stackable, maxstack, itemcategory FROM items WHERE itemid = @itemId";
+            return await conn.QuerySingleOrDefaultAsync<ItemDtoRaw>(sql, new { itemId });
+        }
         public async Task<ItemDtoRaw?> GetItemForPlayerAsync(int playerCharacterId, int itemId)
         {
             const string sql = @"
@@ -109,6 +115,10 @@ namespace LanceMudCapstone.Services
                     WHERE lt.npcid = @NpcId;";
 
             var result = await conn.QueryAsync<LootItemDto>(sql, new { NpcId = npcId });
+            foreach (var loot in result)
+            {
+                
+            }
             return result.ToList();
         }
     }
