@@ -78,6 +78,7 @@
             }
 
             await SessionState.SetUserAsync(user.UserId, user.Username);
+            
             Console.WriteLine($"User {SessionState.UserName} logged in with ID {SessionState.UserId}");
             Nav.NavigateTo("/character");
         }

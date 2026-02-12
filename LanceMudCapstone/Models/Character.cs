@@ -21,6 +21,7 @@ public class Character
     public int RoomId { get; set; }
     public bool IsAlive { get; set; }
     public string CharacterType { get; set; } = string.Empty;
+    public bool IsOnline { get; set; }
     public DateTime CreatedAt { get; set; }
 
 }

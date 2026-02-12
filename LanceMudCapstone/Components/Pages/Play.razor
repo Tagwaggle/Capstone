@@ -233,12 +233,17 @@ else
             .Any(e => e.Direction.Equals(dir, StringComparison.OrdinalIgnoreCase)) == true;
 
     private async Task Move(string dir)
-        => await SessionState.TryMoveAsync(dir);
+    {
+        await CharacterService.UpdateLastCommand(SessionState.CharacterId!.Value);
+        await SessionState.TryMoveAsync(dir);
+    }
+
 
     private async Task GetLoot(int containerId)
     {
 
         var lootedItems = await ContainerService.GetLootAsync(SessionState.Pfile.PlayerCharacterId!.Value, containerId);
+        await CharacterService.UpdateLastCommand(SessionState.CharacterId!.Value);
 
         if(lootedItems.Any())
         {
@@ -261,6 +266,7 @@ else
     private async void Attack(int id)
     {
         var mob = SessionState.CurrentRoomMobs.First(m => m.Instance.NpcId == id);
+        await CharacterService.UpdateLastCommand(SessionState.CharacterId!.Value);
 
         if (mob == null) return;
 
@@ -283,7 +289,7 @@ else
             ArmorClass = mob.Base.ArmorClass,
             IsAlive = mob.Base.Health > 0
         };
-        
+
         SessionState.SetCombat(true);
         //StartCombat(currentMob);
         await InvokeAsync(StateHasChanged);
@@ -292,6 +298,7 @@ else
     private async Task ChangeCharacter()
     {
         await SessionState.ClearCharacterAsync();
+        await SessionState.InitializeAsync();
         Nav.NavigateTo("/character", true);
     }
 

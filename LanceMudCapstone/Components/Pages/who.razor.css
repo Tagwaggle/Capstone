@@ -1,0 +1,57 @@
+﻿.who-container {
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #1a1a1f, #2a1f33);
+    border: 1px solid #b44cff;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(180, 76, 255, 0.4);
+}
+
+.who-title {
+    text-align: center;
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+    color: #e8d9ff;
+    text-shadow: 0 0 8px #b44cff;
+    letter-spacing: 2px;
+}
+
+.who-loading,
+.who-empty {
+    text-align: center;
+    color: #d7baff;
+    font-size: 1.3rem;
+}
+
+.who-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.3rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+    .who-table thead {
+        background: rgba(180, 76, 255, 0.25);
+        color: #f2e6ff;
+    }
+
+    .who-table th,
+    .who-table td {
+        padding: 0.75rem 1rem;
+        text-align: left;
+    }
+
+    .who-table tbody tr {
+        transition: background 0.2s ease;
+    }
+
+        .who-table tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .who-table tbody tr:hover {
+            background: rgba(180, 76, 255, 0.15);
+        }

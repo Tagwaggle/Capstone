@@ -37,6 +37,8 @@ public class PlayerCharacterDto
     public int XpNeeded { get; set; }
     public DateTime? LastKilled { get; set; }
     public DateTime? RespawnAt { get; set; }
+    public DateTime? LastCommand { get; set; }
+    public string Username { get; set; } = string.Empty;
 
 
 }

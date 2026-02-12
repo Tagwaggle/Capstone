@@ -58,8 +58,8 @@
         await Task.Delay(1500);
 
         // Re-hydrate session to make sure localStorage reads complete
-        await SessionState.InitializeAsync();
-        await SessionState.TryHydrateCharacterAsync();
+        //await SessionState.InitializeAsync();
+        //await SessionState.TryHydrateCharacterAsync();
 
         _readyToRender = true;
         StateHasChanged();

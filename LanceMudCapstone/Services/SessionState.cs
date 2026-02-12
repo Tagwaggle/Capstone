@@ -22,6 +22,7 @@ public class SessionState
     public string? UserName { get; private set; }
     public int? CharacterId { get; private set; }
     public int? RoomId { get; private set; }
+    public bool IsOnline { get; private set; }
 
     public bool IsLoggedIn => UserId.HasValue;
     public bool CommandBox = true;
@@ -55,7 +56,8 @@ public class SessionState
     {
         UserId = userId;
         UserName = username;
-
+        IsOnline = true;
+        Ready = true;
         await _localStorage.SetAsync("session.user", new UserSession(userId, username));
         var verify = await _localStorage.GetAsync<UserSession>("session.user");
         Console.WriteLine($"[SessionState] Verified localStorage: UserId={verify?.UserId}, UserName={verify?.UserName}");
@@ -81,12 +83,16 @@ public class SessionState
     }
     public async Task LogoutAsync()
     {
+        if (CharacterId.HasValue)
+            await _characterService.SetOffline(CharacterId.Value);
+
         UserId = null;
         UserName = null;
         CharacterId = null;
         RoomId = null;
         Pfile = null;
         CurrentRoom = null;
+        IsOnline = false;
         CurrentRoomExits.Clear();
         CurrentRoomMobs.Clear();
         CurrentRoomContainers.Clear();
@@ -102,6 +108,8 @@ public class SessionState
     {
         CharacterReady = false; // reset while moving
         CharacterId = character.CharacterId;
+        IsOnline = true;
+        await _characterService.SetOnline(character.CharacterId);
         Pfile = character;
         RoomId = character.RoomId;
 
@@ -116,16 +124,19 @@ public class SessionState
 
     public async Task ClearCharacterAsync()
     {
+        if (CharacterId.HasValue)
+            await _characterService.SetOffline(CharacterId.Value);
         CharacterId = null;
         Pfile = null;
         RoomId = null;
         CurrentRoom = null;
+        IsOnline = false;
         CurrentRoomExits.Clear();
         CurrentRoomMobs.Clear();
         CurrentRoomContainers.Clear();
-
-        CharacterReady = false;
-        await _localStorage.RemoveAsync("session.character");
+        Console.WriteLine("User ID Logged in" + UserId);
+        //CharacterReady = false;
+        //await _localStorage.RemoveAsync("session.character");
         NotifyStateChange();
     }
 
@@ -160,11 +171,21 @@ public class SessionState
         try
         {
             var user = await _localStorage.GetAsync<UserSession>("session.user");
+            try
+            {
+                bool check;
+                check = user != null;
+                Console.WriteLine($"Bool Check: {check} {user.UserName} {user.UserId}");
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine($"Log Error: " + e);
+            }
             if (user != null)
             {
                 UserId = user.UserId;
                 UserName = user.UserName;
-
+                
                 await TryHydrateCharacterAsync();
             }
         }

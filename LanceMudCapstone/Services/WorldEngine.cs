@@ -42,7 +42,9 @@ namespace LanceMudCapstone.Services
                 _effects.ProcessEffects();
                 _combat.ProcessCombatRounds();
                 _mobs.ProcessMobAI();
+                await _respawn.AutoLogoutStaleCharacter();
                 await _respawn.ProcessRespawns();
+                await _respawn.TickHeal();
             }
             finally
             {

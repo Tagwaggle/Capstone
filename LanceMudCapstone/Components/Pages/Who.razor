@@ -1,0 +1,51 @@
+﻿@page "/who"
+@inject CharacterService CharacterService
+
+<div class="who-container">
+    <h2 class="who-title">Who Is Online</h2>
+
+    @if (players == null)
+    {
+        <p class="who-loading">Loading...</p>
+    }
+    else if (!players.Any())
+    {
+        <p class="who-empty">No characters are currently online.</p>
+    }
+    else
+    {
+        <table class="who-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Character</th>
+                    <th>Level</th>
+                    <th>Idle</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in players)
+                {
+                    <tr>
+                        <td>@p.Username</td>
+                        <td>@p.Name</td>
+                        <td>@p.Level</td>
+                        <td>@IdleMinutes(p.LastCommand)m</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private IEnumerable<PlayerCharacterDto>? players;
+
+    protected override async Task OnInitializedAsync()
+    {
+        players = await CharacterService.GetOnlineCharactersAsync();
+    }
+
+    private int IdleMinutes(DateTime? last)
+        => last.HasValue ? (int)(DateTime.UtcNow - last.Value).TotalMinutes : 0;
+}

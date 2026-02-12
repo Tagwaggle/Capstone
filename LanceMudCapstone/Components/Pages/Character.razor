@@ -9,18 +9,21 @@
 
 <div class="main-container">
     <h3>Character Select for @SessionState.UserName</h3>
-
-    @if (SessionState.UserId == null)
+    @if (!SessionState.Ready)
     {
-        <p>Waiting for session…</p>
+        <p>waiting</p>
+        <button @onclick="TryLoadCharactersAsync">Button</button>
+    }
+    else if (SessionState.UserId == null)
+    {
+        <p>Waiting for session… (uid) @SessionState.UserId</p>
         <p>If reload does not happen click button.</p>
-        <button @onclick="TryLoadCharactersAsync">Retry</button>
+        <button @onclick="TryLoadCharactersAsync">Button</button>
     }
     else if (!_loaded)
     {
         <p>Loading Characters…</p>
         <p>If reload does not happen click button.</p>
-        <button @onclick="TryLoadCharactersAsync">Retry</button>
     }
     else if (!characters.Any())
     {
@@ -78,6 +81,9 @@
 
     private async Task TryLoadCharactersAsync()
     {
+        Console.WriteLine($"TryLoad Clicked: {SessionState.UserId} {SessionState.UserName}");
+       // await SessionState.InitializeAsync();
+        await InvokeAsync(StateHasChanged);
         if (_loaded || _loadInProgress)
             return;
 

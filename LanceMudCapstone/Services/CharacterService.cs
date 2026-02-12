@@ -154,6 +154,51 @@ public class CharacterService : ICharacterService
         return result;
     }
 
+    public async Task<IEnumerable<PlayerCharacterDto>> GetOnlineCharactersAsync()
+    {
+        const string sql = @"
+                    SELECT 
+                        c.characterid, c.name, c.level, c.roomid, pc.isonline, pc.lastcommand, u.username
+                    FROM characters c
+                    JOIN playercharacters pc ON pc.characterid = c.characterid
+                    JOIN users u ON u.userid = pc.userid
+                    WHERE pc.isonline = true
+                    ORDER BY c.name";
+
+        using var conn = await _db.CreateOpenConnectionAsync();
+        return await conn.QueryAsync<PlayerCharacterDto>(sql);
+    }
+    public async Task UpdateLastCommand(int playerCharacterId)
+    {
+        const string sql = @"
+            UPDATE playercharacters
+            SET isonline = true, lastcommand = NOW()
+            WHERE characterid = @playerCharacterId;
+        ";
+        using var conn = _db.CreateConnection();
+        await conn.ExecuteAsync(sql, new { playerCharacterId });
+    }
+    public async Task SetOnline(int characterId)
+    {
+        const string sql = @"
+            UPDATE playercharacters
+            SET isonline = true, lastonline = NOW()
+            WHERE characterid = @characterId;
+        ";
+        using var conn = _db.CreateConnection();
+        await conn.ExecuteAsync(sql, new { characterId });
+    }
+    public async Task SetOffline(int characterId)
+    {
+        const string sql = @"
+            UPDATE playercharacters
+            SET isonline = false, lastonline = NOW()
+            WHERE characterid = @characterId;
+        ";
+        using var conn = _db.CreateConnection();
+        await conn.ExecuteAsync(sql, new { characterId });
+    }
+
     public async Task<IEnumerable<RoomNpcDto>> GetNpcsInRoom(int roomId)
     {
         const string sql = @"

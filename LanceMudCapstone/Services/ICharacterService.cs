@@ -8,6 +8,7 @@ namespace LanceMudCapstone.Services
         Task<PlayerCharacterDto> SavePlayer(PlayerCharacterDto saveState);
         Task<IEnumerable<PlayerCharacterDto>> GetCharactersByUserAsync(int userid);
         Task<IEnumerable<RoomNpcDto>> GetNpcsInRoom(int roomId);
+        Task<IEnumerable<PlayerCharacterDto>> GetOnlineCharactersAsync();
     }
 
 }
