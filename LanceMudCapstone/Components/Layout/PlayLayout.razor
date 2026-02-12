@@ -18,6 +18,7 @@
 </div>
 
 @code {
+
     protected override void OnInitialized()
     {
         SessionState.OnChange += StateHasChanged;
@@ -26,5 +27,6 @@
     public void Dispose()
     {
         SessionState.OnChange -= StateHasChanged;
+
     }
 }

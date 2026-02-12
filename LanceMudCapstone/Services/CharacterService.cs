@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using LanceMudCapstone.DTOs;
 using LanceMudCapstone.Models;
+using Microsoft.AspNetCore.Mvc;
 
 
 namespace LanceMudCapstone.Services;
@@ -101,8 +102,26 @@ public class CharacterService : ICharacterService
     public Task<bool> UpdateCharacterAsync(UpdateCharacterDto dto)
         => Task.FromResult(true);
 
-    public Task<CharacterDto?> GetCharacterByIdAsync(int id)
-        => Task.FromResult<CharacterDto?>(null);
+    public async Task<PlayerCharacterDto?> GetCharacterByIdAsync(int characterId)
+    {
+        const string sql = @"
+        SELECT 
+            pc.playercharacterid, pc.userid, pc.characterid, pc.gold, pc.activequest, pc.lastonline,
+            pc.createdat, pc.mana, pc.maxmana, pc.stamina, pc.maxstamina, pc.xp, pc.xpneeded,
+
+            c.name, c.race, c.class, c.level, c.alignment, c.health, c.maxhealth, c.armorclass, c.strength,
+            c.dexterity, c.constitution, c.intelligence, c.wisdom, c.charisma, c.hitdice, c.roomid, c.isalive,
+            c.charactertype,
+            c.createdat AS character_createdat
+        FROM playercharacters pc
+        INNER JOIN characters c ON pc.characterid = c.characterid
+        WHERE pc.characterid = @characterId;
+    ";
+
+        using var conn = _db.CreateConnection();
+        return await conn.QueryFirstOrDefaultAsync<PlayerCharacterDto>(sql, new { characterId });
+    }
+
 
     public async Task<PlayerCharacterDto> SavePlayer(PlayerCharacterDto saveState)
     {

@@ -122,7 +122,7 @@ else
     @if (SessionState.InCombat)
     {
         <div class="combat-slide">
-            <CombatScreen Player="@player"
+            <CombatScreen Player="@SessionState.Pfile"
                           Mob="@currentMob"
                           OnVictory="HandleVictory"
                           OnDefeat="HandleDefeat" />
@@ -133,7 +133,7 @@ else
     {
         <SpellbookModal Show="@showSpellBook"
                         ShowChanged="v => showSpellBook = v"
-                        Player="@player" />
+                        Player="@SessionState.Pfile" />
     }
 
     <InventoryModal Show="@showInventoryModal"
@@ -146,14 +146,48 @@ else
 @code {
     private bool _loaded;
     private bool _loadInProgress;
+    private PeriodicTimer? _refreshTimer;
+    private CancellationTokenSource? _refreshCts;
+
 
     private bool showSpellBook;
     private bool showScoreModal;
     private bool showInventoryModal;
 
 
-    private PlayerCharacterDto player;
     private PlayerCharacterDto currentMob;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _refreshCts = new CancellationTokenSource();
+        _refreshTimer = new PeriodicTimer(TimeSpan.FromSeconds(30));
+
+        _ = RunRefreshLoop(_refreshCts.Token);
+
+    }
+
+    private async Task RunRefreshLoop(CancellationToken token)
+    {
+        Console.WriteLine($"Character Session trying tick {SessionState.CharacterId}");
+        try
+        {
+            while (await _refreshTimer!.WaitForNextTickAsync(token))
+            {
+                if (SessionState.Ready && SessionState.CharacterId != null)
+                {
+                    Console.WriteLine($"Prior Health: {SessionState.Pfile.Health} Character Session tick");
+                    await SessionState.RefreshCharacterAsync();
+                    Console.WriteLine($"Post Health: {SessionState.Pfile.Health} Success Async");
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Timer was stopped, exit gracefully
+        }
+    }
+
 
     private readonly string[] nonAttackable = { "shop", "guard", "safe", "pc" };
     private async Task RefreshAfterCombat()
@@ -178,7 +212,6 @@ else
     protected override void OnInitialized()
     {
         SessionState.OnChange += HandleSessionChanged;
-        player = SessionState.Pfile;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -226,6 +259,9 @@ else
     public void Dispose()
     {
         SessionState.OnChange -= HandleSessionChanged;
+        _refreshCts?.Cancel();
+        _refreshTimer?.Dispose();
+        _refreshCts?.Dispose();
     }
 
     private bool HasExit(string dir)
@@ -268,6 +304,8 @@ else
         var mob = SessionState.CurrentRoomMobs.First(m => m.Instance.NpcId == id);
         await CharacterService.UpdateLastCommand(SessionState.CharacterId!.Value);
 
+        await SessionState.RefreshCharacterAsync();
+
         if (mob == null) return;
 
         currentMob = new PlayerCharacterDto
@@ -291,7 +329,7 @@ else
         };
 
         SessionState.SetCombat(true);
-        //StartCombat(currentMob);
+        //StartCombat(player, currentMob);
         await InvokeAsync(StateHasChanged);
     }
 
@@ -299,7 +337,10 @@ else
     {
         await SessionState.ClearCharacterAsync();
         await SessionState.InitializeAsync();
-        Nav.NavigateTo("/character", true);
+        Console.WriteLine($"User Before {SessionState.UserName} logged in with ID {SessionState.UserId}");
+        await SessionState.SetUserAsync(SessionState.UserId ?? 0, SessionState.UserName ?? "");
+        Console.WriteLine($"User After {SessionState.UserName} logged in with ID {SessionState.UserId}");
+        Nav.NavigateTo("/character");
     }
 
     public static string BuildAsciiMonitor(

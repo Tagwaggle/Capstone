@@ -103,6 +103,17 @@ public class SessionState
         CharacterReady = false;
         NotifyStateChange();
     }
+    public async Task RefreshCharacterAsync()
+    {
+        if (CharacterId == null) return;
+
+        var updated = await _characterService.GetCharacterByIdAsync(CharacterId.Value);
+        if (updated != null)
+        {
+            Pfile = updated;
+            NotifyStateChange();
+        }
+    }
 
     public async Task SetCharacterAsync(PlayerCharacterDto character)
     {
