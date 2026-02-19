@@ -1,15 +1,29 @@
-﻿@inherits LayoutComponentBase
+﻿
+@inherits LayoutComponentBase
+@inject SessionState SessionState
 
-<div class="layout-root">
-<header>
-    <LunitariHeader />
-    <MainNavBar />
-</header>
+<RadzenNotification />
+<RadzenDialog />
+<RadzenContextMenu />
 
-<main>
-    @Body
-</main>
+<RadzenBody class="rz-main-layout">
 
-<AppFooter />
+    <RadzenHeader class="rz-header">
+        <LunitariHeader />
+    </RadzenHeader>
 
-</div>
+    <div class="layout-middle">
+        <RadzenSidebar class="rz-centered-sidebar">
+            <MainNavBar />
+        </RadzenSidebar>
+
+        <div class="layout-content">
+            @Body
+        </div>
+    </div>
+
+    <RadzenFooter class="rz-footer">
+        <AppFooter />
+    </RadzenFooter>
+
+</RadzenBody>

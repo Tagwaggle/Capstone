@@ -7,31 +7,30 @@
 @inject IHttpClientFactory HttpClientFactory
 @inject SessionState SessionState
 @inject NavigationManager Nav
+@inject NotificationService NotificationService
+@inject IJSRuntime JS
 
-<div class="login-wrapper">
-    <div class="login-card">
-        <h2 class="login-title">Login</h2>
+<RadzenNotification />
+<div style="justify-items: center; padding-top: 1.5rem;">
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="login-error-rz">@ErrorMessage</div>
+    }
+    <RadzenCard class="login-card-rz">
+    <div class="login-title-rz">Login</div>
 
-        @if (!string.IsNullOrEmpty(ErrorMessage))
-        {
-            <div class="error-message">@ErrorMessage</div>
-        }
+        <RadzenTemplateForm TItem="LoginModel" Data="@loginModel" Submit="HandleLogin" Method="Post">
+            <RadzenTextBox @bind-Value="loginModel.Username" Name="Username" Placeholder="Username" Style="width:100%" />
+            <RadzenRequiredValidator Component="Username" Text="Username is required" />
+            <RadzenPassword @bind-Value="loginModel.Password" Name="Password" Placeholder="Password" Style="width:100%;margin-top:1.5rem;" />
+            <RadzenRequiredValidator Component="Password" Text="Password is required!" />
 
-        <div class="form-group">
-            <label for="usernameInput">Username</label>
-            <InputText id="usernameInput" @bind-Value="loginModel.Username" class="input" />
-        </div>
+            <RadzenCheckBox @bind-Value="loginModel.RememberMe" Name="RememberMe" />
+            <label for="RememberMe" style="margin-left:0.5rem;">Remember Me</label>
 
-        <div class="form-group">
-            <label for="passwordInput">Password</label>
-            <InputText id="passwordInput" @bind-Value="loginModel.Password" type="password" class="input" />
-        </div>
-
-        <button @onclick="HandleLogin" disabled="@_loading" class="login-button">@(_loading ? "Logging in..." : "Log In")</button>
-
-        
-
-    </div>
+            <RadzenButton Text="Login" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Style="width:50%;margin-top:1.5rem; justify-items: end;" />
+        </RadzenTemplateForm>
+</RadzenCard>
 </div>
 
 @code {
@@ -45,13 +44,30 @@
     {
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public bool RememberMe { get; set; } = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (SessionState.UserId != null)
+        {
+            Nav.NavigateTo("/character");
+        }
+
+        await base.OnInitializedAsync();
     }
 
     private async Task HandleLogin()
     {
+        NotificationService.Notify(new NotificationMessage
+        {
+            Severity = NotificationSeverity.Info,
+            Summary = "Login Attempt",
+            Detail = $"Attempting Login for {loginModel.Username}.",
+            Duration = 2000
+        });
         _loading = true;
         ErrorMessage = null;
-
         try
         {
             var dto = new LoginDto
@@ -61,11 +77,17 @@
                 };
 
             var response = await Api.PostAsJsonAsync("/api/auth/login", dto);
-            Console.WriteLine($"Login response status: {response.StatusCode})");
             if (!response.IsSuccessStatusCode)
             {
                 var error = await response.Content.ReadFromJsonAsync<ApiErrorDto>();
-                ErrorMessage = error?.Message ?? "Login failed.";
+                ErrorMessage = $"Login failed Name({loginModel.Username}) and password do not match.";
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Login Attempt",
+                    Detail = $"Attempting Login for {loginModel.Username} failed.",
+                    Duration = 2000
+                });
                 return;
             }
 
@@ -78,10 +100,14 @@
             }
 
             await SessionState.SetUserAsync(user.UserId, user.Username);
-            
+            if (loginModel.RememberMe)
+            {
+                await JS.InvokeVoidAsync("cookieHelper.writeCookie", "session", user.UserId.ToString(), 30);
+            }
             Console.WriteLine($"User {SessionState.UserName} logged in with ID {SessionState.UserId}");
             Nav.NavigateTo("/character");
         }
         finally { _loading = false; }
     }
 }
+

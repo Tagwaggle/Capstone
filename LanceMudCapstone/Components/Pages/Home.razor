@@ -1,11 +1,34 @@
 ﻿@page "/"
-@layout MainLayout
+@using Radzen
+@inject NotificationService NotificationService
+@rendermode InteractiveServer
 
-<div class="main">
+
+<div class="home-root">
 <PageTitle>Home</PageTitle>
-<HeroCard />
 
-<p class="intro">
-	Welcome to Legends of the Lance -- A world of magic, moons, and mystery.
-</p>
+<h1>Welcome Adventurer!</h1>
+<RadzenNotification />
+<HeroCard />
+<div class="home-body">
+        <RadzenText Style="color: white; font-size: 1rem;">
+            Hello and Howdy! Welcome to Legends of the Lance. A place where you can drink an ale, tell a tale, or even dream to sail! Yes, this is an
+            adventurers dream, here to have a bit of fun.
+            </RadzenText>
+<RadzenButton Text="Secret" Click="@ShowToast" Style="margin-top:20px;" />
+
+    </div>
 </div>
+@code {
+    void ShowToast()
+    {
+        Console.WriteLine("Clicked");
+        NotificationService.Notify(new NotificationMessage
+        {
+            Severity = NotificationSeverity.Error,
+            Summary = "Secret",
+            Detail = "You really think it would be that easy?",
+            Duration = 2000
+        });
+    }
+}

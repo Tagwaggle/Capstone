@@ -7,53 +7,25 @@
 @inject SessionState SessionState
 @inject IHttpClientFactory HttpClientFactory
 @inject NavigationManager Nav
+@inject NotificationService NotificationService
 
-<div class="login-wrapper">
-    <div class="login-card">
-        <h2 class="login-title">Create Account</h2>
+<RadzenNotification />
+<div style="justify-items: center; padding-top: 1.5rem;">
+    <RadzenCard class="login-card-rz">
+        <div class="login-title-rz">Create User</div>
 
-        @if (!string.IsNullOrEmpty(Message))
-        {
-            <div class="error-message">@Message</div>
-        }
-
-        <EditForm Model="@model" OnValidSubmit="HandleCreate">
-            <DataAnnotationsValidator />
-
-            <div class="form-group">
-                <label>Username</label>
-                <InputText @bind-Value="model.Username" class="input" />
-            </div>
-
-            <div class="form-group">
-                <label>Email</label>
-                <InputText @bind-Value="model.Email" class="input" />
-            </div>
-
-            <div class="form-group password-group">
-                <label>Password</label>
-                <div class="password-wrapper">
-                    <InputText @bind-Value="model.Password"
-                               type="@(_showPassword ? "text" : "password")"
-                               class="input" />
-                    <button type="button" class="show-btn" @onclick="ToggleShowPassword">
-                        @(_showPassword ? "Hide" : "Show")
-                    </button>
-                </div>
-            </div>
-
-            <div class="form-group password-group">
-                <label>Confirm Password</label>
-                <div class="password-wrapper">
-                    <InputText @bind-Value="model.ConfirmPassword"
-                               type="@(_showPassword ? "text" : "password")"
-                               class="input" />
-                </div>
-            </div>
-
-            <button type="submit" class="login-button">Create Account</button>
-        </EditForm>
-    </div>
+        <RadzenTemplateForm TItem="CreateUserModel" Data="@model" Submit="HandleCreate" Method="post">
+            <RadzenTextBox @bind-Value="model.Username" Name="Username" Placeholder="Username" Style="width:100%" />
+            <RadzenRequiredValidator Component="Username" Text="Username is required" />
+            <RadzenTextBox @bind-Value="model.Email" Name="Email" Placeholder="Email" Style="width:100%;margin-top:1.5rem;" />
+            <RadzenRequiredValidator Component="Email" Text="Email is required" />
+            <RadzenPassword @bind-Value="model.Password" Name="Password" Placeholder="Password" Style="width:100%;margin-top:1.5rem;" />
+            <RadzenRequiredValidator Component="Password" Text="Password is required!" />
+            <RadzenPassword @bind-Value="model.ConfirmPassword" Name="ConfirmPassword" Placeholder="Confirm Password" Style="width:100%;margin-top:1.5rem;" />
+            <RadzenRequiredValidator Component="ConfirmPassword" Text="Password is required!" />
+            <RadzenButton Text="Create Account" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Style="width:50%;margin-top:1.5rem; justify-items: end;" Click="@(() => Console.WriteLine("Button clicked"))" />
+        </RadzenTemplateForm>
+    </RadzenCard>
 </div>
 
 @code {
@@ -78,10 +50,25 @@
 
     private async Task HandleCreate()
     {
+        Console.WriteLine("Handle triggered");
         Message = null;
+        NotificationService.Notify(new NotificationMessage
+        {
+            Severity = NotificationSeverity.Info,
+            Summary = "Create Attempt",
+            Detail = $"Attempting Creation for {model.Username}/{model.Email}.",
+            Duration = 2000
+        });
 
         if (model.Password != model.ConfirmPassword)
         {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Password Missmatch",
+                Detail = $"Creation for {model.Username} failed due to password missmatch.",
+                Duration = 2000
+            });
             Message = "Passwords do not match.";
             return;
         }
@@ -97,6 +84,13 @@
 
         if (!response.IsSuccessStatusCode)
         {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Password Missmatch",
+                Detail = $"Creation for {model.Username} failed due to database error.",
+                Duration = 2000
+            });
             var error = await response.Content.ReadFromJsonAsync<ApiErrorDto>();
             Message = error?.Message ?? "Account creation failed.";
             return;

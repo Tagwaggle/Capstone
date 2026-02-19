@@ -3,10 +3,14 @@ using LanceMudCapstone.Models;
 using LanceMudCapstone.Services;
 using LanceMudCapstone.API;
 using System.ComponentModel;
+using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+builder.Services.AddRazorComponents();
+builder.Services.AddRadzenComponents();
+
 
 builder.Services.AddScoped<SessionState>();
 builder.Services.AddScoped<LocalStorageService>();

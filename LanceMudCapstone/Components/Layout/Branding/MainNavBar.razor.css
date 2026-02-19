@@ -65,6 +65,12 @@
     gap: 2rem;
     margin: 0;
     padding: 0;
+    display: flow;
+    align-items: center;
+    justify-items: center;
+    align-items: center;
+    vertical-align: auto;
+    glyph-orientation-horizontal:inherit;
 }
 
 .main-nav a {
