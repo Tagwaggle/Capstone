@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using Radzen
 @inject NotificationService NotificationService
+@inject IJSRuntime JS
 @rendermode InteractiveServer
 
 
@@ -20,9 +21,50 @@
     </div>
 </div>
 @code {
-    void ShowToast()
+    async Task ShowToast()
     {
-        Console.WriteLine("Clicked");
+        try
+        {
+
+            var cookieValule = await JS.InvokeAsync<string>("cookieHelper.readCookie", "session");
+
+            if (!string.IsNullOrWhiteSpace(cookieValule))
+            {
+                Console.WriteLine($"Value Found: {cookieValule}");
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Cookie Found",
+                    Detail = $"Value: {cookieValule}",
+                    Duration = 2000
+                });
+
+            }
+            else
+            {
+                Console.WriteLine("Error");
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Cookie Not Found",
+                    Detail = "No cookie returned.",
+                    Duration = 2000
+                });
+
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error: {e}");
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = $"Error Reading Cookie: {e}",
+                Duration = 2000
+            });
+
+        }
         NotificationService.Notify(new NotificationMessage
         {
             Severity = NotificationSeverity.Error,

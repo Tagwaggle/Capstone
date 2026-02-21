@@ -27,6 +27,34 @@
 
 @code {
     [Inject] SessionState SessionState { get; set; } = default!;
+    [Inject] IJSRuntime JS { get; set; } = default!;
+    [Inject] IHttpClientFactory HttpClientFactory { get; set; } = default!;
+    [Inject] NavigationManager Nav { get; set;  } = default!;
+
+    private HttpClient Api => HttpClientFactory.CreateClient("ServerAPI");
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        Console.WriteLine("OAR FIRED");
+        if (!firstRender) return;
+        if (SessionState.UserId != null) return;
+
+        var cookieValue = await JS.InvokeAsync<string>("cookieHelper.readCookie", "session");
+
+        if (string.IsNullOrEmpty(cookieValue)) return;
+
+        var response = await Api.GetAsync($"/api/auth/validate/{cookieValue}");
+
+        if (!response.IsSuccessStatusCode) return;
+
+        var user = await response.Content.ReadFromJsonAsync<UserDto>();
+
+        if (user is null) return;
+
+        await SessionState.SetUserAsync(user.UserId, user.Username);
+
+        Nav.NavigateTo("/character", forceLoad: false);
+    }
 
     protected override async Task OnInitializedAsync()
     {

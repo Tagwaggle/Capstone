@@ -1,42 +1,70 @@
 ﻿@page "/who"
 @inject CharacterService CharacterService
 
-<div class="who-container">
-    <h2 class="who-title">Who Is Online</h2>
+@using LanceMudCapstone.DTOs
+@using Radzen
+@using Radzen.Blazor
+
+<RadzenCard Style="margin: 2rem;">
+    <RadzenHeading Size="H3" Text="Who Is Online" />
 
     @if (players == null)
     {
-        <p class="who-loading">Loading...</p>
+        <RadzenProgressBar Mode="ProgressBarMode.Indeterminate"
+                           Style="width: 100%; margin-top: 1rem;" />
     }
     else if (!players.Any())
     {
-        <p class="who-empty">No characters are currently online.</p>
+        <RadzenAlert Severity="Info" Style="margin-top: 1rem;">
+            No characters are currently online.
+        </RadzenAlert>
     }
     else
     {
-        <table class="who-table">
-            <thead>
-                <tr>
-                    <th>User</th>
-                    <th>Character</th>
-                    <th>Level</th>
-                    <th>Idle</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var p in players)
-                {
-                    <tr>
-                        <td>@p.Username</td>
-                        <td>@p.Name</td>
-                        <td>@p.Level</td>
-                        <td>@IdleMinutes(p.LastCommand)m</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <RadzenDataList Data="@players"
+                        TItem="PlayerCharacterDto"
+                        WrapItems="true"
+                        AllowPaging="false"
+                        Style="margin-top: 1rem;">
+
+            <Template Context="p">
+                <RadzenCard Style="width: 300px; margin: 1rem;">
+                    <RadzenStack Orientation="Orientation.Horizontal"
+                                 AlignItems="AlignItems.Center"
+                                 Gap="10px">
+                        <!-- ⭐ Your actual class SVG -->
+                        <RadzenImage Path=@("/images/classes/" + p.Class.ToLower() + ".svg")
+                                     Style="width:64px;height:64px;" />
+
+
+                        <RadzenStack Gap="0">
+                            <RadzenText TextStyle="TextStyle.Overline">User</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Body1"><b>@p.Username</b></RadzenText>
+
+                            <RadzenText TextStyle="TextStyle.Overline"
+                                        Style="margin-top: 0.5rem;">Character</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Body1"><b>@p.Name</b></RadzenText>
+                        </RadzenStack>
+                    </RadzenStack>
+
+                    <hr style="border: none; background-color: rgba(0,0,0,.2); height: 1px; margin: 1rem 0;" />
+
+                    <RadzenRow>
+                        <RadzenColumn Size="6">
+                            <RadzenBadge BadgeStyle="BadgeStyle.Primary"
+                                         Text=@($"Level {p.Level}") />
+                        </RadzenColumn>
+
+                        <RadzenColumn Size="6" class="rz-text-align-end">
+                            <RadzenBadge BadgeStyle="BadgeStyle.Secondary"
+                                         Text=@($"{IdleMinutes(p.LastCommand)}m idle") />
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenCard>
+            </Template>
+        </RadzenDataList>
     }
-</div>
+</RadzenCard>
 
 @code {
     private IEnumerable<PlayerCharacterDto>? players;

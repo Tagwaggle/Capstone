@@ -177,7 +177,7 @@ public class CharacterService : ICharacterService
     {
         const string sql = @"
                     SELECT 
-                        c.characterid, c.name, c.level, c.roomid, pc.isonline, pc.lastcommand, u.username
+                        c.characterid, c.name, c.level, c.roomid, pc.isonline, pc.lastcommand, u.username, c.class
                     FROM characters c
                     JOIN playercharacters pc ON pc.characterid = c.characterid
                     JOIN users u ON u.userid = pc.userid

@@ -2,6 +2,7 @@
 @layout MainLayout
 @rendermode InteractiveServer
 
+@using System.Security.Cryptography;
 @using LanceMudCapstone.DTOs
 
 @inject IHttpClientFactory HttpClientFactory
@@ -9,6 +10,8 @@
 @inject NavigationManager Nav
 @inject NotificationService NotificationService
 @inject IJSRuntime JS
+@inject SessionRepository SessionRepo
+@inject UserService _userService;
 
 <RadzenNotification />
 <div style="justify-items: center; padding-top: 1.5rem;">
@@ -46,9 +49,33 @@
         public string Password { get; set; } = string.Empty;
         public bool RememberMe { get; set; } = false;
     }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var userData = new User();
 
+        if (!firstRender) return;
+
+        var cookieValue = await JS.InvokeAsync<string>("cookieHelper.readCookie", "session");
+        if (cookieValue != null)
+        {
+            int? uID = SessionRepo.GetUserIdFromToken(cookieValue);
+            if (uID == null) return;
+            int UID = Convert.ToInt32(uID);
+            if (SessionState.UserId != UID)
+            {
+                userData = await _userService.GetUserByIdAsync(UID);
+                await SessionState.SetUserAsync(userData.UserId, userData.Username);
+            }
+        }
+
+        if (SessionState.UserId != null)
+        {
+            Nav.NavigateTo("/character");
+        }
+    }
     protected override async Task OnInitializedAsync()
     {
+
         if (SessionState.UserId != null)
         {
             Nav.NavigateTo("/character");
@@ -102,7 +129,16 @@
             await SessionState.SetUserAsync(user.UserId, user.Username);
             if (loginModel.RememberMe)
             {
-                await JS.InvokeVoidAsync("cookieHelper.writeCookie", "session", user.UserId.ToString(), 30);
+
+                byte[] bytes = new byte[16]; // 128-bit token
+                RandomNumberGenerator.Fill(bytes);
+
+                string secureToken = BitConverter.ToString(bytes).Replace("-", "").ToLower();
+
+                SessionRepo.InsertSession(secureToken, user.UserId);
+
+                await JS.InvokeVoidAsync("cookieHelper.writeCookie", "session", secureToken, 7);
+                
             }
             Console.WriteLine($"User {SessionState.UserName} logged in with ID {SessionState.UserId}");
             Nav.NavigateTo("/character");

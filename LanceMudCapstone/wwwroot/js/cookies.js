@@ -1,5 +1,6 @@
 ﻿window.cookieHelper = {
     writeCookie: function (name, value, days) {
+        console.log("write cookie called:", name, value, days);
         let expires = "";
         if (days) {
             const date = new Date();
@@ -10,6 +11,7 @@
     },
 
     readCookie: function (name) {
+        console.log("read cookie called:", name);
         const nameEQ = name + "=";
         const ca = document.cookie.split(';');
         for (let i = 0; i < ca.length; i++) {
@@ -22,6 +24,7 @@
     },
 
     eraseCookie: function (name) {
+        console.log("erase cookie called:", name);
         document.cookie = name + "=; Max-Age=-99999999; path=/";
     }
 };

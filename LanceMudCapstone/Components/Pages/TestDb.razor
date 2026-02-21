@@ -1,69 +1,67 @@
-﻿@page "/test-db"
+﻿@page "/sessions-dump"
+@layout MainLayout
 @rendermode InteractiveServer
-@inject IHttpClientFactory ClientFactory
 
-<h3>Database Connectivity Test</h3>
+@inject SQLiteService SQLite
 
-<button @onclick="TestConnection">Test DB Connection</button>
-<button @onclick="TestBobLogin">Test Login (bob/bob)</button>
+<h3 style="margin-bottom:1rem;">SQLite Session Table Dump</h3>
 
-@if (!string.IsNullOrEmpty(TestResult))
+@if (sessions is null)
 {
-    <p>Result: @TestResult</p>
+    <p>Loading...</p>
+}
+else if (sessions.Count == 0)
+{
+    <p>No sessions found.</p>
+}
+else
+{
+    <RadzenDataGrid Data="@sessions" TItem="SessionRow" Class="rz-striped rz-hover">
+        <Columns>
+            <RadzenDataGridColumn TItem="SessionRow" Property="Token" Title="Token" />
+            <RadzenDataGridColumn TItem="SessionRow" Property="UserId" Title="User ID" />
+            <RadzenDataGridColumn TItem="SessionRow" Property="CreatedAt" Title="Created At" />
+            <RadzenDataGridColumn TItem="SessionRow" Property="ExpiresAt" Title="Expires At" />
+        </Columns>
+    </RadzenDataGrid>
 }
 
-<p>@Result</p>
-
 @code {
-    private string Result = "";
+    private List<SessionRow>? sessions;
 
-    private async Task TestConnection()
+    public class SessionRow
     {
-        try
-        {
-            var client = ClientFactory.CreateClient("ServerAPI");
-
-            var response1 = await client.GetAsync("api/test-db");
-            var text1 = await response1.Content.ReadAsStringAsync();
-
-            var response2 = await client.GetAsync("api/test-db-users");
-            var text2 = await response2.Content.ReadAsStringAsync();
-
-            Result = $"Test DB:\n{text1}\n\nTest DB Users:\n{text2}";
-        }
-        catch (Exception ex)
-        {
-            Result = $"Error: {ex.Message}";
-        }
-    }
-    private string? TestResult;
-
-    private async Task TestBobLogin()
-    {
-        var dto = new LoginDto
-        {
-            Username = "bob",
-            Password = "bob"
-        };
-
-        var client = ClientFactory.CreateClient("ServerAPI");
-
-        Console.WriteLine("=== Manual Test Login (bob/bob) ===");
-        Console.WriteLine($"Sending DTO: username={dto.Username}, password={dto.Password}");
-
-        var response = await client.PostAsJsonAsync("/api/auth/login", dto);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            var error = await response.Content.ReadFromJsonAsync<ApiErrorDto>();
-            TestResult = $"FAIL: {error?.Message}";
-            Console.WriteLine($"FAIL: {error?.Message}");
-            return;
-        }
-
-        var user = await response.Content.ReadFromJsonAsync<UserDto>();
-        TestResult = $"SUCCESS: Logged in as {user?.Username}";
-        Console.WriteLine($"SUCCESS: Logged in as {user?.Username}");
+        public string Token { get; set; } = "";
+        public int UserId { get; set; }
+        public string CreatedAt { get; set; } = "";
+        public string ExpiresAt { get; set; } = "";
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        sessions = new List<SessionRow>();
+
+        using var conn = SQLite.GetConnection();
+        using var cmd = conn.CreateCommand();
+
+        cmd.CommandText = @"
+SELECT Token, UserId, CreatedAt, ExpiresAt
+FROM Sessions
+ORDER BY CreatedAt DESC;
+";
+
+        using var reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            sessions.Add(new SessionRow
+            {
+                Token = reader.GetString(0),
+                UserId = reader.GetInt32(1),
+                CreatedAt = reader.GetString(2),
+                ExpiresAt = reader.GetString(3)
+            });
+        }
+
+        await base.OnInitializedAsync();
+    }
 }

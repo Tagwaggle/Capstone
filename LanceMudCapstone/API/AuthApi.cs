@@ -1,5 +1,7 @@
 ﻿using LanceMudCapstone.DTOs;
 using LanceMudCapstone.Services;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 
 public static class AuthApi
@@ -20,8 +22,8 @@ public static class AuthApi
 
                 var cmd = new NpgsqlCommand(
                     @"INSERT INTO users (username, email, passwordhash, isactive)
-              VALUES (@u, @e, @p, true)
-              RETURNING userid;",
+                      VALUES (@u, @e, @p, true)
+                      RETURNING userid;",
                     conn
                 );
 
@@ -43,7 +45,6 @@ public static class AuthApi
                 return Results.Problem(ex.ToString());
             }
         });
-
 
         // POST /api/auth/login
         auth.MapPost("/login", async (LoginDto dto, IConfiguration config) =>
@@ -93,6 +94,38 @@ public static class AuthApi
             {
                 return Results.Problem(ex.ToString());
             }
+        });
+
+        // ⭐ GET /api/auth/validate/{userId}
+        auth.MapGet("/validate/{userId}", async (int userId, IConfiguration config) =>
+        {
+            var connString = config["SupabaseDb"];
+            Console.WriteLine("Validate Called");
+            await using var conn = new NpgsqlConnection(connString);
+            await conn.OpenAsync();
+
+            var cmd = new NpgsqlCommand(
+                @"SELECT userid, username 
+                  FROM users 
+                  WHERE userid = @id AND isactive = true
+                  LIMIT 1;",
+                conn
+            );
+
+            cmd.Parameters.AddWithValue("@id", userId);
+
+            var reader = await cmd.ExecuteReaderAsync();
+
+            if (!await reader.ReadAsync())
+                return Results.NotFound();
+
+            var user = new UserDto
+            {
+                UserId = reader.GetInt32(reader.GetOrdinal("userid")),
+                Username = reader.GetString(reader.GetOrdinal("username"))
+            };
+
+            return Results.Ok(user);
         });
     }
 }
