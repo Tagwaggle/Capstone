@@ -186,3 +186,56 @@
 .stats span {
     margin-left: 0.75rem;
 }
+
+
+
+
+========= Fixing Main Layout, here is the original ===========================
+
+@inherits LayoutComponentBase
+@inject SessionState SessionState
+
+<RadzenComponents />
+<RadzenNotification />
+<RadzenDialog />
+<RadzenContextMenu />
+
+
+<RadzenBody class="rz-main-layout">
+
+    <RadzenHeader class="rz-header">
+            <LunitariHeader sidebar1Expanded="@sidebar1Expanded"
+                            sidebar1ExpandedChanged="@OnSidebarChanged" />
+
+    </RadzenHeader>
+
+    <div class="layout-middle">
+
+            <RadzenSidebar class="rz-centered-sidebar" Expanded="@sidebar1Expanded">
+                <MainNavBar />
+            </RadzenSidebar>
+
+     
+
+        <div class="layout-content">
+            @Body
+        </div>
+    </div>
+
+    <RadzenFooter class="rz-footer">
+        <AppFooter />
+    </RadzenFooter>
+
+</RadzenBody>
+
+@code{
+   
+    private bool sidebar1Expanded = true;
+
+    private void OnSidebarChanged(bool value)
+    {
+        sidebar1Expanded = value;
+        StateHasChanged();
+    }
+
+}

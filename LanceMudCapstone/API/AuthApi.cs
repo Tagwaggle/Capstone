@@ -1,5 +1,6 @@
 ﻿using LanceMudCapstone.DTOs;
 using LanceMudCapstone.Services;
+using LanceMudCapstone.Enums;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
@@ -57,7 +58,7 @@ public static class AuthApi
                 await conn.OpenAsync();
 
                 var cmd = new NpgsqlCommand(
-                    @"SELECT userid, username, email, passwordhash, isactive
+                    @"SELECT userid, username, email, passwordhash, isactive, profilepictureid
                       FROM users
                       WHERE username = @u
                       LIMIT 1;",
@@ -85,7 +86,8 @@ public static class AuthApi
                     UserId = reader.GetInt32(reader.GetOrdinal("userid")),
                     Username = reader.GetString(reader.GetOrdinal("username")),
                     Email = reader.GetString(reader.GetOrdinal("email")),
-                    IsActive = reader.GetBoolean(reader.GetOrdinal("isactive"))
+                    IsActive = reader.GetBoolean(reader.GetOrdinal("isactive")),
+                    ProfilePictureId =  (UserIcon)reader.GetInt32(reader.GetOrdinal("profilepictureid"))
                 };
 
                 return Results.Ok(user);
@@ -105,7 +107,7 @@ public static class AuthApi
             await conn.OpenAsync();
 
             var cmd = new NpgsqlCommand(
-                @"SELECT userid, username 
+                @"SELECT userid, username, profilepictureid 
                   FROM users 
                   WHERE userid = @id AND isactive = true
                   LIMIT 1;",
@@ -122,7 +124,8 @@ public static class AuthApi
             var user = new UserDto
             {
                 UserId = reader.GetInt32(reader.GetOrdinal("userid")),
-                Username = reader.GetString(reader.GetOrdinal("username"))
+                Username = reader.GetString(reader.GetOrdinal("username")),
+                ProfilePictureId = (UserIcon)reader.GetInt32(reader.GetOrdinal("profilepictureid"))
             };
 
             return Results.Ok(user);

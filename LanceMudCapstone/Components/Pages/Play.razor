@@ -338,7 +338,7 @@ else
         await SessionState.ClearCharacterAsync();
         await SessionState.InitializeAsync();
         Console.WriteLine($"User Before {SessionState.UserName} logged in with ID {SessionState.UserId}");
-        await SessionState.SetUserAsync(SessionState.UserId ?? 0, SessionState.UserName ?? "");
+        await SessionState.SetUserAsync(SessionState.UserId ?? 0, SessionState.UserName ?? "", SessionState.UserIcon);
         Console.WriteLine($"User After {SessionState.UserName} logged in with ID {SessionState.UserId}");
         Nav.NavigateTo("/character");
     }

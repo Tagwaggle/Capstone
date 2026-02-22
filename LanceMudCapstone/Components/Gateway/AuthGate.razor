@@ -1,0 +1,42 @@
+﻿@inject IJSRuntime JS
+@inject SessionRepository SessionRepo
+@inject UserService _userService
+@inject SessionState SessionState
+@inject NavigationManager Nav
+
+
+@code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        if (SessionState.UserId != null)
+        {
+            return;
+        }
+
+        var cookieValue = await JS.InvokeAsync<string>("cookieHelper.readCookie", "session");
+
+        if (string.IsNullOrWhiteSpace(cookieValue))
+        {
+            Nav.NavigateTo("/login");
+            return;
+        }
+
+        int? uID = SessionRepo.GetUserIdFromToken(cookieValue);
+
+        if (uID == null)
+        {
+            await JS.InvokeVoidAsync("cookieHelper.deleteCookie", "session");
+            Nav.NavigateTo("/login");
+            return;
+        }
+
+            int UID = Convert.ToInt32(uID);
+
+            var userData = await _userService.GetUserByIdAsync(UID);
+            await SessionState.SetUserAsync(userData.UserId, userData.Username, userData.ProfilePictureId);
+    }
+
+}

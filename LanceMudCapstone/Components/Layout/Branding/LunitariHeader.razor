@@ -1,29 +1,86 @@
-﻿<div class="lunitari-header @(Compact ? "compact" : "")">
-    <h1 class="glyph-title">
-        <span style="--i:0" data-rune="ᚦ">L</span>
-        <span style="--i:1" data-rune="ᚱ">e</span>
-        <span style="--i:2" data-rune="ᚨ">g</span>
-        <span style="--i:3" data-rune="ᚾ">e</span>
-        <span style="--i:4" data-rune="ᛞ">n</span>
-        <span style="--i:5" data-rune="ᛋ">d</span>
-        <span style="--i:6" data-rune="ᚲ">s</span>
-        <span style="--i:7">&nbsp;</span>
-        <span style="--i:8" data-rune="ᛟ">o</span>
-        <span style="--i:9" data-rune="ᚠ">f</span>
-        <span style="--i:10">&nbsp;</span>
-        <span style="--i:11" data-rune="ᛏ">t</span>
-        <span style="--i:12" data-rune="ᚺ">h</span>
-        <span style="--i:13" data-rune="ᛖ">e</span>
-        <span style="--i:14">&nbsp;</span>
-        <span style="--i:15" data-rune="ᛚ">L</span>
-        <span style="--i:16" data-rune="ᚨ">a</span>
-        <span style="--i:17" data-rune="ᚾ">n</span>
-        <span style="--i:18" data-rune="ᚲ">c</span>
-        <span style="--i:19" data-rune="ᛖ">e</span>
-    </h1>
+﻿
+@using Radzen.Blazor
+@using Radzen
+@inject SessionState SessionState
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@inject SessionRepository SessionRepo
+
+
+
+
+<div class="lunitari-header">
+    <div class="header-left">
+        <RadzenSidebarToggle Click="CloseSidebar">🍔 Sidebar</RadzenSidebarToggle>
+
+    </div>
+
+    <div class="header-center">
+        <h1 class="glyph-title">
+            <span style="--i:0" data-rune="ᚦ">L</span>
+            <span style="--i:1" data-rune="ᚱ">e</span>
+            <span style="--i:2" data-rune="ᚨ">g</span>
+            <span style="--i:3" data-rune="ᚾ">e</span>
+            <span style="--i:4" data-rune="ᛞ">n</span>
+            <span style="--i:5" data-rune="ᛋ">d</span>
+            <span style="--i:6" data-rune="ᚲ">s</span>
+            <span style="--i:7">&nbsp;</span>
+            <span style="--i:8" data-rune="ᛟ">o</span>
+            <span style="--i:9" data-rune="ᚠ">f</span>
+            <span style="--i:10">&nbsp;</span>
+            <span style="--i:11" data-rune="ᛏ">t</span>
+            <span style="--i:12" data-rune="ᚺ">h</span>
+            <span style="--i:13" data-rune="ᛖ">e</span>
+            <span style="--i:14">&nbsp;</span>
+            <span style="--i:15" data-rune="ᛚ">L</span>
+            <span style="--i:16" data-rune="ᚨ">a</span>
+            <span style="--i:17" data-rune="ᚾ">n</span>
+            <span style="--i:18" data-rune="ᚲ">c</span>
+            <span style="--i:19" data-rune="ᛖ">e</span>
+        </h1>
+    </div>
+
+
+    @if (SessionState?.UserId != null)
+    {
+        <RadzenFabMenu Direction="Radzen.FabMenuDirection.Bottom">
+            <RadzenFabMenuItem Text="Settings"
+                               Icon="settings"
+                               Click="Settings_Clicked" />
+
+            <RadzenFabMenuItem Text="Logout"
+                               Icon="logout"
+                               Click="Logout" />
+        </RadzenFabMenu>
+    }
+
 </div>
 
 @code {
-    [Parameter]
-    public bool Compact { get; set; } = false;
+    [Parameter] public bool Compact { get; set; } = false;
+    [Parameter] public bool sidebar1Expanded { get; set; } = true;
+    [Parameter] public EventCallback<bool> sidebar1ExpandedChanged { get; set; }
+
+    private async Task CloseSidebar()
+    {
+        sidebar1Expanded = !sidebar1Expanded;
+        await sidebar1ExpandedChanged.InvokeAsync(sidebar1Expanded);
+        Console.WriteLine($"Sidebar clicked {sidebar1Expanded}");
+    }
+    private void Settings_Clicked()
+    {
+        Console.WriteLine("Setting clicked");
+        Nav.NavigateTo("/settings");
+    }
+    private async Task Logout()
+    {
+        Console.WriteLine("Settings clicke");
+        await JS.InvokeVoidAsync("cookieHelper.eraseCookie", "session");
+        var cookieValue = await JS.InvokeAsync<string>("cookieHelper.readCookie", "session");
+
+        SessionRepo.DeleteSession(cookieValue);
+        await SessionState.ClearCharacterAsync();
+
+        Nav.NavigateTo("/login", forceLoad: true);
+    }
 }

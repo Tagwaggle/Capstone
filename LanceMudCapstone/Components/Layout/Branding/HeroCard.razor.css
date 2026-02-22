@@ -1,6 +1,7 @@
 ﻿.hero-card {
     
-    width: 60ch;
+    width: 74ch;
+    max-width: 80ch;
     margin: 3rem auto;
     padding: 2rem;
     background: radial-gradient(circle at center, #0a0015 0%, #000000 100%);

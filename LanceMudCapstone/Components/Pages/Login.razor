@@ -64,7 +64,7 @@
             if (SessionState.UserId != UID)
             {
                 userData = await _userService.GetUserByIdAsync(UID);
-                await SessionState.SetUserAsync(userData.UserId, userData.Username);
+                await SessionState.SetUserAsync(userData.UserId, userData.Username, userData.ProfilePictureId);
             }
         }
 
@@ -118,7 +118,7 @@
                 return;
             }
 
-            var user = await response.Content.ReadFromJsonAsync<UserDto>();
+            var user = await response.Content.ReadFromJsonAsync<User>();
 
             if (user is null)
             {
@@ -126,7 +126,7 @@
                 return;
             }
 
-            await SessionState.SetUserAsync(user.UserId, user.Username);
+            await SessionState.SetUserAsync(user.UserId, user.Username, user.ProfilePictureId);
             if (loginModel.RememberMe)
             {
 

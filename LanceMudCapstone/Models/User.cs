@@ -1,4 +1,6 @@
-﻿namespace LanceMudCapstone.Models;
+﻿using LanceMudCapstone.Enums;
+
+namespace LanceMudCapstone.Models;
 
 public class User
 {
@@ -9,6 +11,6 @@ public class User
     public bool IsActive { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime LastLogin { get; set; } = DateTime.UtcNow;
-    public int ProfilePictureId { get; set; }
+    public UserIcon ProfilePictureId { get; set; } = UserIcon.None;
 
 }

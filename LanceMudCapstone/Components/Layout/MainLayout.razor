@@ -1,29 +1,36 @@
-﻿
+﻿@rendermode InteractiveServer
 @inherits LayoutComponentBase
+@using Radzen
+@using Radzen.Blazor
 @inject SessionState SessionState
 
-<RadzenNotification />
-<RadzenDialog />
-<RadzenContextMenu />
+<RadzenLayout>
 
-<RadzenBody class="rz-main-layout">
-
-    <RadzenHeader class="rz-header">
-        <LunitariHeader />
+    <RadzenHeader>
+        <LunitariHeader sidebar1Expanded="@sidebar1Expanded"
+                        sidebar1ExpandedChanged="@OnSidebarChanged" />
     </RadzenHeader>
 
-    <div class="layout-middle">
-        <RadzenSidebar class="rz-centered-sidebar">
-            <MainNavBar />
-        </RadzenSidebar>
+    <RadzenSidebar @bind-Expanded="@sidebar1Expanded">
+        <MainNavBar />
+    </RadzenSidebar>
 
-        <div class="layout-content">
-            @Body
-        </div>
-    </div>
+    <RadzenBody>
+        @Body
+    </RadzenBody>
 
-    <RadzenFooter class="rz-footer">
+    <RadzenFooter>
         <AppFooter />
     </RadzenFooter>
 
-</RadzenBody>
+</RadzenLayout>
+
+@code {
+    private bool sidebar1Expanded = true;
+
+    private void OnSidebarChanged(bool value)
+    {
+        sidebar1Expanded = value;
+        StateHasChanged();
+    }
+}
