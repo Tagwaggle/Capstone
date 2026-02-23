@@ -50,6 +50,8 @@ public static class AuthApi
         // POST /api/auth/login
         auth.MapPost("/login", async (LoginDto dto, IConfiguration config) =>
         {
+            Console.WriteLine($"[LOGIN DTO] Username='{dto.Username}', Password='{dto.Password}'");
+
             var connString = config["SupabaseDb"];
 
             try
@@ -59,9 +61,9 @@ public static class AuthApi
 
                 var cmd = new NpgsqlCommand(
                     @"SELECT userid, username, email, passwordhash, isactive, profilepictureid
-                      FROM users
-                      WHERE username = @u
-                      LIMIT 1;",
+              FROM users
+              WHERE username = @u
+              LIMIT 1;",
                     conn
                 );
 
@@ -76,10 +78,21 @@ public static class AuthApi
 
                 var storedHash = reader.GetString(reader.GetOrdinal("passwordhash"));
 
+                Console.WriteLine($"[LOGIN] StoredHash='{storedHash}'");
+
+                // ✅ THIS is the correct call:
                 if (!PasswordHelper.VerifyPassword(dto.Password, storedHash))
                 {
+                    Console.WriteLine("[LOGIN] VerifyPassword FAILED");
                     return Results.BadRequest(new ApiErrorDto { Message = $"DTOuname{dto.Username}Invalid credentials" });
                 }
+
+                Console.WriteLine("[LOGIN] VerifyPassword SUCCESS");
+
+                int ord = reader.GetOrdinal("profilepictureid");
+                int iconValue = reader.IsDBNull(ord) ? 0 : reader.GetInt32(ord);
+                var tProfilePictureId = (UserIcon)iconValue;
+
 
                 var user = new UserDto
                 {
@@ -87,7 +100,7 @@ public static class AuthApi
                     Username = reader.GetString(reader.GetOrdinal("username")),
                     Email = reader.GetString(reader.GetOrdinal("email")),
                     IsActive = reader.GetBoolean(reader.GetOrdinal("isactive")),
-                    ProfilePictureId =  (UserIcon)reader.GetInt32(reader.GetOrdinal("profilepictureid"))
+                    ProfilePictureId = tProfilePictureId
                 };
 
                 return Results.Ok(user);
@@ -121,11 +134,15 @@ public static class AuthApi
             if (!await reader.ReadAsync())
                 return Results.NotFound();
 
+            int ord = reader.GetOrdinal("profilepictureid");
+            int iconValue = reader.IsDBNull(ord) ? 0 : reader.GetInt32(ord);
+            var tProfilePictureId = (UserIcon)iconValue;
+            
             var user = new UserDto
             {
                 UserId = reader.GetInt32(reader.GetOrdinal("userid")),
                 Username = reader.GetString(reader.GetOrdinal("username")),
-                ProfilePictureId = (UserIcon)reader.GetInt32(reader.GetOrdinal("profilepictureid"))
+                ProfilePictureId = tProfilePictureId
             };
 
             return Results.Ok(user);

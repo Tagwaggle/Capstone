@@ -1,78 +1,39 @@
-﻿@inherits LayoutComponentBase
+﻿@rendermode InteractiveServer
+@inherits LayoutComponentBase
+@using LanceMudCapstone.Components.Gateway
+@using Radzen
+@using Radzen.Blazor
 @inject SessionState SessionState
-@inject NavigationManager Nav
 
-<div class="page">
-    <header class="top-row">
-        <GameHeader />
-    </header>
 
-    <div class="body">
-        <nav class="sidebar">
-            @if (SessionState.Ready && SessionState.CommandBox)
-            {
-                <GameNavBar />
-            }
-        </nav>
 
-        <main>
-            @if (!_readyToRender)
-            {
-                <LoadingPage OnFinished="OnLoadingFinished" />
-            }
-            else
-            {
-                @Body
-            }
-        </main>
-    </div>
-</div>
+<RadzenLayout>
+
+    <RadzenHeader>
+        <LunitariHeader sidebar1Expanded="@sidebar1Expanded"
+                        sidebar1ExpandedChanged="@OnSidebarChanged" />
+    </RadzenHeader>
+
+    <RadzenSidebar @bind-Expanded="@sidebar1Expanded">
+        <GameNavBar />
+    </RadzenSidebar>
+
+    <RadzenBody>
+        @Body
+    </RadzenBody>
+
+    <RadzenFooter>
+        <AppFooter />
+    </RadzenFooter>
+
+</RadzenLayout>
 
 @code {
-    private bool _readyToRender = false;
-    private bool _alreadyInitialized = false;
+    private bool sidebar1Expanded = true;
 
-    protected override void OnInitialized()
+    private void OnSidebarChanged(bool value)
     {
-        // Listen to session changes
-        SessionState.OnChange += StateHasChanged;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender && !_alreadyInitialized)
-        {
-            _alreadyInitialized = true;
-
-            // Ensure hydration occurs after the UI is interactive (important for Azure)
-            await SessionState.InitializeAsync();
-            await SessionState.TryHydrateCharacterAsync();
-
-            StateHasChanged(); // re-render to check if LoadingPage should fire
-        }
-    }
-
-    private async Task OnLoadingFinished()
-    {
-        // Extra delay for cinematic effect (2.5s total)
-        await Task.Delay(1500);
-
-        // Re-hydrate session to make sure localStorage reads complete
-        //await SessionState.InitializeAsync();
-        //await SessionState.TryHydrateCharacterAsync();
-
-        _readyToRender = true;
+        sidebar1Expanded = value;
         StateHasChanged();
-
-        // Optional: redirect if still no logged-in user
-        if (!SessionState.IsLoggedIn)
-        {
-            //Nav.NavigateTo("/character", true);
-        }
-    }
-
-    public void Dispose()
-    {
-        SessionState.OnChange -= StateHasChanged;
     }
 }

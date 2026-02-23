@@ -74,11 +74,15 @@
     }
     private async Task Logout()
     {
-        Console.WriteLine("Settings clicke");
-        await JS.InvokeVoidAsync("cookieHelper.eraseCookie", "session");
         var cookieValue = await JS.InvokeAsync<string>("cookieHelper.readCookie", "session");
 
-        SessionRepo.DeleteSession(cookieValue);
+        if (!string.IsNullOrWhiteSpace(cookieValue))
+        {
+            SessionRepo.DeleteSession(cookieValue);
+        }   
+
+        await JS.InvokeVoidAsync("cookieHelper.eraseCookie", "session");
+
         await SessionState.ClearCharacterAsync();
 
         Nav.NavigateTo("/login", forceLoad: true);
