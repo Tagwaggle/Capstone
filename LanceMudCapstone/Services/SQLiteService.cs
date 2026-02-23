@@ -8,7 +8,11 @@ public class SQLiteService
 
     public SQLiteService(IWebHostEnvironment env)
     {
-        var dbPath = Path.Combine(env.ContentRootPath, "Data", "sessions.db");
+        var dataDir = "/var/data";
+
+        if (!Directory.Exists(dataDir)) { Directory.CreateDirectory(dataDir); }
+
+        var dbPath = Path.Combine(dataDir, "sessions.db");
 
         _connectionString = $"Data Source={dbPath}";
     }
