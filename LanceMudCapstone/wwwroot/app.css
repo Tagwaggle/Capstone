@@ -305,3 +305,10 @@ h1:focus {
     margin-left: 0.75rem;
 }
 
+.rz-card {
+    background: rgba(42,45,52,.8) !important;
+    backdrop-filter: blur(8px) !important;
+    border-radius: 12px !important;
+    border: 2px rgba(125,125,255, .85);
+    box-shadow: 0 0 20px rgba(100,100,255 .15) !important;
+}

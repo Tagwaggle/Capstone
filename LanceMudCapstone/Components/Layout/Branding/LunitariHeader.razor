@@ -1,6 +1,7 @@
 ﻿
 @using Radzen.Blazor
 @using Radzen
+@implements IDisposable
 @inject SessionState SessionState
 @inject NavigationManager Nav
 @inject IJSRuntime JS
@@ -67,10 +68,13 @@
         await sidebar1ExpandedChanged.InvokeAsync(sidebar1Expanded);
         Console.WriteLine($"Sidebar clicked {sidebar1Expanded}");
     }
-    private void Settings_Clicked()
+    private async Task Settings_Clicked()
     {
-        Console.WriteLine("Setting clicked");
-        Nav.NavigateTo("/settings");
+        if(SessionState.CharacterId != null)
+        {
+            await SessionState.ClearCharacterAsync();
+            Nav.NavigateTo("/settings");
+        }
     }
     private async Task Logout()
     {
@@ -86,5 +90,14 @@
         await SessionState.ClearCharacterAsync();
 
         Nav.NavigateTo("/login", forceLoad: true);
+    }
+    protected override void OnInitialized()
+    {
+        SessionState.OnChange += StateHasChanged;
+        base.OnInitialized();
+    }
+    public void Dispose()
+    {
+        SessionState.OnChange -= StateHasChanged;
     }
 }

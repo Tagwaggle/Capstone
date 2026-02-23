@@ -14,6 +14,7 @@
 @inject UserService _userService;
 
 <RadzenNotification />
+<div class="login-wrapper">
 <div style="justify-items: center; padding-top: 1.5rem;">
     @if (!string.IsNullOrEmpty(ErrorMessage))
     {
@@ -34,6 +35,7 @@
             <RadzenButton Text="Login" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Style="width:50%;margin-top:1.5rem; justify-items: end;" />
         </RadzenTemplateForm>
 </RadzenCard>
+    </div>
 </div>
 
 @code {
@@ -138,10 +140,11 @@
                 SessionRepo.InsertSession(secureToken, user.UserId);
 
                 await JS.InvokeVoidAsync("cookieHelper.writeCookie", "session", secureToken, 7);
-                
+
             }
             Console.WriteLine($"User {SessionState.UserName} logged in with ID {SessionState.UserId}");
             Nav.NavigateTo("/character");
+            SessionState.NotifyStateChange();
         }
         finally { _loading = false; }
     }
