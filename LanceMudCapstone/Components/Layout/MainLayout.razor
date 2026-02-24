@@ -6,12 +6,13 @@
 
 <RadzenLayout>
 
+
     <RadzenHeader>
         <LunitariHeader sidebar1Expanded="@sidebar1Expanded"
                         sidebar1ExpandedChanged="@OnSidebarChanged" />
     </RadzenHeader>
 
-    <RadzenSidebar @bind-Expanded="@sidebar1Expanded">
+    <RadzenSidebar @bind-Expanded="@sidebar1Expanded" Style="background: #000; align-content: center">
         <MainNavBar />
     </RadzenSidebar>
 

@@ -301,9 +301,7 @@ h1:focus {
     font-weight: 500;
 }
 
-.stats span {
-    margin-left: 0.75rem;
-}
+
 
 .rz-card {
     background: rgba(42,45,52,.8) !important;
@@ -312,3 +310,32 @@ h1:focus {
     border: 2px rgba(125,125,255, .85);
     box-shadow: 0 0 20px rgba(100,100,255 .15) !important;
 }
+
+.stats-group .stat-card {
+    width: 150px;
+    gap: 1rem;
+    padding-top: 1rem;
+}
+
+.rz-progressbar-value {
+    transition: width 0.4s ease, background 0.3s ease;
+}
+
+.hp-bar .rz-progressbar-value {
+    background: linear-gradient(90deg, #ff3b3b, #ff7a7a) !important;
+    box-shadow: 0 0 6px #ff3b3b !important;
+    flex: auto;
+}
+
+.mana-bar .rz-progressbar-value {
+    background: linear-gradient(90deg, #3b6bff, #7aa2ff) !important;
+    box-shadow: 0 0 6px #3b6bff !important;
+    flex: auto;
+}
+
+.stamina-bar .rz-progressbar-value {
+    background: linear-gradient(90deg, #ff8c3b, #ffc07a) !important;
+    box-shadow: 0 0 6px #ff8c3b !important;
+    flex:auto;
+}
+

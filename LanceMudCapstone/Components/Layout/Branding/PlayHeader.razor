@@ -15,30 +15,36 @@
         <RadzenSidebarToggle Click="CloseSidebar">🍔 Sidebar</RadzenSidebarToggle>
 
     </div>
-
     <div class="header-center">
-        <h1 class="glyph-title">
-            <span style="--i:0" data-rune="ᚦ">L</span>
-            <span style="--i:1" data-rune="ᚱ">e</span>
-            <span style="--i:2" data-rune="ᚨ">g</span>
-            <span style="--i:3" data-rune="ᚾ">e</span>
-            <span style="--i:4" data-rune="ᛞ">n</span>
-            <span style="--i:5" data-rune="ᛋ">d</span>
-            <span style="--i:6" data-rune="ᚲ">s</span>
-            <span style="--i:7">&nbsp;</span>
-            <span style="--i:8" data-rune="ᛟ">o</span>
-            <span style="--i:9" data-rune="ᚠ">f</span>
-            <span style="--i:10">&nbsp;</span>
-            <span style="--i:11" data-rune="ᛏ">t</span>
-            <span style="--i:12" data-rune="ᚺ">h</span>
-            <span style="--i:13" data-rune="ᛖ">e</span>
-            <span style="--i:14">&nbsp;</span>
-            <span style="--i:15" data-rune="ᛚ">L</span>
-            <span style="--i:16" data-rune="ᚨ">a</span>
-            <span style="--i:17" data-rune="ᚾ">n</span>
-            <span style="--i:18" data-rune="ᚲ">c</span>
-            <span style="--i:19" data-rune="ᛖ">e</span>
-        </h1>
+
+        <RadzenCardGroup Responsive="true" class="stats-group">
+
+            <RadzenCard Variant="Variant.Outlined" class="stat-card">
+                <RadzenStack Gap="0.5rem">
+                    <RadzenText TextStyle="TextStyle.H5" Style="color:white;">HP</RadzenText>
+                    <RadzenProgressBar class="hp-bar" Value="@SessionState.Pfile.Health" Max="@SessionState.Pfile.MaxHealth" ShowValue="false" Style="--rz-progressbar-height: 0.75rem;" />
+                </RadzenStack>
+            </RadzenCard>
+            @if(@SessionState.Pfile.MaxMana != 0)
+            {
+            <RadzenCard Variant="Variant.Outlined" class="stat-card">
+                <RadzenStack Gap="0.5rem">
+                    <RadzenText TextStyle="TextStyle.H5" Style="color:white;">Mana</RadzenText>
+                    <RadzenProgressBar class="mana-bar" Value="@SessionState.Pfile.Mana" Max="@SessionState.Pfile.MaxMana" ShowValue="false" Style="--rz-progressbar-height: 0.75rem;" />
+                </RadzenStack>
+            </RadzenCard>
+            }
+            @if(@SessionState.Pfile.MaxStamina != 0)
+            {
+            <RadzenCard Variant="Variant.Outlined" class="stat-card">
+                <RadzenStack Gap="0.5rem">
+                    <RadzenText TextStyle="TextStyle.H5" Style="color:white;">Stamina</RadzenText>
+                    <RadzenProgressBar class="stamina-bar" Value="@SessionState.Pfile.Stamina" Max="@SessionState.Pfile.MaxStamina" ShowValue="false" Style="--rz-progressbar-height: 0.75rem;" />
+                </RadzenStack>
+            </RadzenCard>
+            }
+        </RadzenCardGroup>
+
     </div>
 
 
