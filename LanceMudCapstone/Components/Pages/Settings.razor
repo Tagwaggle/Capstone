@@ -81,15 +81,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Fetch email ONCE — everything else comes from SessionState
         var client = HttpClientFactory.CreateClient("ServerAPI");
-
         try
         {
-            var dto = await client.GetFromJsonAsync<UserEmailDto>(
-                $"api/users/{SessionState.UserId}/email");
 
-            currentEmail = dto?.Email ?? string.Empty;
+            currentEmail = await UserService.GetUserEmail(SessionState.UserId.Value);
+
         }
         catch (Exception ex)
         {
@@ -110,7 +107,10 @@
 
         if (response.IsSuccessStatusCode)
         {
+            if (SessionState.UserId == null) return;
             currentEmail = newEmail.Trim();
+            await UserService.UpdateUserEmailAsync(SessionState.UserId.Value, currentEmail);
+            SessionState.NotifyStateChange();
             newEmail = string.Empty;
         }
         else
@@ -136,6 +136,7 @@
 
     private async Task OpenPasswordDialog()
     {
+        Console.WriteLine("Open clicked");
         var result = await DialogService.OpenAsync<PasswordDialog>(
             "Change Password",
             new Dictionary<string, object>

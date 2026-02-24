@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using LanceMudCapstone.Enums;
 using LanceMudCapstone.Models;
+using Supabase.Realtime.Converters;
 
 namespace LanceMudCapstone.Services;
 
@@ -11,6 +12,17 @@ public class UserService
     public UserService(DbHelper db)
     {
         _db = db;
+    }
+
+    public async Task<string> GetUserEmail(int userId)
+    {
+        using var conn = _db.CreateConnection();
+        var sql = @"
+            SELECT email
+            FROM users
+            WHERE userid = @userid;";
+
+        return await conn.ExecuteScalarAsync<string>(sql, new { userid = userId });
     }
 
     public async Task<int> AddUserAsync(User user)
@@ -51,6 +63,17 @@ public class UserService
         var sql = @"SELECT * FROM users WHERE userid = @id LIMIT 1;";
 
         return await conn.QuerySingleOrDefaultAsync<User>(sql, new { id });
+    }
+    public async Task<bool> UpdateUserEmailAsync(int userId, string email)
+    {
+        using var conn = _db.CreateConnection();
+        var sql = @"UPDATE users
+                    SET email = @email
+                    WHERE userid = @id;";
+
+        var rows = await conn.ExecuteAsync(sql, new { id = userId, email = email });
+
+        return rows > 0;
     }
     public async Task<bool> UpdateUserIconAsync(int userId, UserIcon icon)
     {
