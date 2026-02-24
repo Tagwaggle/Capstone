@@ -1,11 +1,15 @@
 ﻿
 @using Radzen.Blazor
 @using Radzen
+@using LanceMudCapstone.Services
+
 @implements IDisposable
 @inject SessionState SessionState
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 @inject SessionRepository SessionRepo
+@inject UserService UserService
+
 
 
 
@@ -48,7 +52,7 @@
         <div class="rz-p-12 rz-text-align-center">
             <RadzenProfileMenu>
                 <Template>
-                    <RadzenImage Path="images/classes/default.svg" Style="height: 1.5rem">
+                    <RadzenImage Path="@UserIconHelper.GetIconPath(SessionState.UserIcon)" Style="height: 1.5rem">
                     </RadzenImage>
                 </Template>
                 <ChildContent>

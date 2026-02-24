@@ -273,6 +273,8 @@ public class SessionState
         FirstLoadComplete = true;
     }
 
+
+
     public void NotifyStateChange() => OnChange?.Invoke();
 
     public record UserSession(int UserId, string UserName);

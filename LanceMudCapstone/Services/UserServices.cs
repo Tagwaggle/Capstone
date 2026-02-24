@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using LanceMudCapstone.Enums;
 using LanceMudCapstone.Models;
 
 namespace LanceMudCapstone.Services;
@@ -50,6 +51,22 @@ public class UserService
         var sql = @"SELECT * FROM users WHERE userid = @id LIMIT 1;";
 
         return await conn.QuerySingleOrDefaultAsync<User>(sql, new { id });
+    }
+    public async Task<bool> UpdateUserIconAsync(int userId, UserIcon icon)
+    {
+        using var conn = _db.CreateConnection();
+
+        var sql = @"UPDATE users 
+                SET profilepictureid = @icon 
+                WHERE userid = @id;";
+
+        var rows = await conn.ExecuteAsync(sql, new
+        {
+            id = userId,
+            icon = (int)icon
+        });
+
+        return rows > 0;
     }
 
 }

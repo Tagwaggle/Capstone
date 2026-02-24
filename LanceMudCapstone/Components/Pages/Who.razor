@@ -5,8 +5,9 @@
 @using Radzen
 @using Radzen.Blazor
 
+<div class="login-wrapper">
 <RadzenCard Style="margin: 2rem;">
-    <RadzenHeading Size="H3" Text="Who Is Online" />
+    <RadzenHeading Size="H3" Style="color: white" Text="Who Is Online" />
 
     @if (players == null)
     {
@@ -65,7 +66,7 @@
         </RadzenDataList>
     }
 </RadzenCard>
-
+</div>
 @code {
     private IEnumerable<PlayerCharacterDto>? players;
 

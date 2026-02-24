@@ -1,178 +1,154 @@
 ﻿@page "/settings"
 @layout GameLayout
+
 @inject SessionState SessionState
 @inject IHttpClientFactory HttpClientFactory
+@inject DialogService DialogService
+@inject UserService UserService
+
+@using LanceMudCapstone.Enums
 @using LanceMudCapstone.DTOs
-@using LanceMudCapstone.API
+@using LanceMudCapstone.Services
+@using LanceMudCapstone.Components.Settings
 
 @rendermode InteractiveServer
+<div class="login-wrapper">
+<RadzenCard class="settings-card">
 
-@if (showPasswordPopup)
-{
-    <div class="modal-overlay">
-        <div class="modal-card">
-            <h3>Change Password</h3>
+    <!-- Header Row: Avatar + Username/Password -->
+    <RadzenStack Orientation="Orientation.Horizontal"
+                 Gap="1.5rem"
+                 AlignItems="AlignItems.Center">
 
-            <div class="form-group">
-                <label>Old Password</label><br/>
-                <InputText type="password" @bind-Value="oldPassword" class="form-entry" />
-            </div>
+        <!-- Avatar FAB -->
+        <AvatarFab CurrentIcon="@SessionState.UserIcon"
+                   OnIconChanged="OnAvatarChanged" />
 
-            <div class="form-group">
-                <label>New Password</label><br />
-                <InputText type="password" @bind-Value="newPassword" class="form-entry" />
-            </div>
+        <!-- Username + Password -->
+        <RadzenStack Gap="0.25rem">
+            <RadzenText TextStyle="TextStyle.Overline" class="label-text">User Name</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" class="value-text">
+                <b>@SessionState.UserName</b>
+            </RadzenText>
 
-            <div class="form-group">
-                <label>Confirm New Password</label><br />
-                <InputText type="password" @bind-Value="confirmPassword" class="form-entry" />
-            </div>
+            <RadzenText TextStyle="TextStyle.Overline" class="label-text rz-mt-4">Password</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" class="value-text">
+                <b>***</b>
+            </RadzenText>
 
-            <div class="modal-actions">
-                <button class="setting-button" @onclick="SubmitPasswordChange">Submit</button>
-                <button class="setting-button" @onclick="HidePasswordPopup">Cancel</button>
-            </div>
+            <RadzenButton Text="Change Password"
+                          Click="OpenPasswordDialog"
+                          class="btn-lunar rz-mt-2"
+                          Style="width: fit-content;" />
+        </RadzenStack>
 
-            @if (!string.IsNullOrEmpty(errorMessage))
-            {
-                <p class="error-text">@errorMessage</p>
-            }
-        </div>
-    </div>
-}
+    </RadzenStack>
 
-<div class="setting-wrapper">
-    <div class="setting-card">
-        <h2>Settings for @SessionState.UserName</h2>
-          @if (_user is null)
-        {
-            <p>Loading user data...</p>
-        }
-        else
-        {
-        <table class="setting-table">
-            <tr>
-                <td>User Name</td>
-                <td>@SessionState.UserName</td>
-            </tr>
-            <tr>
-                <td>Password</td>
-                <td style="color: grey">***</td>
-            </tr>
-        </table>
-        <button class="setting-button" @onclick="ShowPasswordPopup">Change Password</button>
-        <table class="setting-table">
-            <tr>
-                <td>User Email</td>
-                <td>@_user.Email</td>
-                </tr>
-                <tr>
-                    <td>New Email</td>
-                <td><InputText class="form-entry" @bind-Value="newEmail" id="newEmail" /></td>
-            </tr>
-            <tr>
-                <td>E-Mail</td>
-                <td style="color: grey">@_user.Email</td>
-            </tr>
-        </table>
-        <button class="setting-button" @onclick="EmailButton_Clicked">Change Email</button>
-        }
-    </div>
+    <!-- Divider -->
+    <div class="settings-divider"></div>
+
+    <!-- Email Section -->
+    <RadzenStack Gap="0.25rem">
+        <RadzenText TextStyle="TextStyle.Overline" class="label-text">Email</RadzenText>
+        <RadzenText TextStyle="TextStyle.Body1" class="value-text">
+            <b>@currentEmail</b>
+        </RadzenText>
+
+        <RadzenText TextStyle="TextStyle.Overline" class="label-text rz-mt-4">New Email</RadzenText>
+        <InputText class="form-entry" @bind-Value="newEmail" />
+    </RadzenStack>
+
+    <!-- Action Buttons -->
+    <RadzenStack Orientation="Orientation.Horizontal"
+                 JustifyContent="JustifyContent.End"
+                 Gap="1rem"
+                 class="rz-mt-6">
+
+        <RadzenButton Text="Save Email"
+                      Click="EmailButton_Clicked"
+                      class="btn-lunar" />
+
+        <RadzenButton Text="Back"
+                      NavigateTo="/character"
+                      class="btn-secondary" />
+    </RadzenStack>
+
+</RadzenCard>
 </div>
-
 @code {
-    private string newEmail { get; set; } = string.Empty;
-    private UserDto? _user;
-    private bool showPasswordPopup = false;
-    private string oldPassword = string.Empty;
-    private string newPassword = string.Empty;
-    private string confirmPassword = string.Empty;
-    private string errorMessage = string.Empty;
-
-    private void ShowPasswordPopup() => showPasswordPopup = true;
-    private void HidePasswordPopup() => showPasswordPopup = false;
+    private string currentEmail = string.Empty;
+    private string newEmail = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
+        // Fetch email ONCE — everything else comes from SessionState
         var client = HttpClientFactory.CreateClient("ServerAPI");
 
         try
         {
-            _user = await client.GetFromJsonAsync<UserDto>($"api/users/Select/{SessionState.UserId}");
+            var dto = await client.GetFromJsonAsync<UserEmailDto>(
+                $"api/users/{SessionState.UserId}/email");
+
+            currentEmail = dto?.Email ?? string.Empty;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error fetching user: {ex.Message}");
+            Console.WriteLine($"Error fetching email: {ex.Message}");
         }
     }
+
     private async Task EmailButton_Clicked()
     {
-        if (string.IsNullOrWhiteSpace(newEmail.Trim())) return;
+        if (string.IsNullOrWhiteSpace(newEmail.Trim()))
+            return;
 
         var client = HttpClientFactory.CreateClient("ServerAPI");
-
         var dto = new UserEmailDto { Email = newEmail.Trim() };
 
-        var response = await client.PutAsJsonAsync($"api/users/{SessionState.UserId}/email", dto);
+        var response = await client.PutAsJsonAsync(
+            $"api/users/{SessionState.UserId}/email", dto);
 
         if (response.IsSuccessStatusCode)
         {
-            Console.WriteLine($"Email updated to: {newEmail.Trim()}");
+            currentEmail = newEmail.Trim();
             newEmail = string.Empty;
-            _user = await client.GetFromJsonAsync<UserDto>($"api/users/Select/{SessionState.UserId}");
         }
         else
         {
             Console.WriteLine($"Error writing email: {response.StatusCode}");
         }
     }
-    private async Task SubmitPasswordChange()
+
+    private async Task OnAvatarChanged(UserIcon newIcon)
     {
-        errorMessage = string.Empty;
-
-        if (string.IsNullOrWhiteSpace(oldPassword) || string.IsNullOrWhiteSpace(newPassword) || string.IsNullOrWhiteSpace(confirmPassword))
+        if (SessionState.UserId == null)
         {
-            errorMessage = "All fields are required";
-            return;
-        }
-        if (newPassword != confirmPassword)
-        {
-            errorMessage = "The new passwords must match";
             return;
         }
 
-        var dto = new LoginDto
+        var results = await UserService.UpdateUserIconAsync(SessionState.UserId.Value, newIcon);
+        if(results)
         {
-            Username = _user?.Username.Trim() ?? string.Empty,
-            Password = oldPassword
-        };
-
-        var client = HttpClientFactory.CreateClient("ServerAPI");
-        var response = await client.PostAsJsonAsync("/api/auth/login", dto);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            var error = await response.Content.ReadFromJsonAsync<ApiErrorDto>();
-            errorMessage =  "Password mismatch.";
-            return;
+            SessionState.UserIcon = newIcon;
+            SessionState.NotifyStateChange();
         }
-
-        var dto2 = new PasswordDto { Password = newPassword };
-        var response2 = await client.PutAsJsonAsync($"api/users/{SessionState.UserId}/password", dto2);
-
-        if (response2.IsSuccessStatusCode)
-        {
-            HidePasswordPopup();
-            Console.WriteLine($"Username: {SessionState.UserName} succesfully changed password");
-
-        }
-        else
-        {
-            errorMessage = "Failed to update password";
-            Console.WriteLine($"Username: {SessionState.UserName} failed to chang password");
-
-        }
-
     }
 
+    private async Task OpenPasswordDialog()
+    {
+        var result = await DialogService.OpenAsync<PasswordDialog>(
+            "Change Password",
+            new Dictionary<string, object>
+            {
+                { "Username", SessionState.UserName },
+                { "UserId", SessionState.UserId }
+            },
+            new DialogOptions { Width = "420px", Height = "auto" }
+        );
+
+        if (result is bool success && success)
+        {
+            // Optional: toast or confirmation
+        }
+    }
 }

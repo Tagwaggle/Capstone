@@ -339,3 +339,6 @@ h1:focus {
     flex:auto;
 }
 
+.login-card-rz span{
+    color: white;
+}

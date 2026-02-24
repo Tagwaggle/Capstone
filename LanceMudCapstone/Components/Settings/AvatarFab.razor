@@ -1,0 +1,102 @@
+﻿@using LanceMudCapstone.Enums
+@using LanceMudCapstone.Services
+
+<div class="avatarfab-container">
+    <div class="avatarfab-core @(isOpen ? "open" : "")" @onclick="ToggleMenu">
+        <img src="@UserIconHelper.GetIconPath(CurrentIconSafe)" class="avatarfab-image" />
+        <div class="avatarfab-pencil">✎</div>
+    </div>
+
+    @if (isOpen)
+    {
+        @foreach (var item in radialItems)
+        {
+            <button class="avatarfab-option"
+                    style="@GetItemStyle(item)"
+                    @onclick="() => SelectIcon(item.Icon)">
+                <img src="@UserIconHelper.GetIconPath(item.Icon)" class="avatarfab-option-image" />
+            </button>
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public UserIcon CurrentIcon { get; set; } = UserIcon.None;
+    [Parameter] public EventCallback<UserIcon> OnIconChanged { get; set; }
+
+    private bool isOpen = false;
+
+    private UserIcon CurrentIconSafe => CurrentIcon == UserIcon.None ? UserIcon.Warrior : CurrentIcon;
+
+    private class RadialItem
+    {
+        public UserIcon Icon { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double DelayMs { get; set; }
+    }
+
+    private List<RadialItem> radialItems = new();
+
+    protected override void OnParametersSet()
+    {
+        BuildRadialItems();
+    }
+
+    private void BuildRadialItems()
+    {
+        radialItems.Clear();
+
+        var icons = Enum.GetValues<UserIcon>()
+                        .Where(i => i != UserIcon.None)
+                        .ToList();
+
+        if (!icons.Any())
+            return;
+
+        double startDeg = -135;
+        double endDeg = 135;
+        double count = icons.Count;
+        double step = count > 1 ? (endDeg - startDeg) / (count - 1) : 0;
+
+        double radius = 90;
+        double baseDelay = 60;
+
+        for (int i = 0; i < icons.Count; i++)
+        {
+            double angleDeg = startDeg + step * i;
+            double angleRad = angleDeg * Math.PI / 180.0;
+
+            double x = radius * Math.Cos(angleRad);
+            double y = radius * Math.Sin(angleRad);
+
+            radialItems.Add(new RadialItem
+            {
+                Icon = icons[i],
+                X = x,
+                Y = y,
+                DelayMs = i * baseDelay
+            });
+        }
+    }
+
+    private string GetItemStyle(RadialItem item)
+    {
+        return $"--avatarfab-x: {item.X}px; --avatarfab-y: {item.Y}px; --avatarfab-delay: {item.DelayMs}ms;";
+    }
+
+    private void ToggleMenu()
+    {
+        isOpen = !isOpen;
+    }
+
+    private async Task SelectIcon(UserIcon icon)
+    {
+        isOpen = false;
+
+        if (OnIconChanged.HasDelegate)
+        {
+            await OnIconChanged.InvokeAsync(icon);
+        }
+    }
+}

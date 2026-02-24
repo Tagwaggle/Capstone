@@ -8,14 +8,14 @@ namespace LanceMudCapstone.Services
         {
             return icon switch
             {
-                UserIcon.Warrior => "/images/icons/warrior.svg",
-                UserIcon.Mage => "/images/icons/mage.svg",
-                UserIcon.Cleric => "/images/icons/cleric.svg",
-                UserIcon.Paladin => "/images/icons/paladin.svg",
-                UserIcon.Hunter => "/images/icons/hunter.svg",
-                UserIcon.Rogue => "/images/icons/rogue.svg",
-                UserIcon.Knight => "/images/icons/knight.svg",
-                _ => "/images/icons/default.svg"
+                UserIcon.Warrior => "/images/classes/warrior.svg",
+                UserIcon.Mage => "/images/classes/mage.svg",
+                UserIcon.Cleric => "/images/classes/cleric.svg",
+                UserIcon.Paladin => "/images/classes/paladin.svg",
+                UserIcon.Hunter => "/images/classes/hunter.svg",
+                UserIcon.Rogue => "/images/classes/rogue.svg",
+                UserIcon.Knight => "/images/classes/knight.svg",
+                _ => "/images/classes/default.svg"
             };
         }
     }

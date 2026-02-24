@@ -10,6 +10,7 @@
 @inject NotificationService NotificationService
 
 <RadzenNotification />
+<div class="login-wrapper">
 <div style="justify-items: center; padding-top: 1.5rem;">
     <RadzenCard class="login-card-rz">
         <div class="login-title-rz">Create User</div>
@@ -26,6 +27,7 @@
             <RadzenButton Text="Create Account" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Style="width:50%;margin-top:1.5rem; justify-items: end;" Click="@(() => Console.WriteLine("Button clicked"))" />
         </RadzenTemplateForm>
     </RadzenCard>
+</div>
 </div>
 
 @code {

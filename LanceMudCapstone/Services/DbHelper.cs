@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using LanceMudCapstone.DTOs;
+using LanceMudCapstone.Enums;
 using LanceMudCapstone.Models;
 using Npgsql;
 using System.Data;
@@ -56,5 +57,6 @@ public class DbHelper
 
         return result;
     }
+
 
 }
