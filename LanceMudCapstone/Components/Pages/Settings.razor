@@ -11,7 +11,6 @@
 @using LanceMudCapstone.Services
 @using LanceMudCapstone.Components.Settings
 
-@rendermode InteractiveServer
 <div class="login-wrapper">
 <RadzenCard class="settings-card">
 
@@ -84,7 +83,7 @@
         var client = HttpClientFactory.CreateClient("ServerAPI");
         try
         {
-
+            if (SessionState.UserId == null) return;
             currentEmail = await UserService.GetUserEmail(SessionState.UserId.Value);
 
         }
@@ -137,15 +136,21 @@
     private async Task OpenPasswordDialog()
     {
         Console.WriteLine("Open clicked");
+
+        if (SessionState.UserId == null) return;
+        if (string.IsNullOrWhiteSpace(SessionState.UserName)) return;
+
+
         var result = await DialogService.OpenAsync<PasswordDialog>(
             "Change Password",
-            new Dictionary<string, object>
-            {
-                { "Username", SessionState.UserName },
-                { "UserId", SessionState.UserId }
-            },
+            new Dictionary<string, object?>
+                {
+                { "Username", SessionState.UserName ?? string.Empty },
+                { "UserId", SessionState.UserId.Value }
+                },
             new DialogOptions { Width = "420px", Height = "auto" }
-        );
+            );
+        Console.WriteLine($"{SessionState.UserName} : {SessionState.UserId.Value}");
 
         if (result is bool success && success)
         {
