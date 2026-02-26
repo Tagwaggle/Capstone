@@ -1,5 +1,4 @@
 ﻿@page "/character"
-@rendermode InteractiveServer
 @layout GameLayout
 
 @inject SessionState SessionState
@@ -8,53 +7,50 @@
 @inject NavigationManager Nav
 
 <div class="main-container">
-    <h3>Character Select for @SessionState.UserName</h3>
-    @if (!SessionState.Ready)
-    {
-        <p>waiting</p>
-        <button @onclick="TryLoadCharactersAsync">Button</button>
-    }
-    else if (SessionState.UserId == null)
-    {
-        <p>Waiting for session… (uid) @SessionState.UserId</p>
-        <p>If reload does not happen click button.</p>
-        <button @onclick="TryLoadCharactersAsync">Button</button>
-    }
-    else if (!_loaded)
-    {
-        <p>Loading Characters…</p>
-        <p>If reload does not happen click button.</p>
-    }
-    else if (!characters.Any())
-    {
-        <p>No characters found. Create one to continue.</p>
-    }
-    else
-    {
-        <div class="character-list">
-            <InputRadioGroup @bind-Value="SelectedCharacterId">
-                @foreach (var c in characters)
+    <RadzenStack Gap="1rem">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1.5rem" Wrap="FlexWrap.Wrap">
+                <RadzenButton Text="Clear Selection" Click="() => ClearSelection()" />
+                @if (SelectedCharacter != null)
                 {
-                    <div class="character-item">
-                        <InputRadio Value="@c.CharacterId" />
-                        <span>@c.Name (Level @c.Level, @c.Class)</span>
-                    </div>
+                    <div class="selected-summary" style="color:azure;"> Selected <strong>@SelectedCharacter.Name</strong> (Lvl @SelectedCharacter.Level @SelectedCharacter.Class)</div>
                 }
-            </InputRadioGroup>
-        </div>
-    }
-
+            </RadzenStack>
+        </RadzenCard>
+        <RadzenDataGrid TItem="PlayerCharacterDto" Data="@characters" AllowPaging="true" PageSize="5" AllowSorting="true" AllowFiltering="true"
+            FilterPopupRenderMode="PopupRenderMode.OnDemand" SelectionMode="DataGridSelectionMode.Single" @bind-Value="SelectedCharacters">
+            <Columns>
+                <RadzenDataGridColumn TItem="PlayerCharacterDto" Title="Character" Sortable="false" Filterable="false">
+                    <Template Context="c">
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap=".75rem">
+                            <RadzenImage Path="@($"/images/classes/{c.Class}.svg")" Style="width: 40px; height: 40px;" class="rz-border-radius-2" />
+                            <RadzenStack Gap="0">
+                                <div class="char-name">@c.Name</div>
+                                <div class="char-sub">@c.Class, Level: @c.Level</div>
+                            </RadzenStack>
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="Class" Title="Class" />
+                <RadzenDataGridColumn Property="Level" Title="Level" />
+                <RadzenDataGridColumn Property="RoomId" Title="Room" />
+                
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenStack>
     <div class="character-action">
-        <button @onclick="LoginCharacter" disabled="@(!SelectedCharacterId.HasValue)">
-            Login
-        </button>
-
-        <button @onclick="CreateCharacter">Create New Character</button>
+        <RadzenButton Text="Login" Click="@LoginCharacter" Disabled="@(!SelectedCharacterId.HasValue)" />
+        <RadzenButton Text="Create New Character" Click="@CreateCharacter" ButtonStyle="ButtonStyle.Secondary" />
     </div>
 </div>
 @code {
     private List<PlayerCharacterDto>? characters;
-    private int? SelectedCharacterId;
+    //    private PlayerCharacterDto? SelectedCharacter { get; set; }
+    //    private int? SelectedCharacterId => SelectedCharacter?.CharacterId;
+    private IList<PlayerCharacterDto> SelectedCharacters { get; set; } = new List<PlayerCharacterDto>();
+    private PlayerCharacterDto? SelectedCharacter => SelectedCharacters.FirstOrDefault();
+    private int? SelectedCharacterId => SelectedCharacter?.CharacterId;
+
     private bool _loaded, _loadInProgress;
 
     protected override void OnInitialized()
@@ -82,7 +78,7 @@
     private async Task TryLoadCharactersAsync()
     {
         Console.WriteLine($"TryLoad Clicked: {SessionState.UserId} {SessionState.UserName}");
-       // await SessionState.InitializeAsync();
+        
         await InvokeAsync(StateHasChanged);
         if (_loaded || _loadInProgress)
             return;
@@ -118,6 +114,11 @@
         await SessionState.SetCharacterAsync(selected);
 
         Nav.NavigateTo("/play");
+    }
+
+    private void ClearSelection()
+    {
+        SelectedCharacters = new List<PlayerCharacterDto>();
     }
 
     private void CreateCharacter()

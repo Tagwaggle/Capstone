@@ -39,6 +39,7 @@ public class PlayerCharacterDto
     public DateTime? RespawnAt { get; set; }
     public DateTime? LastCommand { get; set; }
     public string Username { get; set; } = string.Empty;
+    public string? PortraitUrl { get; set; }
 
 
 }

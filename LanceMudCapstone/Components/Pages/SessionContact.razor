@@ -1,14 +1,11 @@
 ﻿@page "/sessioncontact"
 @layout GameLayout
 
+@using Microsoft.AspNetCore.Components.Forms
 @using LanceMudCapstone.Models
 
-@inject HttpClient Http
-@rendermode InteractiveServer
-@using Microsoft.AspNetCore.Components.Forms
-
 @inject IHttpClientFactory ClientFactory
-<div class="contact-wrapper">
+<div class="login-wrapper">
 <div class="contact-container">
     <h2 class="contact-title">Contact Us</h2>
 
@@ -47,7 +44,7 @@
             }
         </ul>
     }
-    </div>
+</div>
 </div>
 
 @code {

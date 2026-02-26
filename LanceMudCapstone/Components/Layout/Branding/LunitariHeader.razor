@@ -9,8 +9,8 @@
 @inject IJSRuntime JS
 @inject SessionRepository SessionRepo
 @inject UserService UserService
-
-
+@inject LogoutService logoutService
+@inject DialogService DialogService
 
 
 
@@ -50,14 +50,15 @@
     @if (SessionState?.UserId != null)
     {
         <div class="rz-p-12 rz-text-align-center">
-            <RadzenProfileMenu>
+            <RadzenProfileMenu Click="@OnProfileMenuClick">
                 <Template>
                     <RadzenImage Path="@UserIconHelper.GetIconPath(SessionState.UserIcon)" Style="height: 1.5rem">
                     </RadzenImage>
                 </Template>
                 <ChildContent>
-                    <RadzenProfileMenuItem Text="Settings" Icon="settings" Path="settings" />
-                    <RadzenProfileMenuItem Text="Logout" Icon="logout" Path="logout" />
+                    <RadzenProfileMenuItem Text="Settings" Icon="settings" Value="settings" />
+                    <RadzenProfileMenuItem Text="Who" Icon="accessibility" Value="who" />
+                    <RadzenProfileMenuItem Text="Logout" Icon="logout" Value="logout" />
                 </ChildContent>
             </RadzenProfileMenu>
         </div>
@@ -98,6 +99,22 @@
 
         Nav.NavigateTo("/login", forceLoad: true);
     }
+    private async Task DisplayWho()
+    {
+        await DialogService.OpenAsync<WhoComp>(
+            "Who's Online",
+            new Dictionary<string, object?>(),
+            new DialogOptions
+                {
+                    Width = "800px",
+                    Height = "800px",
+                    Resizable = true,
+                    Draggable = true,
+                    CloseDialogOnOverlayClick = true,
+                    CloseDialogOnEsc = true
+                }
+        );
+    }
     protected override void OnInitialized()
     {
         SessionState.OnChange += StateHasChanged;
@@ -106,5 +123,20 @@
     public void Dispose()
     {
         SessionState.OnChange -= StateHasChanged;
+    }
+    private async Task OnProfileMenuClick(RadzenProfileMenuItem item)
+    {
+        switch (item.Value?.ToString())
+        {
+            case "settings":
+                Nav.NavigateTo("/settings");
+                break;
+            case "logout":
+                await logoutService.RequestLogoutAsync();
+                break;
+            case "who":
+                await DisplayWho();
+                break;
+        }
     }
 }

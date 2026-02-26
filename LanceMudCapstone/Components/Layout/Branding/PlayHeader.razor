@@ -6,6 +6,8 @@
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 @inject SessionRepository SessionRepo
+@inject LogoutService logoutService
+@inject DialogService DialogService
 
 
 
@@ -15,6 +17,8 @@
         <RadzenSidebarToggle Click="CloseSidebar">🍔 Sidebar</RadzenSidebarToggle>
 
     </div>
+@if(SessionState.Pfile != null)
+{
     <div class="header-center">
 
         <RadzenCardGroup Responsive="true" class="stats-group">
@@ -46,20 +50,21 @@
         </RadzenCardGroup>
 
     </div>
-
+}
 
     
     @if (SessionState?.UserId != null)
     {
         <div class="rz-p-12 rz-text-align-center">
-            <RadzenProfileMenu>
+            <RadzenProfileMenu Click="@OnProfileMenuClick">
                 <Template>
                     <RadzenImage Path="images/classes/default.svg" Style="height: 1.5rem">
                     </RadzenImage>
                 </Template>
                 <ChildContent>
-                    <RadzenProfileMenuItem Text="Settings" Icon="settings" Path="settings" />
-                    <RadzenProfileMenuItem Text="Logout" Icon="logout" Path="logout" />
+                    <RadzenProfileMenuItem Text="Settings" Icon="settings" Value="settings" />
+                    <RadzenProfileMenuItem Text="Who" Icon="accessibility" Value="who" />
+                    <RadzenProfileMenuItem Text="Logout" Icon="logout" Value="logout" />
                 </ChildContent>
             </RadzenProfileMenu>
         </div>
@@ -99,6 +104,37 @@
         await SessionState.ClearCharacterAsync();
 
         Nav.NavigateTo("/login", forceLoad: true);
+    }
+    private async Task DisplayWho()
+    {
+        await DialogService.OpenAsync<WhoComp>(
+            "Who's Online",
+            new Dictionary<string, object?>(),
+            new DialogOptions
+            {
+                Width = "800px",
+                Height = "800px",
+                Resizable = true,
+                Draggable = true,
+                CloseDialogOnOverlayClick = true,
+                CloseDialogOnEsc = true
+            }
+        );
+    }
+    private async Task OnProfileMenuClick(RadzenProfileMenuItem item)
+    {
+        switch (item.Value?.ToString())
+        {
+            case "settings":
+                Nav.NavigateTo("/settings");
+                break;
+            case "logout":
+                await logoutService.RequestLogoutAsync();
+                break;
+            case "who":
+                await DisplayWho();
+                break;
+        }
     }
     protected override void OnInitialized()
     {

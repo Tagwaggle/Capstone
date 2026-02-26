@@ -5,6 +5,8 @@
 @inject IHttpClientFactory HttpClientFactory
 @inject DialogService DialogService
 @inject UserService UserService
+@inject NotificationService NotificationService
+@inject NavigationManager Nav
 
 @using LanceMudCapstone.Enums
 @using LanceMudCapstone.DTOs
@@ -14,16 +16,13 @@
 <div class="login-wrapper">
 <RadzenCard class="settings-card">
 
-    <!-- Header Row: Avatar + Username/Password -->
     <RadzenStack Orientation="Orientation.Horizontal"
                  Gap="1.5rem"
                  AlignItems="AlignItems.Center">
 
-        <!-- Avatar FAB -->
         <AvatarFab CurrentIcon="@SessionState.UserIcon"
                    OnIconChanged="OnAvatarChanged" />
 
-        <!-- Username + Password -->
         <RadzenStack Gap="0.25rem">
             <RadzenText TextStyle="TextStyle.Overline" class="label-text">User Name</RadzenText>
             <RadzenText TextStyle="TextStyle.Body1" class="value-text">
@@ -43,10 +42,8 @@
 
     </RadzenStack>
 
-    <!-- Divider -->
     <div class="settings-divider"></div>
 
-    <!-- Email Section -->
     <RadzenStack Gap="0.25rem">
         <RadzenText TextStyle="TextStyle.Overline" class="label-text">Email</RadzenText>
         <RadzenText TextStyle="TextStyle.Body1" class="value-text">
@@ -57,7 +54,6 @@
         <InputText class="form-entry" @bind-Value="newEmail" />
     </RadzenStack>
 
-    <!-- Action Buttons -->
     <RadzenStack Orientation="Orientation.Horizontal"
                  JustifyContent="JustifyContent.End"
                  Gap="1rem"
@@ -111,6 +107,14 @@
             await UserService.UpdateUserEmailAsync(SessionState.UserId.Value, currentEmail);
             SessionState.NotifyStateChange();
             newEmail = string.Empty;
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Success",
+                Detail = "E-Mail Address Updated",
+                Duration = 2000
+            });
+
         }
         else
         {
@@ -131,8 +135,19 @@
             SessionState.UserIcon = newIcon;
             SessionState.NotifyStateChange();
         }
-    }
+        NotificationService.Notify(new NotificationMessage
+        {
+            Severity = NotificationSeverity.Success,
+            Summary = "Success",
+            Detail = "User Icon Updated",
+            Duration = 2000
+        });
 
+    }
+    private void Back_Clicked()
+    {
+        Nav.NavigateTo("/character");
+    }
     private async Task OpenPasswordDialog()
     {
         Console.WriteLine("Open clicked");
@@ -154,7 +169,13 @@
 
         if (result is bool success && success)
         {
-            // Optional: toast or confirmation
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Success",
+                Detail = "Password Updated",
+                Duration = 2000
+            });
         }
     }
 }

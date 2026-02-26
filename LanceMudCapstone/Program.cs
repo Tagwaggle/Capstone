@@ -20,6 +20,7 @@ builder.Services.AddScoped<SessionState>();
 builder.Services.AddScoped<LocalStorageService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<CharacterService>();
+builder.Services.AddScoped<LogoutService>();
 
 builder.Services.AddScoped<MobService>();
 builder.Services.AddScoped<EffectService>();

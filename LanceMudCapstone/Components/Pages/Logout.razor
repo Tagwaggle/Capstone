@@ -1,22 +1,10 @@
 ﻿@page "/logout"
-@inject SessionState SessionState
-@inject NavigationManager Nav
-@inject IJSRuntime JS
-@inject SessionRepository SessionRepo
+@inject LogoutService logoutService
 
-@code {
-    protected override async Task OnInitializedAsync()
-    {
-        var cookieValue = await JS.InvokeAsync<string>("cookieHelper.readCookie", "session");
-
-        if (!string.IsNullOrWhiteSpace(cookieValue))
-        {
-            SessionRepo.DeleteSession(cookieValue);
-        }
-
-        await JS.InvokeVoidAsync("cookieHelper.eraseCookie", "session");
-        await SessionState.ClearCharacterAsync();
-
-        Nav.NavigateTo("/login", forceLoad: true);
-    }
+@code{
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (!firstRender) return;
+		await logoutService.RequestLogoutAsync();
+	}
 }
