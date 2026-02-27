@@ -128,15 +128,15 @@ using System.Collections.Generic;
 
                 string temp = $"{attacker.Name} hits {defender.Name} for {damage} damage!";
                 log.Add(temp);
-                SessionState.PushEvent(temp);
-                SessionState.NotifyStateChange();
+                await SessionState.PushEvent(temp);
+                await SessionState.NotifyStateChange();
             }
             else
             {
                 string temp = $"{attacker.Name} misses {defender.Name}.";
                 log.Add(temp);
-                SessionState.PushEvent(temp);
-                SessionState.NotifyStateChange();
+                await SessionState.PushEvent(temp);
+                await SessionState.NotifyStateChange();
             }
 
             bool died = false;
@@ -147,8 +147,8 @@ using System.Collections.Generic;
                 died = true;
                 log.Add($"{defender.Name} has been defeated!");
 
-                SessionState.PushEvent($"{defender.Name} has been defeated by {attacker.Name}!");
-                SessionState.NotifyStateChange();
+                await SessionState.PushEvent($"{defender.Name} has been defeated by {attacker.Name}!");
+                await SessionState.NotifyStateChange();
 
                 if (attacker.CharacterType == "pc" && defender.CharacterType != "pc")
                     await GainXP(attacker, defender);
@@ -197,12 +197,12 @@ using System.Collections.Generic;
                 AbilityDto ability)
             {
                 var abilityResult = _abilityEngine.ExecuteAbility(attacker, defender, ability);
-                if (defender.Health <= 0 && defender.IsAlive)
+                if (defender.Health <= 0 && !defender.IsAlive)
                 {
                 defender.IsAlive = false;
 
-                SessionState.PushEvent($"{defender.Name} has been defeated by {attacker.Name}'s {ability.Name}!");
-                SessionState.NotifyStateChange();
+                await SessionState.PushEvent($"{defender.Name} has been defeated by {attacker.Name}'s {ability.Name}!");
+                await SessionState.NotifyStateChange();
 
                 if (attacker.CharacterType == "pc" && defender.CharacterType != "pc") await GainXP(attacker, defender);
                 await HandleDeathAsync(defender);
@@ -278,12 +278,12 @@ using System.Collections.Generic;
                     if (room != null && SessionState.CurrentRoomMobs != null)
                     {
                         SessionState.CurrentRoomMobs.RemoveAll(m => m.Instance.NpcId == dead.NpcId);
-                        SessionState.PushEvent($"The {dead.Name} has been defeated!");
+                        await SessionState.PushEvent($"The {dead.Name} has been defeated!");
                     }
 
                 }
             
-            SessionState.NotifyStateChange();
+            await SessionState.NotifyStateChange();
             }
         private async Task HandlePlayerDeath(PlayerCharacterDto deadCharacter)
             {
@@ -441,18 +441,18 @@ using System.Collections.Generic;
                 bool _level = false;
                 string message = string.Empty;
                 player.Xp += XpGained;
-            SessionState.PushEvent($"You gain {XpGained} XP for defeating {dead.Name}.");
+            await SessionState.PushEvent($"You gain {XpGained} XP for defeating {dead.Name}.");
 
             while (player.Xp >= player.XpNeeded)
                 {
                     player.Xp -= player.XpNeeded;
                     var levelResult = await GainLevel(player);
-                    SessionState.PushEvent(levelResult.Message);
+                    await SessionState.PushEvent(levelResult.Message);
                 }
                 int remain = player.XpNeeded - player.Xp;
                 await _characterService.SavePlayer(player);
-            SessionState.PushEvent($"{remain} XP remaining for next level!");
-                SessionState.NotifyStateChange();
+            await SessionState.PushEvent($"{remain} XP remaining for next level!");
+                await SessionState.NotifyStateChange();
                 
             }
 

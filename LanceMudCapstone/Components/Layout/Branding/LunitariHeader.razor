@@ -117,12 +117,12 @@
     }
     protected override void OnInitialized()
     {
-        SessionState.OnChange += StateHasChanged;
+        SessionState.OnChange += () => InvokeAsync(StateHasChanged);
         base.OnInitialized();
     }
     public void Dispose()
     {
-        SessionState.OnChange -= StateHasChanged;
+        SessionState.OnChange -= () => InvokeAsync(StateHasChanged);
     }
     private async Task OnProfileMenuClick(RadzenProfileMenuItem item)
     {

@@ -105,7 +105,7 @@
             if (SessionState.UserId == null) return;
             currentEmail = newEmail.Trim();
             await UserService.UpdateUserEmailAsync(SessionState.UserId.Value, currentEmail);
-            SessionState.NotifyStateChange();
+            await SessionState.NotifyStateChange();
             newEmail = string.Empty;
             NotificationService.Notify(new NotificationMessage
             {
@@ -133,7 +133,7 @@
         if(results)
         {
             SessionState.UserIcon = newIcon;
-            SessionState.NotifyStateChange();
+            await SessionState.NotifyStateChange();
         }
         NotificationService.Notify(new NotificationMessage
         {

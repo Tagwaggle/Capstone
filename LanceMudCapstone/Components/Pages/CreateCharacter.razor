@@ -1,99 +1,102 @@
 ﻿@page "/character/create"
 @layout GameLayout
+
 @using LanceMudCapstone.DTOs
 @using LanceMudCapstone.Services
 @using System.Text.Json
-@rendermode InteractiveServer
 
 @inject SessionState SessionState
 @inject IHttpClientFactory HttpClientFactory
 @inject NavigationManager Nav
 @inject CharacterService CharacterService
-
-<div class="create-wrapper">
-    <div class="create-card">
-<h2>Create a Character: Current Level 1</h2>
-    <br />
-    <table class="create-table">
-        <tr>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-        </tr>
-        <tr>
-            <td><label>Name</label></td>
-            <td><InputText id="characterName" @bind-Value="form.Name" /></td>
-            <td><label>Class</label></td>
-            <td><InputSelect @bind-Value="form.Class">
-                        <option value="">-- Select Class--</option>
-                        @foreach (var option in _class)
-                        {
-                            <option value="@option">@option</option> 
-                        }
-            </InputSelect></td>
-        </tr>
-        <tr>
-            <td colspan="2"></td>
-            <td><label>Race</label></td>
-            <td><InputSelect @bind-Value="form.Race" >
-                        <option value="">-- Select Race--</option>
-                        @foreach (var option in _race)
-                        {
-                            <option value="@option">@option</option>
-                        }
-            </InputSelect></td>
-        </tr>
-        <tr>
-            <td><label>Alignment</label></td>
-            <td><InputSelect @bind-Value="alignLaw">
-                        <option value="">-- Select Alignment--</option>
-                        @foreach (var option in _alignment2)
-                {
-                        <option value="@option">@option</option>
-                    }
-            </InputSelect> </td>
-            <td></td>
-            <td><InputSelect @bind-Value="alignVal">
-                        <option value="">-- Select Alignment--</option>
-                        @foreach (var option in _alignment)
-                        {
-                            <option value="@option">@option</option>
-                        }
-            </InputSelect></td>
-        </tr>
-            <tr class="divider-row">
-                <td colspan="4"></td>
-            </tr>
-            <tr>
-            <td><label>Attributes</label></td>
-            <td></td>
-            <td>Skill Points Remaing</td>
-            <td><label>@Remaining</label></td>
-            </tr>
+<div class="login-wrapper">
+<div class="create-wraper">
+    <RadzenCard Style="max-width: 600px; margin: 2rem auto; padding: 2rem;">
+        <RadzenText TextStyle="TextStyle.DisplayH5" Style="color: azure; margin-bottom: 1.5rem;">
+            Create a Character - Level 1
+        </RadzenText>
+        <RadzenTemplateForm TItem="PlayerCharacterDto" Data="@form" Submit="SaveButton_Clicked">
+            <RadzenRow Gap="1rem" Style="margin-bottom: 1rem;">
+            <RadzenColumn Size="6">
+                <RadzenLabel Style="color: azure;" Text="Name" />
+                <RadzenTextBox Name="Name" @bind-Value="form.Name" Placeholder="Character Name" Style="width: 100%;" />
+                <RadzenRequiredValidator Component="Name" Text="Name is required." />
+            </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" Style="margin-bottom: 1rem;">
+                <RadzenColumn Size="6">
+                    <RadzenLabel Style="color: azure;" Text="Class" />
+                    <RadzenDropDown Name="Class" @bind-Value="form.Class" Data="@_class" Placeholder="-- Class --" Style="width: 100%;" />
+                    <RadzenRequiredValidator Component="Class" Text="Class is required." />
+                </RadzenColumn>
+                <RadzenColumn Size="6">
+                    <RadzenLabel Style="color: azure;" Text="Race" />
+                    <RadzenDropDown Name="Race" @bind-Value="form.Race" Data="@_race" Placeholder="-- Race --" Style="width: 100%;" />
+                    <RadzenRequiredValidator Component="Race" Text="Race is required." />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" Style="margin-bottom: 1rem;">
+                <RadzenColumn Size="6">
+                    <RadzenLabel Style="color: azure;" Text="Law / Chaos" />
+                    <RadzenDropDown Name="alignLaw" @bind-Value="alignLaw" Data="@_alignment2" Placeholder="-- Select --" Style="width: 100%;" />
+                    <RadzenRequiredValidator Component="alignLaw" Text="Legality is Required." />
+                </RadzenColumn>
+                <RadzenColumn Size="6">
+                    <RadzenLabel Style="color: azure;" Text="Good / Evil" />
+                    <RadzenDropDown Name="alignVal" @bind-Value="alignVal" Data="@_alignment" Placeholder="-- Select --" Style="width: 100%;" />
+                    <RadzenRequiredValidator Component="alignVal" Text="Value is required." />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenAlert AlertStyle="AlertStyle.Info" Style="margin-bottom: 1rem;" AllowClose="false">
+                Skill Points Remaining: <strong>@Remaining</strong>
+            </RadzenAlert>
             @foreach (var kvp in Stats)
             {
-                <tr>
-                <td><label>@kvp.Key</label></td>
-                <td>@kvp.Value</td>
-                <td><button @onclick="() => AdjustStat(kvp.Key, -1)">-</button></td>
-                <td><button @onclick="() => AdjustStat(kvp.Key, +1)">+</button></td>
-                </tr>
+                <RadzenRow AlignItems="AlignItems.Center" Gap=".5rem;" Style="margin-bottom: .5rem;" >
+                    <RadzenColumn Size="4" >
+                        <RadzenLabel Text="@kvp.Key" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="2" Style="test-align: center;">
+                        <RadzenText TextStyle="TextStyle.Body1">
+                            <b>@kvp.Value</b>
+                        </RadzenText>
+                    </RadzenColumn>
+                    <RadzenColumn Size="3">
+                         <RadzenButton Icon="remove" ButtonStyle="ButtonStyle.Danger"
+                                    Size="ButtonSize.Small"
+                                    Click="() => AdjustStat(kvp.Key, -1)"
+                                    Style="width:100%" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="3">
+                        <RadzenButton Icon="add" ButtonStyle="ButtonStyle.Success"
+                                      Size="ButtonSize.Small"
+                                      Click="() => AdjustStat(kvp.Key, 1)"
+                                      Style="width:100%" />
+                    </RadzenColumn>
+                </RadzenRow>
             }
-            <tr class="divider-row">
-                <td colspan="4"></td>
-            </tr>
-            <tr>
-                <td ><label>Max Health</label></td>
-                <td ><label>@Health</label></td>
-                <td><label>Starting Gold</label></td>
-                <td><label>@Gold</label></td>
-            </tr>
-            <tr colspan="4">
-                <button @onclick="SaveButton_Clicked">Save</button>
-            </tr>
-        </table>
-        
+
+            <hr style="border-color: rgba(255,255,255,0.2); margin: 1.5rem 0;" />
+
+            <RadzenRow Gap="1rem" Style="margin-bottom: 1.5rem;">
+                <RadzenColumn Size="6">
+                    <RadzenLabel Text="Max Health" />
+                    <RadzenText TextStyle="TextStyle.H6" Style="color:white;">@Health</RadzenText>
+                </RadzenColumn>
+                <RadzenColumn Size="6">
+                    <RadzenLabel Text="Starting Gold" />
+                    <RadzenText TextStyle="TextStyle.H6" Style="color:white;">@Gold</RadzenText>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenButton ButtonType="ButtonType.Submit"
+                          Text="Create Character"
+                          ButtonStyle="ButtonStyle.Primary"
+                          Style="width:100%" />
+
+            }
+        </RadzenTemplateForm>
+    </RadzenCard>
 </div>
 </div>
 

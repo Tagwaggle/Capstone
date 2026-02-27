@@ -11,6 +11,8 @@
     {
         if (!firstRender) return;
 
+        await SessionState.EnsureInitializedAsync();
+
         if (SessionState.UserId != null)
         {
             return;
@@ -34,7 +36,6 @@
         }
 
             int UID = Convert.ToInt32(uID);
-
             var userData = await _userService.GetUserByIdAsync(UID);
             await SessionState.SetUserAsync(userData.UserId, userData.Username, userData.ProfilePictureId);
     }

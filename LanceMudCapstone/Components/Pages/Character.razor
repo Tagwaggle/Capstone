@@ -55,7 +55,7 @@
 
     protected override void OnInitialized()
     {
-        SessionState.OnChange += HandleSessionChanged;
+        SessionState.OnChange += () => InvokeAsync(StateHasChanged);
         Console.WriteLine("OnInitialized Called Called");
 
     }
@@ -126,6 +126,6 @@
 
     public void Dispose()
     {
-        SessionState.OnChange -= HandleSessionChanged;
+        SessionState.OnChange -= () => InvokeAsync(StateHasChanged);
     }
 }

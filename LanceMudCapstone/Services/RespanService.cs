@@ -57,6 +57,14 @@ WHERE pc.characterid = c.characterid
   AND pc.isonline = true;";
             using var conn = _db.CreateConnection();
             await conn.ExecuteAsync(onlinesql);
+            const string manasql = @"
+UPDATE playercharacters
+SET mana = LEAST(maxmana, mana + 3)";
+            await conn.ExecuteAsync(manasql);
+            const string stamsql = @"
+UPDATE playercharacters
+SET stamina = LEAST(pc.maxstamina, pc.stamina + 3)
+            await conn.ExecuteAsync(stamsql);";
             const string offlinesql = @"
 UPDATE characters AS c
 SET health = LEAST(c.maxhealth, c.health + 2)

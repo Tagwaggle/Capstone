@@ -78,9 +78,12 @@
 
     private async Task CloseSidebar()
     {
-        sidebar1Expanded = !sidebar1Expanded;
-        await sidebar1ExpandedChanged.InvokeAsync(sidebar1Expanded);
-        Console.WriteLine($"Sidebar clicked {sidebar1Expanded}");
+        Console.WriteLine($"[Close Bar Clicked {SessionState.ShowLeftPanel}] START {DateTime.UtcNow:HH:mm:ss.fff}");
+        SessionState.ShowLeftPanel = !SessionState.ShowLeftPanel;
+        SessionState.ShowRightPanel = !SessionState.ShowRightPanel;
+        Console.WriteLine($"[Close Bar Changed {SessionState.ShowLeftPanel}] START {DateTime.UtcNow:HH:mm:ss.fff}");
+        await SessionState.NotifyStateChange();
+        Console.WriteLine($"[Close Bar Function Over {SessionState.ShowLeftPanel}] START {DateTime.UtcNow:HH:mm:ss.fff}");
     }
     private async Task Settings_Clicked()
     {
@@ -138,11 +141,11 @@
     }
     protected override void OnInitialized()
     {
-        SessionState.OnChange += StateHasChanged;
+        SessionState.OnChange += () => InvokeAsync(StateHasChanged);
         base.OnInitialized();
     }
     public void Dispose()
     {
-        SessionState.OnChange -= StateHasChanged;
+        SessionState.OnChange -= () => InvokeAsync(StateHasChanged);
     }
 }

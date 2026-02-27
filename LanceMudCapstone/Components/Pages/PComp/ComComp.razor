@@ -1,0 +1,167 @@
+﻿@inject SessionState SessionState
+@inject CharacterService CharacterService
+@inject NavigationManager Nav
+@inject ContainerService ContainerService
+@implements IDisposable
+
+
+        <h3>Commands</h3>
+        <div>
+        @foreach (var c in SessionState.CurrentRoomContainers)
+            {
+                <button @onclick="() => GetLoot(c.ContainerId)">
+                    Loot @c.Name
+                </button>
+            }
+
+            @foreach (var mob in SessionState.CurrentRoomMobs)
+            {
+                if (!nonAttackable.Contains(mob.Base.CharacterType))
+                {
+                    <button @onclick="() => Attack(mob.Instance.NpcId)">
+                        Attack @mob.Base.Name
+                    </button>
+                }
+            }
+
+            <button @onclick="() => showScoreModal = true">Score</button>
+            <button @onclick="() => showInventoryModal = true">Inventory</button>
+            <button @onclick="() => showSpellBook = true">Spells / Skills</button>
+            <button @onclick="ChangeCharacter">Logout</button>
+        </div>
+    @if (SessionState.InCombat)
+    {
+        <div class="combat-slide">
+            <CombatScreen Player="@SessionState.Pfile"
+                          Mob="@currentMob"
+                          OnVictory="HandleVictory"
+                          OnDefeat="HandleDefeat" />
+        </div>
+    }
+
+    @if (showSpellBook)
+    {
+        <SpellbookModal Show="@showSpellBook"
+                        ShowChanged="v => showSpellBook = v"
+                        Player="@SessionState.Pfile" />
+    }
+
+    <InventoryModal Show="@showInventoryModal"
+                    ShowChanged="v => showInventoryModal = v" />
+
+    <PlayScore Show="@showScoreModal"
+               ShowChanged="v => showScoreModal = v" />
+
+
+
+@code {
+    private bool _loaded;
+    private bool _loadInProgress;
+    private PeriodicTimer? _refreshTimer;
+    private CancellationTokenSource? _refreshCts;
+    private readonly string[] nonAttackable = { "shop", "guard", "safe", "pc" };
+
+
+    private bool showSpellBook;
+    private bool showScoreModal;
+    private bool showInventoryModal;
+
+
+    private PlayerCharacterDto currentMob;
+
+    private async Task GetLoot(int containerId)
+    {
+
+        var lootedItems = await ContainerService.GetLootAsync(SessionState.Pfile.PlayerCharacterId!.Value, containerId);
+        await CharacterService.UpdateLastCommand(SessionState.CharacterId!.Value);
+
+        if (lootedItems.Any())
+        {
+            foreach (var item in lootedItems)
+            { await SessionState.PushEvent($"You loot {string.Join(", ", lootedItems.Select(i => i.Name))} from the container."); }
+        }
+        else
+        {
+            await SessionState.PushEvent("Nothing there but cobwebs and entrails.");
+        }
+        SessionState.CurrentRoomContainers =
+            SessionState.CurrentRoomContainers
+                .Where(c => c.ContainerId != containerId)
+                .ToList();
+
+        await SessionState.NotifyStateChange();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task Attack(int id)
+    {
+        var mob = SessionState.CurrentRoomMobs.First(m => m.Instance.NpcId == id);
+        await CharacterService.UpdateLastCommand(SessionState.CharacterId!.Value);
+
+        await SessionState.RefreshCharacterAsync();
+
+        if (mob == null) return;
+
+        currentMob = new PlayerCharacterDto
+        {
+            CharacterId = mob.Base.CharacterId,
+            NpcId = mob.Instance.NpcId,
+            CharacterType = mob.Base.CharacterType,
+
+            Name = mob.Base.Name,
+            Health = mob.Base.MaxHealth,
+            MaxHealth = mob.Base.MaxHealth,
+            Level = mob.Base.Level,
+            Strength = mob.Base.Strength,
+            Dexterity = mob.Base.Dexterity,
+            Constitution = mob.Base.Constitution,
+            Intelligence = mob.Base.Intelligence,
+            Wisdom = mob.Base.Wisdom,
+            Charisma = mob.Base.Charisma,
+            ArmorClass = mob.Base.ArmorClass,
+            IsAlive = mob.Base.Health > 0
+        };
+
+        await SessionState.SetCombat(true);
+        //StartCombat(player, currentMob);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ChangeCharacter()
+    {
+        await SessionState.ClearCharacterAsync();
+        await SessionState.InitializeAsync();
+        await SessionState.SetUserAsync(SessionState.UserId ?? 0, SessionState.UserName ?? "", SessionState.UserIcon);
+        Nav.NavigateTo("/character");
+    }
+    private async Task HandleVictory(string mobName)
+    {
+        await SessionState.SetCombat(false);
+        await RefreshAfterCombat();
+        //        showCombat = false;
+    }
+
+    private async Task HandleDefeat()
+    {
+        await SessionState.SetCombat(false);
+        await RefreshAfterCombat();
+        //        showCombat = false;
+    }
+    private async Task RefreshAfterCombat()
+    {
+        //await SessionState.MoveToRoom(SessionState.CurrentRoom.RoomId);
+        await SessionState.NotifyStateChange();
+    }
+    private Func<Task> _stateHandler = default!;
+
+    protected override void OnInitialized()
+    {
+        _stateHandler = () => InvokeAsync(StateHasChanged);
+        SessionState.OnChange += _stateHandler;
+    }
+
+    public void Dispose()
+    {
+        SessionState.OnChange -= _stateHandler;
+    }
+}

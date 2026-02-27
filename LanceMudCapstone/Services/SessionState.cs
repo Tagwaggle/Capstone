@@ -38,10 +38,13 @@ public class SessionState
     public bool FirstLoadComplete { get; private set; } = false;
     public bool CharacterReady { get; private set; } = false;
     public bool InCombat { get; set; }
+    public bool ShowLeftPanel { get; set; }
+    public bool ShowRightPanel { get; set; }
     public UserIcon UserIcon { get; set; } = UserIcon.None;
 
 
-    public event Action? OnChange;
+    //public event Action? OnChange;
+    public event Func<Task>? OnChange;
 
     public SessionState(RoomService roomService,
                         CharacterService characterService,
@@ -65,25 +68,25 @@ public class SessionState
         await _localStorage.SetAsync("session.user", new UserSession(userId, username));
         var verify = await _localStorage.GetAsync<UserSession>("session.user");
         Console.WriteLine($"[SessionState] Verified localStorage: UserId={verify?.UserId}, UserName={verify?.UserName}");
-        NotifyStateChange();
+        await NotifyStateChange();
     }
-    public void SetCombat(bool value)
+    public async Task SetCombat(bool value)
     {
         InCombat = value;
-        NotifyStateChange();
+        await NotifyStateChange();
     }
-    public void SetEvent(string message)
+    public async Task SetEvent(string message)
     {
         LastEventMessage = message;
-        NotifyStateChange();
+        await NotifyStateChange();
     }
 
-    public void PushEvent(string message)
+    public async Task PushEvent(string message)
     {
         EventLog.Add(message);
         if (EventLog.Count > 10) EventLog.RemoveAt(0);
 
-        NotifyStateChange();
+        await NotifyStateChange();
     }
     public async Task LogoutAsync()
     {
@@ -106,7 +109,7 @@ public class SessionState
         await _localStorage.RemoveAsync("session.character");
 
         CharacterReady = false;
-        NotifyStateChange();
+        await NotifyStateChange();
     }
     public async Task RefreshCharacterAsync()
     {
@@ -116,7 +119,7 @@ public class SessionState
         if (updated != null)
         {
             Pfile = updated;
-            NotifyStateChange();
+            await NotifyStateChange();
         }
     }
 
@@ -135,7 +138,7 @@ public class SessionState
         await _localStorage.SetAsync("session.character", new CharacterSession(CharacterId.Value, RoomId ?? 0));
 
         CharacterReady = true; // signal ready
-        NotifyStateChange();
+        await NotifyStateChange();
     }
 
     public async Task ClearCharacterAsync()
@@ -153,7 +156,7 @@ public class SessionState
         Console.WriteLine("User ID Logged in" + UserId);
         //CharacterReady = false;
         //await _localStorage.RemoveAsync("session.character");
-        NotifyStateChange();
+        await NotifyStateChange();
     }
 
     public async Task MoveToRoom(int roomId)
@@ -168,7 +171,7 @@ public class SessionState
         if (Pfile != null) Pfile.RoomId = roomId;
         RoomId = roomId;
 
-        NotifyStateChange();
+        await NotifyStateChange();
     }
 
     public async Task<bool> TryMoveAsync(string direction)
@@ -211,7 +214,7 @@ public class SessionState
         }
 
         Ready = true;
-        NotifyStateChange();
+        await NotifyStateChange();
     }
 
     public async Task TryHydrateCharacterAsync(int characterId)
@@ -275,7 +278,20 @@ public class SessionState
 
 
 
-    public void NotifyStateChange() => OnChange?.Invoke();
+    //    public void NotifyStateChange() => OnChange?.Invoke();
+
+    public async Task NotifyStateChange()
+    {
+        Console.WriteLine($"[NotifyStateChange] START {DateTime.UtcNow:HH:mm:ss.fff}");
+        if (OnChange != null)
+            await OnChange.Invoke();
+        Console.WriteLine($"[NotifyStateChange] END {DateTime.UtcNow:HH:mm:ss.fff}");
+    }
+    /*public async Task NotifyStateChange()
+    {
+        if (OnChange != null)
+            await OnChange.Invoke();
+    }*/
 
     public record UserSession(int UserId, string UserName);
     public record CharacterSession(int CharacterId, int RoomId);

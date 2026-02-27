@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @inject SessionState SessionState
+@rendermode InteractiveServer
 
 
 <RadzenDialog />
@@ -13,13 +14,9 @@
     <header class="top-row">
         <PlayHeader />
     </header>
-
-    <div class="body">
-        <main>
-            @Body
-        </main>
-    </div>
-
+    <main>
+        @Body
+    </main>
     <footer class="play-footer">
         <AppFooter />
     </footer>
@@ -29,12 +26,12 @@
 
     protected override void OnInitialized()
     {
-        SessionState.OnChange += StateHasChanged;
+        SessionState.OnChange += () => InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
     {
-        SessionState.OnChange -= StateHasChanged;
+        SessionState.OnChange -= () => InvokeAsync(StateHasChanged);
 
     }
 }

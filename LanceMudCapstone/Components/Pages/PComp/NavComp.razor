@@ -1,0 +1,86 @@
+﻿@inject SessionState SessionState
+@inject CharacterService CharacterService
+
+@implements IDisposable
+
+<div class="play-movement">
+    <h3>Movement</h3>
+
+    <div class="compass-rose">
+        <div></div>
+
+        <div class="cell">
+            <button @onclick='() => Move("north")'
+                    disabled="@(!HasExit("north"))"
+                    class="@(!HasExit("north") ? "disabled-btn" : null)">
+                N
+            </button>
+        </div>
+
+        <div class="cell">
+            <button @onclick='() => Move("up")'
+                    disabled="@(!HasExit("up"))"
+                    class="@(!HasExit("up") ? "disabled-btn" : null)">
+                U
+            </button>
+        </div>
+
+        <div class="cell">
+            <button @onclick='() => Move("west")'
+                    disabled="@(!HasExit("west"))"
+                    class="@(!HasExit("west") ? "disabled-btn" : null)">
+                W
+            </button>
+        </div>
+
+        <div></div>
+
+        <div class="cell">
+            <button @onclick='() => Move("east")'
+                    disabled="@(!HasExit("east"))"
+                    class="@(!HasExit("east") ? "disabled-btn" : null)">
+                E
+            </button>
+        </div>
+
+        <div></div>
+
+        <div class="cell">
+            <button @onclick='() => Move("south")'
+                    disabled="@(!HasExit("south"))"
+                    class="@(!HasExit("south") ? "disabled-btn" : null)">
+                S
+            </button>
+        </div>
+
+        <div class="cell">
+            <button @onclick='() => Move("down")'
+                    disabled="@(!HasExit("down"))"
+                    class="@(!HasExit("down") ? "disabled-btn" : null)">
+                D
+            </button>
+        </div>
+    </div>
+</div>
+
+@code{
+    private bool HasExit(string dir)
+    => SessionState.CurrentRoomExits?
+        .Any(e => e.Direction.Equals(dir, StringComparison.OrdinalIgnoreCase)) == true;
+
+    private async Task Move(string dir)
+    {
+        await CharacterService.UpdateLastCommand(SessionState.CharacterId!.Value);
+        await SessionState.TryMoveAsync(dir);
+    }
+
+    protected override void OnInitialized()
+    {
+        SessionState.OnChange += () => InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        SessionState.OnChange -= () => InvokeAsync(StateHasChanged);
+    }
+}
