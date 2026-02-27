@@ -38,6 +38,7 @@
             int UID = Convert.ToInt32(uID);
             var userData = await _userService.GetUserByIdAsync(UID);
             await SessionState.SetUserAsync(userData.UserId, userData.Username, userData.ProfilePictureId);
+            Nav.NavigateTo("/characters");
     }
 
 }
