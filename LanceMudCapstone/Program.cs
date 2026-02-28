@@ -3,19 +3,21 @@ using LanceMudCapstone.Models;
 using LanceMudCapstone.Services;
 using LanceMudCapstone.API;
 using Radzen;
+using LanceMudCapstone.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Razor Components (correct registration)
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddRadzenComponents();
+builder.Services.AddSignalR();
 
 builder.Services.AddSingleton<SQLiteService>();
 builder.Services.AddSingleton<SessionRepository>();
 
-// App services
+
+builder.Services.AddScoped<MudHubClient>();
 builder.Services.AddScoped<SessionState>();
 builder.Services.AddScoped<LocalStorageService>();
 builder.Services.AddScoped<EmailService>();
@@ -103,7 +105,6 @@ app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages:
 app.UseHttpsRedirection();
 app.UseAntiforgery();
 
-// API endpoints
 app.MapUserApi();
 app.MapCharacterApi();
 app.MapTestApi();
@@ -112,17 +113,10 @@ app.MapInventoryApi();
 app.MapWorldApi();
 app.MapContactApi();
 app.MapPlayerCharacterApi();
+app.MapHub<MudHub>("/mudhub");
 
-// Static assets + Razor components
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
-// Request logging
-app.Use(async (context, next) =>
-{
-    Console.WriteLine($"Incoming {context.Request.Method} {context.Request.Path}, Content-Type: {context.Request.ContentType}");
-    await next();
-});
 
 app.Run();

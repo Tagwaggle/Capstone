@@ -4,7 +4,7 @@
 @implements IDisposable
 
 <RadzenSplitter Orientation="Orientation.Horizontal"
-                Style="width: 100%; height: calc(100vh - 8rem);">
+                Style="width: 100%; height: calc(100vh - 6.5rem);">
     @if(SessionState.ShowLeftPanel)
     {
     <RadzenSplitterPane Size="20%" Min="150px" Style="align-content: center; justify-items: center;">
@@ -16,8 +16,17 @@
     </RadzenSplitterPane>
     @if (SessionState.ShowRightPanel)
     {
-        <RadzenSplitterPane Size="20%" Min="150px" Style="align-content: center; justify-items: center;">
-            <ComComp />
+        <RadzenSplitterPane Size="25%" Min="150px" Style="overflow: hidden; padding-top: 5.5rem">
+            <RadzenTabs Style="height: 100%; display: flex; flex-direction: column;">
+                <Tabs>
+                    <RadzenTabsItem Text="Commands">
+                    <ComComp />
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="Chat">
+                        <ChatComp />
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
         </RadzenSplitterPane>
     }
 </RadzenSplitter>

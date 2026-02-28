@@ -1,0 +1,81 @@
+﻿@inject MudHubClient HubClient
+@inject SessionState SessionState
+@inject NavigationManager Nav
+@implements IAsyncDisposable
+
+<RadzenCard Style="height: 100%; display: flex; flex-direction: column; padding: 0.5rem; box-sizing: border-box; overflow: hidden;">
+	<RadzenText TextStyle="TextStyle.H6" Style="color: white; margin-bottom: 0.5rem;">
+		Global Chat
+	</RadzenText>
+
+	<RadzenAlert AlertStyle="AlertStyle.Warning"
+							Visible="@(!HubClient.IsConnected)"
+							Style="margin-bottom: 0.5rem;">
+				Connecting to chat...
+	</RadzenAlert>
+
+	<div class="chat-messages" style="flex: 1; min-height: 0; overflow-y: auto; margin-bottom: 0.5rem;">
+	@foreach (var msg in messages)
+		{
+			<RadzenText Style="@($"color: {msg.Color}; margin: 0.1rem 0;")">
+		<b>@msg.User:</b> @msg.Text
+		</RadzenText>
+	}
+	</div>
+
+	<RadzenStack Orientation="Orientation.Horizontal" Gap="0.25rem">
+		<RadzenTextBox @bind-Value="currentMessage"
+						Placeholder="Say something special..."
+						Style="flex: 1;"
+						@onkeypress="HandleKeyPress" />
+		<RadzenButton Icon="send"
+						ButtonStyle="ButtonStyle.Primary"
+						Click="Send"
+						Disabled="@(!HubClient.IsConnected)"/>
+	</RadzenStack>
+
+</RadzenCard>
+
+		@code {
+
+			private List<ChatMessage> messages = new();
+		private string currentMessage = string.Empty;
+
+		private record ChatMessage(string User, string Text, string Color);
+
+		protected override async Task OnInitializedAsync()
+		{
+			HubClient.OnGlobalMessage += HandleGlobalMessage;
+			await HubClient.StartAsync(Nav);
+		}
+
+		private void HandleGlobalMessage(string user, string msg, string color)
+		{
+			messages.Add(new ChatMessage(user, msg, color));
+			if (messages.Count > 100) messages.RemoveAt(0);
+			InvokeAsync(StateHasChanged);
+		}
+		private async Task Send()
+		{
+			if (string.IsNullOrWhiteSpace(currentMessage)) return;
+			if (!HubClient.IsConnected) return;
+			string user = SessionState.UserName ?? "Guest";
+			string color = SessionState.IsLoggedIn ? "white" : "red";
+
+			await HubClient.SendGlobalMessage(user, currentMessage, color);
+			currentMessage = string.Empty;
+		}
+
+		private async Task HandleKeyPress(KeyboardEventArgs e)
+		{
+			if (e.Key == "Enter") await Send();
+		}
+		public async ValueTask DisposeAsync()
+		{
+			HubClient.OnGlobalMessage -= HandleGlobalMessage;
+			await HubClient.DisposeAsync();
+		}
+
+
+
+}
