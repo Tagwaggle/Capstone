@@ -29,6 +29,15 @@ else
                 </pre>
         </div>
     </div>
+    @if (SessionState.InCombat)
+        {
+            <div class="combat-slide">
+                <CombatScreen Player="@SessionState.Pfile"
+                              Mob="@SessionState.CurrentMob"
+                              OnVictory="HandleVictory"
+                              OnDefeat="HandleDefeat" />
+            </div>
+        }
     </div>
 }
 @code {
@@ -202,6 +211,26 @@ else
 
         return sb.ToString();
     }
+
+    private async Task HandleVictory(string mobName)
+    {
+        await SessionState.SetCombat(false);
+        await RefreshAfterCombat();
+        //        showCombat = false;
+    }
+
+    private async Task HandleDefeat()
+    {
+        await SessionState.SetCombat(false);
+        await RefreshAfterCombat();
+        //        showCombat = false;
+    }
+    private async Task RefreshAfterCombat()
+    {
+        await SessionState.MoveToRoom(SessionState.CurrentRoom.RoomId);
+        await SessionState.NotifyStateChange();
+    }
+
     private Func<Task> _stateHandler = default!;
 
     protected override async Task OnInitializedAsync()

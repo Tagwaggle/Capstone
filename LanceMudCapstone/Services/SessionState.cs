@@ -24,6 +24,8 @@ public class SessionState
     public int? CharacterId { get; private set; }
     public int? RoomId { get; private set; }
     public bool IsOnline { get; private set; }
+    public PlayerCharacterDto? CurrentMob { get; set; }
+
 
     public bool IsLoggedIn => UserId.HasValue;
     public bool CommandBox = true;
@@ -169,6 +171,7 @@ public class SessionState
         CurrentRoomExits = (await _roomService.GetExitsForRoomAsync(roomId))?.ToList() ?? new List<RoomExit>();
 
         if (Pfile != null) Pfile.RoomId = roomId;
+        if (Pfile != null) await _characterService.SavePlayer(Pfile);
         RoomId = roomId;
 
         await NotifyStateChange();

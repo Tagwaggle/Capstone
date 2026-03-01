@@ -55,14 +55,14 @@
     right: 0;
     width: 50vw;
     height: 100vh;
-    background: #1a1a1a;
+    background: #1a1a1a !important;
     color: #f0f0f0;
     box-shadow: -4px 0 12px rgba(0,0,0,0.6);
     padding: 20px;
     overflow-y: auto;
     z-index: 999999;
     /* Slide-in animation */
-    transform: translateX(100%);
+    
     animation: slideIn 0.3s forwards ease-out;
 }
 

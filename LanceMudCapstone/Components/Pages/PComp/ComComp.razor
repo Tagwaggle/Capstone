@@ -1,6 +1,7 @@
 ﻿@inject SessionState SessionState
 @inject CharacterService CharacterService
 @inject NavigationManager Nav
+@inject NotificationService NotificationService
 @inject ContainerService ContainerService
 @implements IDisposable
 
@@ -28,18 +29,10 @@
             <button @onclick="() => showInventoryModal = true">Inventory</button>
             <button @onclick="() => showSpellBook = true">Spells / Skills</button>
             <button @onclick="ChangeCharacter">Logout</button>
+            <button @onclick="SaveButton_Clicked">Save Character</button>
         </div>
-    @if (SessionState.InCombat)
-    {
-        <div class="combat-slide">
-            <CombatScreen Player="@SessionState.Pfile"
-                          Mob="@currentMob"
-                          OnVictory="HandleVictory"
-                          OnDefeat="HandleDefeat" />
-        </div>
-    }
 
-    @if (showSpellBook)
+@if (showSpellBook)
     {
         <SpellbookModal Show="@showSpellBook"
                         ShowChanged="v => showSpellBook = v"
@@ -55,19 +48,12 @@
 
 
 @code {
-    private bool _loaded;
-    private bool _loadInProgress;
-    private PeriodicTimer? _refreshTimer;
-    private CancellationTokenSource? _refreshCts;
     private readonly string[] nonAttackable = { "shop", "guard", "safe", "pc" };
-
 
     private bool showSpellBook;
     private bool showScoreModal;
     private bool showInventoryModal;
 
-
-    private PlayerCharacterDto currentMob;
 
     private async Task GetLoot(int containerId)
     {
@@ -92,7 +78,20 @@
         await SessionState.NotifyStateChange();
         await InvokeAsync(StateHasChanged);
     }
+    private async Task SaveButton_Clicked()
+    {
+        if (SessionState.Pfile == null) return;
+        await CharacterService.SavePlayer(SessionState.Pfile);
+        NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Saved",
+                Detail = $"Character: {SessionState.Pfile.Name} Successful",
+                Duration = 2000
+            });
+        await SessionState.NotifyStateChange();
 
+    }
     private async Task Attack(int id)
     {
         var mob = SessionState.CurrentRoomMobs.First(m => m.Instance.NpcId == id);
@@ -102,7 +101,7 @@
 
         if (mob == null) return;
 
-        currentMob = new PlayerCharacterDto
+        SessionState.CurrentMob = new PlayerCharacterDto
         {
             CharacterId = mob.Base.CharacterId,
             NpcId = mob.Instance.NpcId,
@@ -124,6 +123,7 @@
 
         await SessionState.SetCombat(true);
         //StartCombat(player, currentMob);
+        await SessionState.NotifyStateChange();
         await InvokeAsync(StateHasChanged);
     }
 
@@ -134,24 +134,7 @@
         await SessionState.SetUserAsync(SessionState.UserId ?? 0, SessionState.UserName ?? "", SessionState.UserIcon);
         Nav.NavigateTo("/character");
     }
-    private async Task HandleVictory(string mobName)
-    {
-        await SessionState.SetCombat(false);
-        await RefreshAfterCombat();
-        //        showCombat = false;
-    }
 
-    private async Task HandleDefeat()
-    {
-        await SessionState.SetCombat(false);
-        await RefreshAfterCombat();
-        //        showCombat = false;
-    }
-    private async Task RefreshAfterCombat()
-    {
-        //await SessionState.MoveToRoom(SessionState.CurrentRoom.RoomId);
-        await SessionState.NotifyStateChange();
-    }
     private Func<Task> _stateHandler = default!;
 
     protected override void OnInitialized()
