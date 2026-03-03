@@ -451,7 +451,7 @@ using System.Collections.Generic;
                 }
                 int remain = player.XpNeeded - player.Xp;
                 await _characterService.SavePlayer(player);
-            await SessionState.PushEvent($"{remain} XP remaining for next level!");
+                await SessionState.PushEvent($"{remain} XP remaining for next level!");
                 await SessionState.NotifyStateChange();
                 
             }

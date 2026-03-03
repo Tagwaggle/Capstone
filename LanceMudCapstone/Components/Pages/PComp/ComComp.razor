@@ -63,8 +63,20 @@
 
         if (lootedItems.Any())
         {
+            string lootItems = "You looted: \n";
             foreach (var item in lootedItems)
-            { await SessionState.PushEvent($"You loot {string.Join(", ", lootedItems.Select(i => i.Name))} from the container."); }
+            {
+                await SessionState.PushEvent($"You loot {string.Join(", ", lootedItems.Select(i => i.Name))} from the container.");
+                lootItems += item.Name + " ";
+            }
+            lootItems += '\n';
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Loot",
+                Detail = $"{lootItems}",
+                Duration = 2000
+            });
         }
         else
         {
