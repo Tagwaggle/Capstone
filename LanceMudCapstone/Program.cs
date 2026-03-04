@@ -27,8 +27,10 @@ builder.Services.AddScoped<LogoutService>();
 builder.Services.AddScoped<MobService>();
 builder.Services.AddScoped<EffectService>();
 builder.Services.AddScoped<RespawnService>();
-builder.Services.AddScoped<WorldEngine>();
 builder.Services.AddScoped<AbilityEngine>();
+
+builder.Services.AddSingleton<WorldEngine>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<WorldEngine>());
 
 builder.Services.AddScoped<ICombatService, CombatService>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
@@ -87,12 +89,6 @@ CreatedAt TEXT NOT NULL,
 ExpiresAt TEXT NOT NULL
 );";
     cmd.ExecuteNonQuery();
-}
-// Start world engine
-using (var scope = app.Services.CreateScope())
-{
-    var world = scope.ServiceProvider.GetRequiredService<WorldEngine>();
-    world.Start();
 }
 
 if (!app.Environment.IsDevelopment())
