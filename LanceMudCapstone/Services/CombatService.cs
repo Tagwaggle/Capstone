@@ -217,23 +217,6 @@ using System.Collections.Generic;
                 });
             }
 
-
-        /*    public async Task<CombatRoundResult> CastSpellAsync(PlayerCharacterDto caster, PlayerCharacterDto target, Spell spell)
-            {
-                var log = new List<string>
-                {
-                    $"{caster.Name} casts {spell.Name} on {target.Name}!"
-                };
-                
-                return await Task.FromResult(new CombatRoundResult
-                {
-                    Attacker = caster,
-                    Defender = target,
-                    Log = log
-                });
-            }
-        */
-
             public async Task<CombatRoundResult> UseItemAsync(PlayerCharacterDto user, Item item, PlayerCharacterDto? target = null)
             {
                 var log = new List<string>
