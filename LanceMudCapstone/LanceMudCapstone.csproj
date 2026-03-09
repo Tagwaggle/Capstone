@@ -9,6 +9,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Content Include="Components\Pages\CombatScreen.razor.backup" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Azure.Communication.Email" Version="1.1.0" />
 		<PackageReference Include="Dapper" Version="2.1.66" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.3" />

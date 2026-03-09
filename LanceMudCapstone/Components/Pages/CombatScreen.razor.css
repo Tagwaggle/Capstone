@@ -1,102 +1,256 @@
-﻿.modal-overlay {
+﻿.atb-combat-overlay {
     position: fixed;
-    inset: 0; 
-    background-color: rgba(0, 0, 0, 0.65);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 200000;
-}
-
-.modal {
-    background-color: #1a1a1a;
-    border-radius: 8px;
-    padding: 1.5rem;
-    max-width: 500px;
-    width: 90%;
-    color: #f0f0f0;
-    z-index: 210000;
-}
-
-.combat-bars {
-    margin-bottom: 1rem;
+    inset: 0;
+    background: #0a0a0f;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    z-index: 999999;
+    font-family: Courier New, Courier, monospace;
+    color: #e0e0e0;
 }
-
-.bar {
-    height: 20px;
-    border-radius: 6px;
-    background: #333;
-    overflow: hidden;
-    position: relative;
-}
-
-    .bar .fill {
-        height: 100%;
-        transition: width 0.3s ease;
-    }
-
-.health-bar .fill {
-    background: linear-gradient(90deg, #8b0000, #ff3b3b);
-}
-
-.mana-bar .fill {
-    background: linear-gradient(90deg, #0033aa, #3399ff);
-}
-
-.stamina-bar .fill {
-    background: linear-gradient(90deg, #006600, #33cc33);
-}
-.combat-header {
-    text-align: center;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #444;
-}
-
-    .combat-header h2 {
-        margin: 0;
-        font-size: 1.4rem;
-        letter-spacing: 1px;
-    }
-
-.combat-log {
-    background: #0f0f0f;
-    border: 1px solid #333;
-    padding: 10px;
-    height: auto;
-    overflow-y: auto;
-    margin-bottom: 1rem;
-}
-.ability-buttons {
-    margin-top: 1rem;
+.mob-arena {
+    flex: 1;
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-    .ability-buttons button {
-        background: #333;
-        color: #fff;
-        padding: 6px 12px;
-        border-radius: 4px;
-    }
-.combat-end-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    z-index: 5000;
+    justify-content: center;
+    background: linear-gradient(180deg, #0d0d1a 0%, #1a1a2e 100%);
+    border-bottom: 2px solid #333;
+    padding: 1rem;
+}
+.mob-name-plate {
+    font-size: 1.4rem;
+    color: #ff6b6b;
+    letter-spacing: .2rem;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
 }
 
-.combat-end-card {
-    background: #222;
-    padding: 20px;
-    border-radius: 10px;
-    color: white;
-    text-align: center;
+.mob-placeholder {
+    font-size: 6rem;
+    line-height: 1;
+    margin: 1rem 0;
+    filter: drop-shadow(0 0 20px #ff6b6b);
+}
+
+.mob-health-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 60%;
+}
+
+.combat-log-area {
+    height: 8rem;
+    overflow-y: auto;
+    background: #0f0f0f;
+    border-top: 1px solid #222;
+    border-bottom: 1px solid #222;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+}
+
+.log-line {
+    color: #aaa;
+    line-height: 1.6;
+    border-bottom: 1px solid #1a1a1a;
+    padding: 0.1rem 0;
+}
+
+    .log-line:last-child {
+        color: #fff;
+    }
+
+.battle-hud {
+    display: flex;
+    gap: 0;
+    background: #111118;
+    border-top: 2px solid #9b59b6;
+    min-height: 12rem;
+}
+
+.player-stats-panel {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border-right: 1px solid #333;
+}
+
+.player-name {
+    font-size: 1.1rem;
+    color: #9b59b6;
+    letter-spacing: 0.15rem;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+}
+
+.stat-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+}
+
+.bar-label {
+    width: 2rem;
+    font-size: 0.75rem;
+    color: #888;
+    text-align: right;
+}
+
+.bar-value {
+    width: 6rem;
+    font-size: 0.75rem;
+    color: #ccc;
+    text-align: right;
+}
+
+.atb-bar {
+    flex: 1;
+    height: 10px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.atb-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+    border-radius: 2px;
+}
+
+.hp-fill {
+    background: linear-gradient(90deg, #27ae60, #2ecc71);
+}
+
+.mp-fill {
+    background: linear-gradient(90deg, #2980b9, #3498db);
+}
+
+.st-fill {
+    background: linear-gradient(90deg, #e67e22, #f39c12);
+}
+
+.atb-fill {
+    background: linear-gradient(90deg, #7f8c8d, #bdc3c7);
+    transition: width 0.1s linear;
+}
+
+    .atb-fill.atb-ready {
+        background: linear-gradient(90deg, #f1c40f, #f39c12);
+        animation: atb-pulse 0.5s infinite alternate;
+    }
+
+@keyframes atb-pulse {
+    from {
+        opacity: 0.8;
+    }
+
+    to {
+        opacity: 1;
+        box-shadow: 0 0 8px #f1c40f;
+    }
+}
+
+.atb-ready-text {
+    color: #f1c40f;
+    font-weight: bold;
+    animation: atb-pulse 0.5s infinite alternate;
+}
+
+.action-menu-panel {
+    width: 280px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.menu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.menu-btn {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    border: 1px solid #9b59b6;
+    padding: 0.5rem 1rem;
+    text-align: left;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    transition: all 0.15s;
+    letter-spacing: 0.05rem;
+}
+
+    .menu-btn:hover:not(.disabled) {
+        background: #9b59b6;
+        color: #fff;
+        border-color: #c39bd3;
+    }
+
+    .menu-btn.disabled, .menu-btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+
+    .menu-btn.flee-btn {
+        border-color: #e74c3c;
+        color: #e74c3c;
+    }
+
+        .menu-btn.flee-btn:hover {
+            background: #e74c3c;
+            color: #fff;
+        }
+
+    .menu-btn.back-btn {
+        border-color: #555;
+        color: #888;
+        font-size: 0.8rem;
+    }
+
+.ability-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mp-cost {
+    color: #3498db;
+    font-size: 0.75rem;
+}
+
+.st-cost {
+    color: #f39c12;
+    font-size: 0.75rem;
+}
+
+.combat-end-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.end-title {
+    font-size: 1.5rem;
+    letter-spacing: 0.2rem;
+}
+
+    .end-title.victory {
+        color: #f1c40f;
+    }
+
+    .end-title.defeat {
+        color: #e74c3c;
+    }
+
+.end-sub {
+    color: #888;
+    font-size: 0.85rem;
 }

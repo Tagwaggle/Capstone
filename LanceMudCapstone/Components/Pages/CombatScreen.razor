@@ -2,184 +2,236 @@
 @using LanceMudCapstone.Enums
 @inject ICombatService CombatService
 
+<div class="atb-combat-overlay">
+	<div class="mob-arean">
+		<div class="mob-name-plate">@Mob.Name</div>
+		<div class="mob-sprite-area">
+			<!-- Future Holder -->
+			<div class="mob-placeholder">👾</div>
+		</div>
+		<div class="mob-health-row">
+			<div class="bar-label">HP</div>
+			<div class="atb-bar mob-hp-bar">
+				<div class="atb-fill" style="width:@($"{GetPercent(Mob.Health, Mob.MaxHealth)}%")"></div>
+			</div>
+			<span class="bar-value">@($"{Mob.Health}/{Mob.MaxHealth}")</span>
+		</div>
+	</div>
+	<div class="combat-log-area">
+		@foreach (var line in combatLines)
+		{
+			<div class="combat-log-line">@line</div>
+		}
+	</div>
+	@if( endState != CombatEndState.None)
+	{
+		<div class="combat-end-panel">
+			@if (endState == CombatEndState.Victory)
+			{
+				<div class="end-title victory">⚔️ Victory ⚔️ Victory ⚔️</div>
+				<div class="end-sub">@Mob.Name has been defeated! 🤺</div>
+			}
+			else
+			{
+				<div class="end-title defeat">☠️ Defeat ☠️</div>
+				<div class="end-sub"> The Great @Mob.Name has taken you down, but the gods show pitty and spare your life.</div>
+			}
+			<button class="menu-btn" @onclick="FinishCombat">Continue</button>
+		</div>
+	}
+	<div class="battle-hud">
+		<div class="player-stat-panel">
+			<div class="player-name">@Player.Name</div>
+			<div class="stat-row">
+				<span class="bar-label">HP</span>
+				<div class="atb-bar">
+				<div class="atb-fill hp-fill" style="width:@($"{GetPercent(Player.Health, Player.MaxHealth)}%")"></div>
+				</div>
+			</div>
+			<span class="bar-value">@Player.Health / @Player.MaxHealth</span>
+			<div class="stat-row">
+				<span class="bar-label">ATB</span>
+				<div class="atb-bar">
+					<div class="atb-fill @(_atbReady ? "atb-ready" : "")" style="width:@($"{_atbProgress}%")"></div>
+				</div>
+				<span class="atb-fill @(_atbReady ? "atb-ready0text" : "")">
+					@(_atbReady ? "Ready!" : $"{_atbProgress}%")
+				</span>
+			</div>
+		
+		</div>
 
-<div class="combat-screen">
-    <h3>Combat!</h3>
+		@if (Player.MaxMana > 0)
+		{
+			<div class="player-stat-panel">
+				<div class="stat-row">
+					<span class="bar-label">MP</span>
+					<div class="atb-fill mp-fill" style="width:@($"{GetPercent(Player.Mana, Player.MaxMana)}%")"></div>
+				</div>
+				<span class="bar-value">@Player.Mana / @Player.MaxMana</span>
+			</div>
+		}
+		@if (Player.MaxStamina > 0)
+		{
+			<div class="player-stat-panel">
+				<div class="stat-row">
+					<span class="bar-label">SP</span>
+					<div class="atb-fill sp-fill" style="width:@($"{GetPercent(Player.Stamina, Player.MaxStamina)}%")"></div>
+				</div>
+				<span class="bar-value">@Player.Stamina / @Player.MaxStamina</span>
+			</div>
+		}
+		<div class="action-menu-panel">
+			@if(activeMenu == MenuState.Root)
+			{
+				<div class="menu-list">
+					<button class="menu-btn @(!_atbReady ? "disabled" : "" )" 
+						disabled="@(!_atbReady)"
+						@onclick="() => AttackRound()">🤺 Attack</button>
+					<button class="menu-btn @(!_atbReady ? "disabled" : "" )"
+						disabled="@(!_atbReady)"
+						@onclick=" ()=> activeMenu = MenuState.Abilites">🌟✨🌟 Abilities</button>
+					<button class="menu-btn @(!_atbReady ? "disabled" : "")"
+						disabled="@(!_atbReady)"
+						@onclick="RunAway">�� Run</button>
+								</div>
+							}
+							else if (activeMenu == MenuState.Abilites)
+							{
+								<div class="bi-list-nested-nav-menu submenu">
+					<button class="menu-btn back-btn" @onclick="() => activeMenu = MenuState.Root">⬅️ Back</button>
+					@foreach (var ability in UsableAbilities)
+					{
+						<button class="menu-btn" @onclick="() => UseAbility(ability)">@ability.Name
+						@if (ability.ManaCost > 0) { <span class="mp-cost">@ability.ManaCost</span> }
+						@if (ability.StaminaCost > 0) { <span class="sp-cost">@ability.StaminaCost</span> }
+						</button>
+					}
 
-    <div class="combat-header">
-        <h2>@Player.Name vs @Mob.Name</h2>
-    </div>
-    <div class="combat-log">
-        <pre>@combatLog</pre>
-    </div>
-    <div style="display: inline-block">
-        @if (UsableAbilities.Any())
-        {
-            <div class="ability-buttons">
-                @foreach (var ability in UsableAbilities)
-                {
-                    <button @onclick="() => UseAbility(ability)">
-                        @ability.Name
-                    </button>
-                }
-            </div>
-        }
+					
+				</div>
+							}
+							else if (activeMenu == MenuState.Items)
+							{
+				<button class="menu-btn back-btn" @onclick="() => activeMenu = MenuState.Root">⬅️ Back</button>
+				<!-- Future Item Menu -->
+							}
 
-        <button @onclick="AttackRound">Attack</button>
-        <button @onclick="RunAway">Run Away</button>
-    </div>
-    <br />
+						</div>
 
-
-
-    <br />
-
-    <div class="combat-bars">
-
-        <div class="stat-row">
-            <span class="stat-label">HP:</span>
-            <div class="bar health-bar">
-                <div class="fill" style="width:@($"{GetPercent(Player.Health, Player.MaxHealth)}%")"></div>
-            </div>
-        </div>
-
-        @if (Player.MaxMana != 0)
-        {
-            <div class="stat-row">
-                <span class="stat-label">Mana:</span>
-                <div class="bar mana-bar">
-                    <div class="fill" style="width:@($"{GetPercent(Player.Mana, Player.MaxMana)}%")"></div>
-                </div>
-            </div>
-        }
-
-        @if (Player.MaxStamina != 0)
-        {
-            <div class="stat-row">
-                <span class="stat-label">Stamina:</span>
-                <div class="bar stamina-bar">
-                    <div class="fill" style="width:@($"{GetPercent(Player.Stamina, Player.MaxStamina)}%")"></div>
-                </div>
-            </div>
-        }
-
-    </div>
-    @if (endState != CombatEndState.None)
-    {
-        <div class="combat-end-overlay">
-            <div class="combat-end-card">
-                @if (endState == CombatEndState.Victory)
-                {
-                    <h2>You defeated @Mob.Name!</h2>
-                }
-                else
-                {
-                    <h2>You have been defeated...</h2>
-                }
-
-                <button @onclick="FinishCombat">Continue</button>
-            </div>
-        </div>
-    }
+	</div>
 </div>
 
-@code {
-    [Parameter] public PlayerCharacterDto Player { get; set; } = default!;
-    [Parameter] public PlayerCharacterDto Mob { get; set; } = default!;
-    [Parameter] public EventCallback<string> OnVictory { get; set; }
-    [Parameter] public EventCallback OnDefeat { get; set; }
+@code{
+	[Parameter] public PlayerCharacterDto Player { get; set; } = default!;
+	[Parameter] public PlayerCharacterDto Mob { get; set; } = default!;
+	[Parameter] public EventCallback OnCombatEnd { get; set; }
+	[Parameter] public EventCallback OnDefeat { get; set; }
+	[Parameter] public EventCallback<string> OnVictory { get; set; }
 
-    private string combatLog = string.Empty;
-    private bool showEndScreen = false;
-    private string endMessage = "";
-    private CombatEndState endState;
+	private List<string> combatLines = new();
+	private CombatEndState endState = CombatEndState.None;
+	private List<AbilityDto> UsableAbilities = new();
 
-    private List<AbilityDto> UsableAbilities = new();
+	private double _atbProgress = 0;
+	private bool _atbReady = false;
+	private System.Threading.Timer? _atbTimer;
 
-    protected override void OnParametersSet()
-    {
-        LoadUsableAbilities();
-    }
-    private async Task UseAbility(AbilityDto ability)
-    {
-        combatLog = "";
+	private enum MenuState { Root, Abilites, Items }
+	private MenuState activeMenu = MenuState.Root;
 
-        var result = await CombatService.ResolveRoundAsync(Player, Mob, ability);
+	protected override void OnInitialized()
+	{
+		LoadUsableAbilites();
+		StartAtb();
+	}
 
-        combatLog += string.Join("\n", result.Log) + "\n";
-        combatLog += $"Player HP: {Player.Health}/{Player.MaxHealth}\n";
-        combatLog += $"{Mob.Name} HP: {Mob.Health}/{Mob.MaxHealth}\n\n";
+	private void StartAtb()
+	{
+		_atbProgress = 0;
+		_atbReady = false;
+		_atbTimer?.Dispose();
+		_atbTimer = new System.Threading.Timer(_ =>
+		{
+			if (!_atbReady)
+			{
+				_atbProgress = Math.Min(100, _atbProgress + 4);
+				if (_atbProgress >= 100) _atbReady = true;
+			}
+			InvokeAsync(StateHasChanged);
+		}, null, 0, 100);
+	}
 
-        if (!Mob.IsAlive)
-        {
-            combatLog += $"The {Mob.Name} has fallen!\n";
-            endState = CombatEndState.Victory;
-            //            showEndScreen = true;
-            return;
-        }
-        else if (!Player.IsAlive)
-        {
-            combatLog += $"You have been defeated...\n";
-            endState = CombatEndState.Defeat;
-//            showEndScreen = true;
-            return;
-        }
+	private void ResetAtb()
+	{
+		_atbProgress = 0;
+		_atbReady = false;
+		activeMenu = MenuState.Root;
+	}
 
-        LoadUsableAbilities(); // refresh after mana/stamina changes
-    }
+	private async Task AttackRound()
+	{
+		if (!_atbReady) return;
+		ResetAtb();
+		activeMenu = MenuState.Root;
 
-    private void LoadUsableAbilities() 
-    { 
-        var all = AbilityBook.GetByClass(Player.Class);
-        UsableAbilities = all
-        .Where(a => a.LevelRequirement <= Player.Level)
-        .Where(a => a.ManaCost == null || Player.Mana >= a.ManaCost)
-        .Where(a => a.StaminaCost == null || Player.Stamina >= a.StaminaCost)
-        .OrderBy(a => a.LevelRequirement).ToList(); }
+		var result = await CombatService.ResolveRoundAsync(Player, Mob);
+		foreach (var line in result.Log) combatLines.Add(line);
+		if (combatLines.Count > 12) combatLines.RemoveRange(0, combatLines.Count - 12);
 
-    private async Task AttackRound()
-    {
-        combatLog = "";
-        var result = await CombatService.ResolveRoundAsync(Player, Mob);
+		CheckEndState();
+		LoadUsableAbilites();
+		if (endState == CombatEndState.None) StartAtb();
+	}
 
-        combatLog += string.Join("\n", result.Log) + "\n";
-        combatLog += $"Player HP: {Player.Health}/{Player.MaxHealth}\n";
-        combatLog += $"{Mob.Name} HP: {Mob.Health}/{Mob.MaxHealth}\n\n";
+	private async Task UseAbility(AbilityDto ability)
+	{
+		if (!_atbReady) return;
+		ResetAtb();
+		activeMenu = MenuState.Root;
 
-        if (!Mob.IsAlive)
-        {
-            endState = CombatEndState.Victory;
-            return;
-        }
-        else if (!Player.IsAlive)
-        {
-            endState = CombatEndState.Defeat;
-            return;
-        }
-        LoadUsableAbilities();
-    }
+		var result = await CombatService.ResolveRoundAsync(Player, Mob, ability);
+		foreach (var line in result.Log) combatLines.Add(line);
+		if (combatLines.Count > 12) combatLines.RemoveRange(0, combatLines.Count - 12);
 
-    private async Task RunAway()
-    {
-        combatLog += "You flee from combat!\n";
-        await OnDefeat.InvokeAsync();
-    }
+		CheckEndState();
+		LoadUsableAbilites();
+		if (endState == CombatEndState.None) StartAtb();
+	}
 
-    private int GetPercent(int value, int max)
-    {
-        if (max <= 0)
-            return 0;
+	private void CheckEndState()
+	{
+		if (!Mob.IsAlive) endState = CombatEndState.Victory;
+		else if (!Player.IsAlive) endState = CombatEndState.Defeat;
 
-        return (int)(value * 100 / max);
-    }
+		if (endState != CombatEndState.None) _atbTimer?.Dispose();
+	}
 
-    private async Task FinishCombat()
-    {
-        if (endState == CombatEndState.Victory) await OnVictory.InvokeAsync(Mob.Name);
-        else
-            await OnDefeat.InvokeAsync();
+	private void LoadUsableAbilites()
+	{
+		var all = AbilityBook.GetByClass(Player.Class ?? "");
 
-        endState = CombatEndState.None;
-    }
+		UsableAbilities = all
+			.Where(a => a.LevelRequirement <= Player.Level)
+			.Where(a => a.ManaCost <= Player.Mana || a.ManaCost == null)
+			.Where(a => a.StaminaCost <= Player.Stamina || a.StaminaCost == null )
+			.OrderBy(a => a.LevelRequirement).ToList();
+	}
 
+	private async Task RunAway()
+	{
+		_atbTimer?.Dispose();
+		await OnDefeat.InvokeAsync();
+	}
+
+	private async Task FinishCombat()
+	{
+		if (endState == CombatEndState.Victory) await OnVictory.InvokeAsync(Mob.Name);
+		else await OnDefeat.InvokeAsync();
+		endState = CombatEndState.None;
+	}
+
+	private int GetPercent(int value, int max) => max <= 0 ? 0 : (int)((double)value / max * 100);
+
+	public void Dispose() => _atbTimer?.Dispose();
 }

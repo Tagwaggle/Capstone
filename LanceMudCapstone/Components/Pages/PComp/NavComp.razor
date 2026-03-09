@@ -104,7 +104,7 @@
         await HubClient.AnnounceToRoom(oldRoomId!.Value, $"{SessionState.Pfile?.Name} leaves {dir}.");
 
         await HubClient.AnnounceToRoom(SessionState.RoomId!.Value, $"{SessionState.Pfile?.Name} has entered from {dirLeave}.");
-
+        await CharacterService.SetOnline(SessionState.CharacterId!.Value);
         if (SessionState.RoomId.HasValue)
             await HubClient.JoinRoom(SessionState.RoomId.Value);
     }
