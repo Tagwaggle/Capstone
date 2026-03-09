@@ -64,13 +64,11 @@
     {
         if (!firstRender || _loaded)
             return;
-        Console.WriteLine("AfterRender Called");
         await TryLoadCharactersAsync();
     }
 
     private async void HandleSessionChanged()
     {
-        Console.WriteLine("HandleSessionChange Called");
         await TryLoadCharactersAsync();
         await InvokeAsync(StateHasChanged);
     }
@@ -78,7 +76,7 @@
     private async Task TryLoadCharactersAsync()
     {
         Console.WriteLine($"TryLoad Clicked: {SessionState.UserId} {SessionState.UserName}");
-        
+
         await InvokeAsync(StateHasChanged);
         if (_loaded || _loadInProgress)
             return;
@@ -112,7 +110,7 @@
         });
 
         await SessionState.SetCharacterAsync(selected);
-
+        await CharacterService.SavePlayer(SessionState.Pfile!);
         Nav.NavigateTo("/play");
     }
 

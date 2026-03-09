@@ -1,5 +1,6 @@
 ﻿@inject SessionState SessionState
 @inject CharacterService CharacterService
+@inject MudHubClient HubClient
 
 @implements IDisposable
 
@@ -70,17 +71,53 @@
 
     private async Task Move(string dir)
     {
+        int? oldRoomId = SessionState.RoomId;
+
+        if (SessionState.RoomId.HasValue)
+            await HubClient.LeaveRoom(SessionState.RoomId.Value);
         await CharacterService.UpdateLastCommand(SessionState.CharacterId!.Value);
         await SessionState.TryMoveAsync(dir);
+        string dirLeave = string.Empty;
+        switch(dir){
+            case "up":
+                dirLeave = "down below";
+                break;
+            case "down":
+                dirLeave = "up above";
+                break;
+            case "east":
+                dirLeave = "the west";
+                break;
+            case "west":
+                dirLeave = "the east";
+                break;
+            case "south":
+                dirLeave = "the north";
+                break;
+            case "north":
+                dirLeave = "the south";
+                break;
+            default:
+                dirLeave = "somewhere";
+                break;
+        }
+        await HubClient.AnnounceToRoom(oldRoomId!.Value, $"{SessionState.Pfile?.Name} leaves {dir}.");
+
+        await HubClient.AnnounceToRoom(SessionState.RoomId!.Value, $"{SessionState.Pfile?.Name} has entered from {dirLeave}.");
+
+        if (SessionState.RoomId.HasValue)
+            await HubClient.JoinRoom(SessionState.RoomId.Value);
     }
+    private Func<Task> _stateHandler = default!;
 
     protected override void OnInitialized()
     {
-        SessionState.OnChange += () => InvokeAsync(StateHasChanged);
+        _stateHandler = () => InvokeAsync(StateHasChanged);
+        SessionState.OnChange += _stateHandler;
     }
 
     public void Dispose()
     {
-        SessionState.OnChange -= () => InvokeAsync(StateHasChanged);
+        SessionState.OnChange -= _stateHandler;
     }
 }

@@ -3,9 +3,11 @@ using LanceMudCapstone.Models;
 using LanceMudCapstone.Services;
 using LanceMudCapstone.API;
 using Radzen;
+using QuestPDF.Infrastructure;
 using LanceMudCapstone.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
+QuestPDF.Settings.License = LicenseType.Community;
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -23,6 +25,7 @@ builder.Services.AddScoped<LocalStorageService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<CharacterService>();
 builder.Services.AddScoped<LogoutService>();
+builder.Services.AddScoped<CharacterSheetService>();
 
 builder.Services.AddScoped<MobService>();
 builder.Services.AddScoped<EffectService>();

@@ -66,6 +66,7 @@ public class SessionState
         CurrentRoom = null;
         CurrentRoomExits.Clear();
         CurrentRoomMobs.Clear();
+        CurentRoomPlayers.Clear();
         CurrentRoomContainers.Clear();
 
         await _localStorage.RemoveAsync("session.user");

@@ -36,25 +36,33 @@
 
 </RadzenCard>
 
-		@code {
+@code {
 
-			private List<ChatMessage> messages = new();
-		private string currentMessage = string.Empty;
+	private List<ChatMessage> messages = new();
+	private string currentMessage = string.Empty;
 
-		private record ChatMessage(string User, string Text, string Color);
 
-		protected override async Task OnInitializedAsync()
-		{
-			HubClient.OnGlobalMessage += HandleGlobalMessage;
-			await HubClient.StartAsync(Nav);
-		}
+	private record ChatMessage(string User, string Text, string Color);
 
-		private void HandleGlobalMessage(string user, string msg, string color)
-		{
-			messages.Add(new ChatMessage(user, msg, color));
-			if (messages.Count > 100) messages.RemoveAt(0);
-			InvokeAsync(StateHasChanged);
-		}
+	protected override async Task OnInitializedAsync()
+	{
+		HubClient.OnGlobalMessage += HandleGlobalMessage;
+		HubClient.OnRoomEvent += HandleRoomEvent;
+		await HubClient.StartAsync(Nav);
+	}
+
+	private void HandleGlobalMessage(string user, string msg, string color)
+	{
+		messages.Add(new ChatMessage(user, msg, color));
+		if (messages.Count > 100) messages.RemoveAt(0);
+		InvokeAsync(StateHasChanged);
+	}
+
+	private void HandleRoomEvent(string msg)
+	{
+		_ = SessionState.PushEvent(msg);
+		InvokeAsync(StateHasChanged);
+	}
 		private async Task Send()
 		{
 			if (string.IsNullOrWhiteSpace(currentMessage)) return;

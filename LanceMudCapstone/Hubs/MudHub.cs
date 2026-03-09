@@ -11,5 +11,7 @@ public class MudHub : Hub
         await Clients.All.SendAsync("ReceiveGlobalMessage", user, message, color);
     public async Task SendRoomMessage(string roomId, string message) =>
         await Clients.Group($"room_{roomId}").SendAsync("ReceiveRoomMessage", message);
+    public async Task AnnounceToRoom(string roomId, string message) =>
+        await Clients.Group($"room_{roomId}").SendAsync("ReceiveRoomEvent", message);
 
 }

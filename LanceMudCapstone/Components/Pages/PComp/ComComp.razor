@@ -3,6 +3,9 @@
 @inject NavigationManager Nav
 @inject NotificationService NotificationService
 @inject ContainerService ContainerService
+@inject MudHubClient HubClient
+
+@inject IJSRuntime JS
 @implements IDisposable
 
 
@@ -28,6 +31,7 @@
             <button @onclick="() => showScoreModal = true">Score</button>
             <button @onclick="() => showInventoryModal = true">Inventory</button>
             <button @onclick="() => showSpellBook = true">Spells / Skills</button>
+            <button @onclick="DownloadSheet">Downlad Character Sheet</button>
             <button @onclick="ChangeCharacter">Logout</button>
             <button @onclick="SaveButton_Clicked">Save Character</button>
         </div>
@@ -133,6 +137,8 @@
             IsAlive = mob.Base.Health > 0
         };
 
+        await HubClient.AnnounceToRoom(SessionState.RoomId!.Value, $"{SessionState.Pfile?.Name} has bruttaly attacked {mob.Base.Name}.");
+
         await SessionState.SetCombat(true);
         //StartCombat(player, currentMob);
         await SessionState.NotifyStateChange();
@@ -145,6 +151,11 @@
         await SessionState.InitializeAsync();
         await SessionState.SetUserAsync(SessionState.UserId ?? 0, SessionState.UserName ?? "", SessionState.UserIcon);
         Nav.NavigateTo("/character");
+    }
+
+    private async Task DownloadSheet()
+    {
+        await JS.InvokeVoidAsync("open", $"/api/characters/sheet/{SessionState.CharacterId}", "_blank");
     }
 
     private Func<Task> _stateHandler = default!;

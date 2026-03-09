@@ -23,6 +23,7 @@ else
     @BuildAsciiMonitor(
         SessionState.CurrentRoom,
         SessionState.CurrentRoomMobs,
+        SessionState.CurrentRoomPcs,
         SessionState.CurrentRoomContainers,
         SessionState.CurrentRoomExits,
         SessionState.EventLog)
@@ -138,6 +139,7 @@ else
     public static string BuildAsciiMonitor(
         Room? room,
         IEnumerable<RoomNpcDto> mobs,
+		IEnumerable<RoomPcDto> pcs,
         IEnumerable<Container> containers,
         IEnumerable<RoomExit> exits,
         IEnumerable<string> eventLog)
@@ -179,7 +181,12 @@ else
             foreach (var m in mobs)
                 lines.Add("    " + m.Base.Name);
         }
-
+        if (pcs.Any())
+        {
+            lines.Add("Player:");
+            foreach (var p in pcs)
+                lines.Add("    " + p.Base.Name);
+		}
         if (containers.Any())
         {
             lines.Add("Container:");

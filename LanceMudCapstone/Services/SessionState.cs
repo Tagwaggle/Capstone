@@ -35,6 +35,7 @@ public class SessionState
     public List<Container> CurrentRoomContainers { get; set; } = new();
     public List<RoomExit> CurrentRoomExits { get; set; } = new();
     public List<RoomNpcDto> CurrentRoomMobs { get; set; } = new();
+    public List<RoomPcDto> CurrentRoomPcs { get; set; } = new();
 
     public bool Ready { get; private set; } = false;
     public bool FirstLoadComplete { get; private set; } = false;
@@ -105,6 +106,7 @@ public class SessionState
         IsOnline = false;
         CurrentRoomExits.Clear();
         CurrentRoomMobs.Clear();
+        CurrentRoomPcs.Clear();
         CurrentRoomContainers.Clear();
 
         await _localStorage.RemoveAsync("session.user");
@@ -154,6 +156,7 @@ public class SessionState
         IsOnline = false;
         CurrentRoomExits.Clear();
         CurrentRoomMobs.Clear();
+        CurrentRoomPcs.Clear();
         CurrentRoomContainers.Clear();
         Console.WriteLine("User ID Logged in" + UserId);
         //CharacterReady = false;
@@ -167,12 +170,15 @@ public class SessionState
             EventLog.Clear();
         CurrentRoom = await _roomService.GetRoomAsync(roomId);
         CurrentRoomMobs = (await _characterService.GetNpcsInRoom(roomId)).ToList();
+        CurrentRoomPcs = (await _characterService.GetPCsInRoom(roomId)).ToList();
         CurrentRoomContainers = (await _containerService.GetContainersInRoom(roomId)).ToList();
         CurrentRoomExits = (await _roomService.GetExitsForRoomAsync(roomId))?.ToList() ?? new List<RoomExit>();
 
         if (Pfile != null) Pfile.RoomId = roomId;
         if (Pfile != null) await _characterService.SavePlayer(Pfile);
         RoomId = roomId;
+
+        // _mudHubClient.NotifyRoomChange(roomId); // Notify the hub of the room change
 
         await NotifyStateChange();
     }

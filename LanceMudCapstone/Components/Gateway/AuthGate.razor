@@ -15,6 +15,10 @@
 
         if (SessionState.UserId != null)
         {
+            if (SessionState.CharacterId == null)
+            {
+                Nav.NavigateTo("/character");
+			}
             return;
         }
 
@@ -38,7 +42,7 @@
             int UID = Convert.ToInt32(uID);
             var userData = await _userService.GetUserByIdAsync(UID);
             await SessionState.SetUserAsync(userData.UserId, userData.Username, userData.ProfilePictureId);
-            Nav.NavigateTo("/characters");
+		    if (SessionState.CharacterId == null) Nav.NavigateTo("/character");
     }
 
 }

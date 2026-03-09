@@ -241,4 +241,28 @@ public class CharacterService : ICharacterService
 
         return result;
     }
+    public async Task<IEnumerable<RoomPcDto>> GetPCsInRoom(int roomId)
+    {
+        const string sql = @"
+            SELECT c.characterid, c.name, c.race, c.class, c.level, c.alignment,
+                   c.health, c.maxhealth, c.armorclass, c.strength, c.dexterity,
+                   c.constitution, c.intelligence, c.wisdom, c.charisma,
+                   c.isalive, c.charactertype, c.createdat,
+                   pc.playercharacterid, pc.characterid as pc_characterid,
+                   pc.userid, pc.gold, pc.activequest, pc.lastonline, pc.isonline 
+            FROM playercharacters pc
+            INNER JOIN characters c ON pc.characterid = c.characterid
+            WHERE c.roomid = @roomId AND c.isalive = true AND c.charactertype = 'pc' AND pc.isonline = true;
+        ";
+
+        using var conn = _db.CreateConnection();
+        var result = await conn.QueryAsync<Character, PlayerCharacter, RoomPcDto>(
+            sql,
+            (character, pc) => new RoomPcDto { Base = character, Instance = pc },
+            new { roomId },
+            splitOn: "playercharacterid"
+        );
+
+        return result;
+    }
 }
