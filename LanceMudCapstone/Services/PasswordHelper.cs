@@ -1,5 +1,4 @@
 ﻿using System.Security.Cryptography;
-using System.Text;
 
 namespace LanceMudCapstone.Services;
 
@@ -16,7 +15,7 @@ public class PasswordHelper
 
         byte[] key = Rfc2898DeriveBytes.Pbkdf2(
             password, salt, Iterations, HashAlgorithmName.SHA256, KeySize);
-        
+
         return $"{Iterations}.{Convert.ToBase64String(salt)}.{Convert.ToBase64String(key)}";
     }
 
@@ -31,7 +30,7 @@ public class PasswordHelper
 
         byte[] keyToCheck = Rfc2898DeriveBytes.Pbkdf2(
             password, salt, iterations, HashAlgorithmName.SHA256, key.Length);
-        
+
         Console.WriteLine($"Stored hash: {storedHash}");
 
         return CryptographicOperations.FixedTimeEquals(keyToCheck, key);

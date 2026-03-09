@@ -1,7 +1,7 @@
-﻿using LanceMudCapstone.Enums;
+﻿using Dapper;
 using LanceMudCapstone.DTOs;
+using LanceMudCapstone.Enums;
 using LanceMudCapstone.Models;
-using Dapper;
 
 namespace LanceMudCapstone.Services
 {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace LanceMudCapstone.Services
+﻿namespace LanceMudCapstone.Services
 {
     public class MobService
     {

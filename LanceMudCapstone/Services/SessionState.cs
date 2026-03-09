@@ -1,11 +1,6 @@
 ﻿using LanceMudCapstone.DTOs;
 using LanceMudCapstone.Enums;
 using LanceMudCapstone.Models;
-using Microsoft.AspNetCore.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace LanceMudCapstone.Services;
 
@@ -205,7 +200,7 @@ public class SessionState
                 check = user != null;
                 Console.WriteLine($"Bool Check: {check} {user.UserName} {user.UserId}");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine($"Log Error: " + e);
             }
@@ -213,7 +208,7 @@ public class SessionState
             {
                 UserId = user.UserId;
                 UserName = user.UserName;
-                
+
                 await TryHydrateCharacterAsync();
             }
         }

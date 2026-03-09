@@ -13,7 +13,7 @@ public class LocalStorageService
     public async Task SetAsync<T>(string key, T value)
     {
         var json = JsonSerializer.Serialize(value);
-    await _js.InvokeVoidAsync("localStorage.setItem", key, json);
+        await _js.InvokeVoidAsync("localStorage.setItem", key, json);
     }
     public async Task<T?> GetAsync<T>(string key)
     {
@@ -24,7 +24,7 @@ public class LocalStorageService
     public async Task RemoveAsync(string key)
     {
         await _js.InvokeVoidAsync("localStorage.removeItem", key);
-    }   
+    }
 
 
 

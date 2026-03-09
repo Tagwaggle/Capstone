@@ -104,7 +104,7 @@
     {
         combatLog = "";
 
-        var result = await CombatService.ResolveAbilityAsync(Player, Mob, ability);
+        var result = await CombatService.ResolveRoundAsync(Player, Mob, ability);
 
         combatLog += string.Join("\n", result.Log) + "\n";
         combatLog += $"Player HP: {Player.Health}/{Player.MaxHealth}\n";
@@ -113,13 +113,15 @@
         if (!Mob.IsAlive)
         {
             combatLog += $"The {Mob.Name} has fallen!\n";
-            showEndScreen = true;
+            endState = CombatEndState.Victory;
+            //            showEndScreen = true;
             return;
         }
         else if (!Player.IsAlive)
         {
             combatLog += $"You have been defeated...\n";
-            showEndScreen = true;
+            endState = CombatEndState.Defeat;
+//            showEndScreen = true;
             return;
         }
 
@@ -154,6 +156,7 @@
             endState = CombatEndState.Defeat;
             return;
         }
+        LoadUsableAbilities();
     }
 
     private async Task RunAway()

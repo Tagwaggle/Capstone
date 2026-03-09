@@ -1,8 +1,6 @@
 ﻿using LanceMudCapstone.DTOs;
-using LanceMudCapstone.Services;
 using LanceMudCapstone.Enums;
-using System.Security.Cryptography;
-using Microsoft.AspNetCore.Mvc;
+using LanceMudCapstone.Services;
 using Npgsql;
 
 public static class AuthApi
@@ -137,7 +135,7 @@ public static class AuthApi
             int ord = reader.GetOrdinal("profilepictureid");
             int iconValue = reader.IsDBNull(ord) ? 0 : reader.GetInt32(ord);
             var tProfilePictureId = (UserIcon)iconValue;
-            
+
             var user = new UserDto
             {
                 UserId = reader.GetInt32(reader.GetOrdinal("userid")),

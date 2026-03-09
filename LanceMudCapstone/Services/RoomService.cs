@@ -1,11 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Dapper;
 using LanceMudCapstone.Models;
-using Dapper;
 using Npgsql;
-using System.Net.WebSockets;
 using System.Text;
-using System.Diagnostics.Tracing;
 
 namespace LanceMudCapstone.Services
 {
@@ -75,7 +71,7 @@ namespace LanceMudCapstone.Services
                         line.Append(word);
                     }
                 }
-                if ( line.Length > 0)
+                if (line.Length > 0)
                 {
                     yield return line.ToString();
                 }

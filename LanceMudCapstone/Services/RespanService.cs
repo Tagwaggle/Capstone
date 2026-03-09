@@ -23,7 +23,7 @@ namespace LanceMudCapstone.Services
         }
         public async Task ProcessRespawns()
         {
-            
+
             const string sql = @"
                 SELECT npc.npcid, npc.characterid
                 FROM nonplayercharacters npc
@@ -34,9 +34,10 @@ namespace LanceMudCapstone.Services
             using var conn = await _db.CreateOpenConnectionAsync();
             var toRespawn = await conn.QueryAsync<(int NpcId, int CharacterId)>(sql);
 
-            foreach (var npc in toRespawn) {
+            foreach (var npc in toRespawn)
+            {
                 Console.WriteLine("Respawining");
-            await conn.ExecuteAsync(@"
+                await conn.ExecuteAsync(@"
                 UPDATE characters
                 SET isalive = true, health = maxhealth
                 WHERE characterid = @CharacterId;", new { npc.CharacterId });
@@ -45,7 +46,7 @@ namespace LanceMudCapstone.Services
                 UPDATE nonplayercharacters
                 SET respawnat = NULL
                 WHERE npcid = @NpcId;", new { npc.NpcId });
-                    }
+            }
         }
         public async Task TickHeal()
         {

@@ -85,7 +85,7 @@ public static class UserApi
         });
         users.MapPut("/{uid:int}/password", async (int uid, PasswordDto dto, IConfiguration config) =>
         {
-        var connString = config["SupabaseDb"];
+            var connString = config["SupabaseDb"];
             try
             {
                 await using var conn = new NpgsqlConnection(connString);
@@ -108,7 +108,7 @@ public static class UserApi
 
                 return Results.NotFound(new { Message = "User not found" });
             }
-           catch (Exception ex)
+            catch (Exception ex)
             {
                 return Results.Problem(ex.ToString());
             }

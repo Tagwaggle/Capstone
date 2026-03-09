@@ -1,7 +1,7 @@
 ﻿using LanceMudCapstone.DTOs;
-using QuestPDF.Infrastructure;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 namespace LanceMudCapstone.Services;
 
@@ -77,12 +77,11 @@ public class CharacterSheetService
                 });
             });
         });
-                return document.GeneratePdf();
-            }
-            }
+        return document.GeneratePdf();
+    }
+}
 
 
 
 
 
-    

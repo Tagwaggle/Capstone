@@ -1,35 +1,27 @@
-﻿    using Dapper;
-    using LanceMudCapstone.DTOs;
-    using LanceMudCapstone.Enums;
-    using LanceMudCapstone.Models;
-    using LanceMudCapstone.Services;
-    using Microsoft.AspNetCore.Components;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.ApiExplorer;
-    using Microsoft.IdentityModel.Tokens;
-    using System;
-using System.Collections.Generic;
-    using System.Text.Json;
-    using System.Threading.Tasks;
+﻿using Dapper;
+using LanceMudCapstone.DTOs;
+using LanceMudCapstone.Enums;
+using LanceMudCapstone.Models;
+using System.Text.Json;
 
-    namespace LanceMudCapstone.Services
+namespace LanceMudCapstone.Services
+{
+    public class CombatService : ICombatService
     {
-        public class CombatService : ICombatService
+        private readonly Random _rng = new();
+        private readonly AbilityEngine _abilityEngine = new();
+        private readonly DbHelper _db;
+        private readonly InventoryService _inventoryService;
+        private readonly CharacterService _characterService;
+        private readonly SessionState SessionState;
+        private int[] junkIds = { 3, 4, 5, 6 };
+        public CombatService(DbHelper db, InventoryService iServe, CharacterService characterService, SessionState sessionState)
         {
-            private readonly Random _rng = new();
-            private readonly AbilityEngine _abilityEngine = new();
-            private readonly DbHelper _db;
-            private readonly InventoryService _inventoryService;
-            private readonly CharacterService _characterService;
-            private readonly SessionState SessionState;
-            private int[] junkIds = { 3, 4, 5, 6 };
-            public CombatService(DbHelper db, InventoryService iServe, CharacterService characterService, SessionState sessionState)
-            {
-                _db = db;
-                _inventoryService = iServe;
-                _characterService = characterService;
-                SessionState = sessionState;
-            }
+            _db = db;
+            _inventoryService = iServe;
+            _characterService = characterService;
+            SessionState = sessionState;
+        }
 
         private int StatBonus(int stat)
         {
@@ -105,9 +97,9 @@ using System.Collections.Generic;
             else _DamageDelt = _rng.Next(1, 5) + StatBonus(attacker.Strength);
 
             return new DamageDealtDto
-                {
-                    DamageeDelt = _DamageDelt
-                };
+            {
+                DamageeDelt = _DamageDelt
+            };
         }
         // Basic attack
         public async Task<CombatRoundResult> AttackAsync(PlayerCharacterDto attacker, PlayerCharacterDto defender)
@@ -166,123 +158,164 @@ using System.Collections.Generic;
             };
         }
 
-
-        public async Task<CombatRoundResult> ResolveRoundAsync(PlayerCharacterDto player, PlayerCharacterDto mob)
+        public async Task<CombatRoundResult> ResolveRoundAsync(PlayerCharacterDto player, PlayerCharacterDto mob, AbilityDto? special = null)
+        {
+            string className = player.Class ?? "_";
+            int statBonus = 0;
+            switch (className.ToLower())
             {
-                var roundLog = new List<string>();
-
-                var playerAttack = await AttackAsync(player, mob);
-                roundLog.AddRange(playerAttack.Log);
-
-                if (mob.IsAlive)
-                {
-                    var mobAttack = await AttackAsync(mob, player);
-                    roundLog.AddRange(mobAttack.Log);
-                }
-                
-                return new CombatRoundResult
-                {
-                    Attacker = player,
-                    Defender = mob,
-                    Log = roundLog,
-                    DamageDealt = 0,
-                    TargetDied = !mob.IsAlive
-                };
+                case "warrior" or "knight":
+                    statBonus = StatBonus(player.Strength);
+                    break;
+                case "Rogue" or "Hunter":
+                    statBonus = StatBonus(player.Dexterity);
+                    break;
+                case "Mage":
+                    statBonus = StatBonus(player.Wisdom);
+                    break;
+                case "Cleric":
+                    statBonus = StatBonus(player.Intelligence);
+                    break;
+                case "paladin":
+                    statBonus = StatBonus(player.Charisma);
+                    break;
+                default:
+                    statBonus = StatBonus(player.Dexterity);
+                    break;
             }
 
+            int roll = _rng.Next(1, 21);
+            int attackScore = roll + statBonus;
 
-            public async Task<CombatRoundResult> ResolveAbilityAsync(
-                PlayerCharacterDto attacker,
-                PlayerCharacterDto defender,
-                AbilityDto ability)
+            var roundLog = new List<string>();
+
+            roundLog.AddRange($"{player.Name} rolls {roll} + Bonus {statBonus} = {attackScore} against {mob.ArmorClass} AC");
+
+            var baseAttack = AbilityBook.GetBaseAttack(player.Class ?? "_");
+            var playerBaseResult = await ResolveAbilityAsync(player, mob, baseAttack);
+
+            //roundLog.AddRange(playerBaseResult.Log);
+            roundLog.AddRange($"{player.Name} uses {baseAttack.Name}!");
+            roundLog.AddRange($"{player.Name} hits {mob.Name} with {baseAttack.Description}!");
+
+            if (special != null && mob.IsAlive)
             {
-                var abilityResult = _abilityEngine.ExecuteAbility(attacker, defender, ability);
-                if (defender.Health <= 0 && !defender.IsAlive)
-                {
+                var specialResult = await ResolveAbilityAsync(player, mob, special);
+                roundLog.AddRange(specialResult.Log);
+            }
+
+            if (mob.IsAlive)
+            {
+                var mobBaseAttack = AbilityBook.GetBaseAttack(mob.Class ?? "_");
+                var mobResult = await ResolveAbilityAsync(mob, player, mobBaseAttack);
+                roundLog.AddRange(mobResult.Log);
+            }
+
+            return new CombatRoundResult
+            {
+                Attacker = player,
+                Defender = mob,
+                Log = roundLog,
+                DamageDealt = 0,
+                TargetDied = !mob.IsAlive
+            };
+        }
+
+
+        public async Task<CombatRoundResult> ResolveAbilityAsync(
+            PlayerCharacterDto attacker,
+            PlayerCharacterDto defender,
+            AbilityDto ability)
+        {
+            var abilityResult = _abilityEngine.ExecuteAbility(attacker, defender, ability);
+            if (defender.Health <= 0)
+            {
+
                 defender.IsAlive = false;
 
                 await SessionState.PushEvent($"{defender.Name} has been defeated by {attacker.Name}'s {ability.Name}!");
                 await SessionState.NotifyStateChange();
 
                 if (attacker.CharacterType == "pc" && defender.CharacterType != "pc") await GainXP(attacker, defender);
+
                 await HandleDeathAsync(defender);
             }
             return await Task.FromResult(new CombatRoundResult
-                {
-                    Attacker = attacker,
-                    Defender = defender,
-                    Log = new List<string> { abilityResult.Message },
-                    DamageDealt = abilityResult.Damage,
-                    TargetDied = defender.Health <= 0
-                });
-            }
-
-            public async Task<CombatRoundResult> UseItemAsync(PlayerCharacterDto user, Item item, PlayerCharacterDto? target = null)
             {
-                var log = new List<string>
+                Attacker = attacker,
+                Defender = defender,
+                Log = new List<string> { abilityResult.Message },
+                DamageDealt = abilityResult.Damage,
+                TargetDied = defender.Health <= 0
+            });
+        }
+
+        public async Task<CombatRoundResult> UseItemAsync(PlayerCharacterDto user, Item item, PlayerCharacterDto? target = null)
+        {
+            var log = new List<string>
                 {
                     $"{user.Name} uses {item.Name}."
                 };
 
-                return await Task.FromResult(new CombatRoundResult
-                {
-                    Attacker = user,
-                    Defender = target ?? user,
-                    Log = log
-                });
-            }
-
-            public async Task<CombatRoundResult> RunAsync(PlayerCharacterDto runner, Room currentRoom)
+            return await Task.FromResult(new CombatRoundResult
             {
-                var log = new List<string>
+                Attacker = user,
+                Defender = target ?? user,
+                Log = log
+            });
+        }
+
+        public async Task<CombatRoundResult> RunAsync(PlayerCharacterDto runner, Room currentRoom)
+        {
+            var log = new List<string>
                 {
                     $"{runner.Name} attempts to flee from {currentRoom.Name}!"
                 };
 
-                return await Task.FromResult(new CombatRoundResult
-                {
-                    Attacker = runner,
-                    Defender = runner,
-                    Log = log
-                });
-            }
-            private async Task HandleDeathAsync(PlayerCharacterDto dead)
+            return await Task.FromResult(new CombatRoundResult
             {
+                Attacker = runner,
+                Defender = runner,
+                Log = log
+            });
+        }
+        private async Task HandleDeathAsync(PlayerCharacterDto dead)
+        {
 
-                string testType = dead.CharacterType ?? string.Empty;
-                if (testType == "pc")
+            string testType = dead.CharacterType ?? string.Empty;
+            if (testType == "pc")
+            {
+                await HandlePlayerDeath(dead);
+            }
+            else
+            {
+                await HanldeNPCDeath(dead);
+                var room = SessionState.CurrentRoom;
+                if (room != null && SessionState.CurrentRoomMobs != null)
                 {
-                    await HandlePlayerDeath(dead);
+                    SessionState.CurrentRoomMobs.RemoveAll(m => m.Instance.NpcId == dead.NpcId);
+                    await SessionState.PushEvent($"The {dead.Name} has been defeated!");
                 }
-                else
-                {
-                    await HanldeNPCDeath(dead);
-                    var room = SessionState.CurrentRoom;
-                    if (room != null && SessionState.CurrentRoomMobs != null)
-                    {
-                        SessionState.CurrentRoomMobs.RemoveAll(m => m.Instance.NpcId == dead.NpcId);
-                        await SessionState.PushEvent($"The {dead.Name} has been defeated!");
-                    }
 
-                }
-            
+            }
+
             await SessionState.NotifyStateChange();
-            }
+        }
         private async Task HandlePlayerDeath(PlayerCharacterDto deadCharacter)
+        {
+            var inventoryItems = await _inventoryService.GetInventory(deadCharacter.PlayerCharacterId!.Value);
+            var equippedItems = await _inventoryService.GetEquipped(deadCharacter.PlayerCharacterId!.Value);
+
+            var corpse = await CreateCorpseAsync(deadCharacter);
+
+            foreach (var eq in equippedItems)
             {
-                var inventoryItems = await _inventoryService.GetInventory(deadCharacter.PlayerCharacterId!.Value);
-                var equippedItems = await _inventoryService.GetEquipped(deadCharacter.PlayerCharacterId!.Value);
+                await _inventoryService.UnequipAsync(deadCharacter.PlayerCharacterId!.Value, eq.Slot);
+            }
 
-                var corpse = await CreateCorpseAsync(deadCharacter);
+            await MoveInventoryToCorpseAsync(deadCharacter, corpse.ContainerId);
 
-                foreach (var eq in equippedItems)
-                {
-                    await _inventoryService.UnequipAsync(deadCharacter.PlayerCharacterId!.Value, eq.Slot);
-                }
-
-                await MoveInventoryToCorpseAsync(deadCharacter, corpse.ContainerId);
-
-                string sql = @"
+            string sql = @"
                     UPDATE characters
                     SET isalive = true, health = 1, roomid = 2
                     WHERE characterid = @CharacterId;
@@ -291,63 +324,63 @@ using System.Collections.Generic;
 
         }
         private async Task<Container> CreateCorpseAsync(PlayerCharacterDto deadCharacter)
-            {
-                int roomId = deadCharacter.RoomId ?? 20;
+        {
+            int roomId = deadCharacter.RoomId ?? 20;
 
-                string sql = @"
+            string sql = @"
                     INSERT INTO containers (name, roomid, ownernpcid, islootable, createdat)
                     VALUES (@Name, @RoomId, @OwnerNPCId, @IsLootable, @CreatedAt)
                     RETURNING containerid;
                             ";
 
-                var corpse = new Container
-                {
-                    Name = $"Corpse of {deadCharacter.Name}",
-                    RoomId = roomId,
-                    OwnerNPCId = 1,
-                    IsLootable = true,
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                corpse.ContainerId = await _db.ExecuteScalarAsync<int>(sql, corpse);
-
-                return corpse;
-            }
-            public async Task HanldeNPCDeath(PlayerCharacterDto deadCharacter)
+            var corpse = new Container
             {
-                var corpse = await CreateCorpseAsync(deadCharacter);
-                var loot = await _inventoryService.GetLootForMobAsync(deadCharacter.CharacterId);
-                using var conn = await _db.CreateOpenConnectionAsync();
+                Name = $"Corpse of {deadCharacter.Name}",
+                RoomId = roomId,
+                OwnerNPCId = 1,
+                IsLootable = true,
+                CreatedAt = DateTime.UtcNow
+            };
 
-                if (loot.Any())
+            corpse.ContainerId = await _db.ExecuteScalarAsync<int>(sql, corpse);
+
+            return corpse;
+        }
+        public async Task HanldeNPCDeath(PlayerCharacterDto deadCharacter)
+        {
+            var corpse = await CreateCorpseAsync(deadCharacter);
+            var loot = await _inventoryService.GetLootForMobAsync(deadCharacter.CharacterId);
+            using var conn = await _db.CreateOpenConnectionAsync();
+
+            if (loot.Any())
+            {
+                foreach (var item in loot)
                 {
-                    foreach (var item in loot)
-                    {
-                        await _inventoryService.MoveToContainerAsync(
-                            deadCharacter.CharacterId,
-                            item.ItemId,
-                            corpse.ContainerId
-                        );
-                    }
+                    await _inventoryService.MoveToContainerAsync(
+                        deadCharacter.CharacterId,
+                        item.ItemId,
+                        corpse.ContainerId
+                    );
                 }
-                else
-                {
-                    int junkId = junkIds[_rng.Next(junkIds.Length)];
+            }
+            else
+            {
+                int junkId = junkIds[_rng.Next(junkIds.Length)];
 
-                    string junkSql = @"
+                string junkSql = @"
                     INSERT INTO roomitems (itemid, containerid, quantity, droppeddatetime)
                     VALUES (@ItemId, @ContainerId, 1, NOW());
                 ";
 
-                    await conn.ExecuteAsync(junkSql, new
-                    {
-                    
-                        ItemId = junkId,
-                        ContainerId = corpse.ContainerId
-                    });
-                }
+                await conn.ExecuteAsync(junkSql, new
+                {
 
-                string sql = @"
+                    ItemId = junkId,
+                    ContainerId = corpse.ContainerId
+                });
+            }
+
+            string sql = @"
                     UPDATE characters
                     SET isalive = false, health = 0
                     WHERE characterid = @CharacterId;
@@ -361,89 +394,89 @@ using System.Collections.Generic;
                     ";
 
             await _db.ExecuteAsync(respawnSql, new { NpcId = deadCharacter.NpcId });
-            }
-            private async Task MoveInventoryToCorpseAsync(PlayerCharacterDto character, int containerId)
+        }
+        private async Task MoveInventoryToCorpseAsync(PlayerCharacterDto character, int containerId)
+        {
+            var inventory = await _inventoryService.GetInventory(character.PlayerCharacterId!.Value);
+            int roomId = character.RoomId ?? 2;
+
+            foreach (var item in inventory)
             {
-                var inventory = await _inventoryService.GetInventory(character.PlayerCharacterId!.Value);
-                int roomId = character.RoomId ?? 2;
+                // Move into corpse container
+                await _inventoryService.MoveToContainerAsync(
+                    character.PlayerCharacterId!.Value,
+                    item.ItemId,
+                    containerId
+                );
 
-                foreach (var item in inventory)
-                {
-                    // Move into corpse container
-                    await _inventoryService.MoveToContainerAsync(
-                        character.PlayerCharacterId!.Value,
-                        item.ItemId,
-                        containerId
-                    );
-
-                    // Remove from player inventory
-                    await _inventoryService.DeleteItemAsync(
-                        character.PlayerCharacterId!.Value,
-                        item.ItemId
-                    );
-                }
+                // Remove from player inventory
+                await _inventoryService.DeleteItemAsync(
+                    character.PlayerCharacterId!.Value,
+                    item.ItemId
+                );
             }
-            public async Task<LevelDto> GainLevel(PlayerCharacterDto player)
+        }
+        public async Task<LevelDto> GainLevel(PlayerCharacterDto player)
+        {
+
+            player.Level++;
+            int Health = _rng.Next(2, 10);
+            int Mana = _rng.Next(1, 4);
+            int Stamina = _rng.Next(1, 4);
+            string message = "Congratulations! You've reached level " + player.Level + ", You gain ";
+            player.MaxHealth += Health;
+            message += Health + " health";
+            if (player.MaxMana != 0)
             {
-
-                player.Level++;
-                int Health = _rng.Next(2, 10);
-                int Mana = _rng.Next(1, 4);
-                int Stamina = _rng.Next(1, 4);
-                string message = "Congratulations! You've reached level " + player.Level + ", You gain ";
-                player.MaxHealth += Health;
-                message += Health + " health";
-                if (player.MaxMana != 0)
-                {
-                    message += ", " + Mana + " mana ";
-                    player.MaxMana += Mana;
-                }
-                if (player.MaxStamina != 0)
-                {
-                    message += ", " + Stamina + " stamina ";
-                    player.MaxStamina += Stamina;
-                }
-                message += "!";
-                player.Health = player.MaxHealth;
-                player.Mana = player.MaxMana;
-                player.Stamina = player.MaxStamina;
-               
-                player.Xp = 0;
-                player.XpNeeded = player.Level * 100;
-
-                return new LevelDto
-                {
-                    Message = message,
-                    Player = player
-                };
+                message += ", " + Mana + " mana ";
+                player.MaxMana += Mana;
             }
-            public async Task GainXP(PlayerCharacterDto player, PlayerCharacterDto dead)
+            if (player.MaxStamina != 0)
             {
-                int XpGained = dead.Xp;
-                if (XpGained == 0) XpGained = 25;
-                bool _level = false;
-                string message = string.Empty;
-                player.Xp += XpGained;
+                message += ", " + Stamina + " stamina ";
+                player.MaxStamina += Stamina;
+            }
+            message += "!";
+            player.Health = player.MaxHealth;
+            player.Mana = player.MaxMana;
+            player.Stamina = player.MaxStamina;
+
+            player.Xp = 0;
+            player.XpNeeded = player.Level * 100;
+
+            return new LevelDto
+            {
+                Message = message,
+                Player = player
+            };
+        }
+        public async Task GainXP(PlayerCharacterDto player, PlayerCharacterDto dead)
+        {
+            int XpGained = dead.Xp;
+            if (XpGained == 0) XpGained = 25;
+            bool _level = false;
+            string message = string.Empty;
+            player.Xp += XpGained;
             await SessionState.PushEvent($"You gain {XpGained} XP for defeating {dead.Name}.");
 
             while (player.Xp >= player.XpNeeded)
-                {
-                    player.Xp -= player.XpNeeded;
-                    var levelResult = await GainLevel(player);
-                    await SessionState.PushEvent(levelResult.Message);
-                }
-                int remain = player.XpNeeded - player.Xp;
-                await _characterService.SavePlayer(player);
-                await SessionState.PushEvent($"{remain} XP remaining for next level!");
-                await SessionState.NotifyStateChange();
-                
-            }
-
-
-            public void ProcessCombatRounds()
             {
-                // Future expansion
+                player.Xp -= player.XpNeeded;
+                var levelResult = await GainLevel(player);
+                await SessionState.PushEvent(levelResult.Message);
             }
+            int remain = player.XpNeeded - player.Xp;
+            await _characterService.SavePlayer(player);
+            await SessionState.PushEvent($"{remain} XP remaining for next level!");
+            await SessionState.NotifyStateChange();
+
+        }
+
+
+        public void ProcessCombatRounds()
+        {
+            // Future expansion
+        }
 
 
     }

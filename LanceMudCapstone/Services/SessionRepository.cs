@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace LanceMudCapstone.Services;
+﻿namespace LanceMudCapstone.Services;
 
 public class SessionRepository
 {
@@ -13,7 +11,7 @@ public class SessionRepository
     {
         DateTime storeDate = DateTime.UtcNow;
         DateTime expDate = DateTime.UtcNow.AddDays(7);
-        
+
         using var conn = _service.GetConnection();
         using var cmd = conn.CreateCommand();
 
@@ -44,7 +42,7 @@ WHERE Token = @token;";
 
         var user = cmd.ExecuteScalar();
 
-        if (user == null || user == DBNull.Value ) return null;
+        if (user == null || user == DBNull.Value) return null;
 
         return Convert.ToInt32(user); ;
     }

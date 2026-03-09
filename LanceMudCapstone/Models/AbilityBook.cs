@@ -1,5 +1,4 @@
 ﻿using LanceMudCapstone.DTOs;
-using System.Collections.Generic;
 
 namespace LanceMudCapstone.Models
 {
@@ -19,7 +18,18 @@ namespace LanceMudCapstone.Models
                 _ => new List<AbilityDto>()
             };
         }
-
+        public static AbilityDto GetBaseAttack(string className) => className.ToLower() switch
+        {
+            "warrior" or "knight" => new AbilityDto
+            { Name = "Strike", LevelRequirement = 1, DamageFormula = "1d8", CooldownSeconds = 0, StaminaCost = 0, Description = "a striking blow", Type = "Physical" },
+            "mage" => new AbilityDto
+            { Name = "Magic Bolt", LevelRequirement = 1, DamageFormula = "1d6", CooldownSeconds = 0, ManaCost = 0, Description = "an arcane bolt", Type = "Arcane" },
+            "cleric" or "paladin" => new AbilityDto
+            { Name = "Smite", LevelRequirement = 1, DamageFormula = "1d8", CooldownSeconds = 0, ManaCost = 0, Description = "smiting from above", Type = "Holy" },
+            "rogue" or "hunter" => new AbilityDto
+            { Name = "Quick Attack", LevelRequirement = 1, DamageFormula = "1d6", CooldownSeconds = 0, StaminaCost = 0, Description = "a quick strike from the shadows", Type = "Physical" },
+            _ => new AbilityDto { Name = "Strike", LevelRequirement = 1, DamageFormula = "1d8", CooldownSeconds = 0, StaminaCost = 0, Description = "easily", Type = "Physical" }
+        };
         public static readonly List<AbilityDto> Warrior = new()
         {
             new AbilityDto { Name="Kick", LevelRequirement=1, DamageFormula="2d10", CooldownSeconds=3, StaminaCost=5, Description="Enzuigiri kick to defender.name", Type="Physical" },

@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using LanceMudCapstone.DTOs;
 using LanceMudCapstone.Models;
-using Microsoft.AspNetCore.Mvc;
 
 
 namespace LanceMudCapstone.Services;
@@ -147,7 +146,7 @@ public class CharacterService : ICharacterService
                 characterid = @CharacterId;";
         await conn.ExecuteAsync(updateCharacterSql, saveState, tx);
         await conn.ExecuteAsync(updatePlayerSql, saveState, tx);
-        
+
         await tx.CommitAsync();
         return saveState;
     }

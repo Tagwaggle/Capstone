@@ -1,6 +1,5 @@
 ﻿using LanceMudCapstone.Models;
 using LanceMudCapstone.Services;
-using Microsoft.AspNetCore.Builder;
 
 namespace LanceMudCapstone.API;
 
@@ -18,7 +17,7 @@ public static class ContactApi
                 Console.WriteLine($"Form received: Name={form.Name}, Email={form.Email}, Message length={form.Message?.Length}");
 
                 Console.WriteLine("About to call EmailService.SendContactFormEmail...");
-                if(!string.IsNullOrEmpty(form.Message))
+                if (!string.IsNullOrEmpty(form.Message))
                     await emailService.SendContactFormEmail(form.Name, form.Email, form.Message);
                 Console.WriteLine("EmailService completed successfully");
 

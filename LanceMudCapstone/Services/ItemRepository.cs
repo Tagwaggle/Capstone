@@ -1,9 +1,5 @@
 ﻿using Dapper;
-using LanceMudCapstone.Models;
-using LanceMudCapstone.Services;
 using LanceMudCapstone.DTOs;
-using System.Threading.Tasks;
-using LanceMudCapstone.Enums;
 
 namespace LanceMudCapstone.Services
 {
@@ -117,7 +113,7 @@ namespace LanceMudCapstone.Services
             var result = await conn.QueryAsync<LootItemDto>(sql, new { NpcId = npcId });
             foreach (var loot in result)
             {
-                
+
             }
             return result.ToList();
         }

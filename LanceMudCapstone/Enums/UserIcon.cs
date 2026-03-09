@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Tracing;
-
-namespace LanceMudCapstone.Enums;
+﻿namespace LanceMudCapstone.Enums;
 
 public enum UserIcon
 {

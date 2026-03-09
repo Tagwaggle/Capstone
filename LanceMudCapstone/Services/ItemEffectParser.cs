@@ -1,5 +1,5 @@
-﻿using System.Text.Json;
-using LanceMudCapstone.Models;
+﻿using LanceMudCapstone.Models;
+using System.Text.Json;
 
 namespace LanceMudCapstone.Services
 {

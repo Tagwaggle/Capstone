@@ -47,6 +47,6 @@ public class MudHubClient : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        if(_hub != null ) await _hub.DisposeAsync();
+        if (_hub != null) await _hub.DisposeAsync();
     }
 }

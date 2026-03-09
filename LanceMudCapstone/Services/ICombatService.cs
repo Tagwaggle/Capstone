@@ -1,6 +1,5 @@
 ﻿using LanceMudCapstone.DTOs;
 using LanceMudCapstone.Models;
-using System.Threading.Tasks;
 
 namespace LanceMudCapstone.Services
 {
@@ -8,14 +7,9 @@ namespace LanceMudCapstone.Services
     {
         Task<CombatRoundResult> AttackAsync(PlayerCharacterDto attacker, PlayerCharacterDto defender);
 
-        Task<CombatRoundResult> ResolveRoundAsync(PlayerCharacterDto player, PlayerCharacterDto mob);
+        Task<CombatRoundResult> ResolveRoundAsync(PlayerCharacterDto player, PlayerCharacterDto mob, AbilityDto? special = null);
 
-        Task<CombatRoundResult> ResolveAbilityAsync(
-            PlayerCharacterDto attacker,
-            PlayerCharacterDto defender,
-            AbilityDto ability);
-
-        //Task<CombatRoundResult> CastSpellAsync(PlayerCharacterDto caster, PlayerCharacterDto target, Spell spell);
+        Task<CombatRoundResult> ResolveAbilityAsync(PlayerCharacterDto attacker, PlayerCharacterDto defender, AbilityDto ability);
 
         Task<CombatRoundResult> UseItemAsync(PlayerCharacterDto user, Item item, PlayerCharacterDto? target = null);
 

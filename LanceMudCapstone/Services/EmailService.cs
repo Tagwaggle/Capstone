@@ -1,6 +1,5 @@
 ﻿using Azure;
 using Azure.Communication.Email;
-using System.Data.Common;
 
 namespace LanceMudCapstone.Services;
 

@@ -12,5 +12,5 @@ public class ContactFormModel
     public string Email { get; set; } = string.Empty;
     [Required]
     [StringLength(2000)]
-    public string Message {  get; set; } = string.Empty;
+    public string Message { get; set; } = string.Empty;
 }
