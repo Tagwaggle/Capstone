@@ -1,0 +1,83 @@
+﻿@page "/leaderboard"
+@inject CharacterService CharacterService
+
+@using LanceMudCapstone.DTOs
+@using Radzen
+@using Radzen.Blazor
+@layout MainLayout
+
+<div class="login-wrapper">
+    <RadzenCard Style="margin: 2rem;">
+        <RadzenHeading Size="H3" Style="color: white" Text="Leaderboard" />
+        <RadzenText TextStyle="TextStyle.H4" Style="color: white; margin-bottom: 1rem;">
+            Player Search
+        </RadzenText>
+        <RadzenDataGrid Data="@players"
+                            TItem="PlayerCharacterDto"
+                            AllowFiltering="true"
+                            AllowSorting="true"
+                            AllowPaging="true"
+                            PageSize="10"
+                            FilterMode="FilterMode.Simple"
+                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                            ColumnWidth="150px"
+                            Style="margin-top: 1rem;">
+			<Columns>
+                <RadzenDataGridColumn TItem="PlayerCharacterDto" Title="Image" Width="40px">
+                    <Template Context="p">
+                        <RadzenImage Path=@("/images/classes/" + p.Class.ToLower() + ".svg")
+                                     Style="width:15px;height:15px;" />
+                    </Template>
+                </RadzenDataGridColumn>
+				<RadzenDataGridColumn TItem="PlayerCharacterDto" Property="Name" Title="Name" />
+				<RadzenDataGridColumn TItem="PlayerCharacterDto" Property="Level" Title="Level" />
+				<RadzenDataGridColumn TItem="PlayerCharacterDto" Property="Class" Title="Class" />
+                <RadzenDataGridColumn TItem="PlayerCharacterDto" Property="Race" Title="Race" />
+                <RadzenDataGridColumn TItem="PlayerCharacterDto" Property="Alignment" Title="Alignment" />
+                <RadzenDataGridColumn TItem="PlayerCharacterDto" Title="Status" Width="120px">
+                    <Template Context="p">
+                        @if (p.LastOnline.HasValue)
+                        {
+                            var idle = IdleMinutes(p.LastOnline);
+                            if (idle < 5)
+                            {
+                                <span style="color: lightgreen;">Online</span>
+                                <RadzenImage Path=@("/images/classes/" + p.Class.ToLower() + ".svg")
+                                             Style="width:15px;height:15px;" />
+                            }
+                            else if (idle < 30)
+                            {
+                                <span style="color: orange;">Idle</span>
+                                <RadzenImage Path=@("/images/classes/" + p.Class.ToLower() + ".svg")
+                                             Style="width:15px;height:15px;" />
+                            }
+                            else
+                            {
+                                <span style="color: gray;">Offline</span>
+                                <RadzenImage Path=@("/images/classes/" + p.Class.ToLower() + ".svg")
+                                             Style="width:15px;height:15px;" />
+                            }
+                        }
+                        else
+                        {
+                            <span style="color: gray;">Offline</span>
+                            <RadzenImage Path=@("/images/classes/" + p.Class.ToLower() + ".svg")
+                                         Style="width:15px;height:15px;" />
+						}
+                    </Template>
+                </RadzenDataGridColumn>
+                </Columns>
+        </RadzenDataGrid>
+    </RadzenCard>
+</div>
+@code {
+    private IEnumerable<PlayerCharacterDto>? players;
+
+    protected override async Task OnInitializedAsync()
+    {
+        players = await CharacterService.FullCharacterListAsync();
+    }
+
+    private int IdleMinutes(DateTime? last)
+        => last.HasValue ? (int)(DateTime.UtcNow - last.Value).TotalMinutes : 0;
+}

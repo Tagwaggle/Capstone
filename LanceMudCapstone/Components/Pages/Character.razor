@@ -4,6 +4,7 @@
 @inject SessionState SessionState
 @inject CharacterService CharacterService
 @inject LocalStorageService LocalStorage
+@inject NotificationService NotificationService
 @inject NavigationManager Nav
 
 <div class="main-container">
@@ -34,6 +35,11 @@
                 <RadzenDataGridColumn Property="Class" Title="Class" />
                 <RadzenDataGridColumn Property="Level" Title="Level" />
                 <RadzenDataGridColumn Property="RoomId" Title="Room" />
+                <RadzenDataGridColumn TItem="PlayerCharacterDto" Title="Actions" Sortable="false" Filterable="false" Width="120px">
+                    <Template Context="c">
+                        <RadzenButton Text="Retire" Icon="emoji_events" ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small" Click="() => ConfirmRetire(c)" />
+                    </Template>
+                </RadzenDataGridColumn>
                 
             </Columns>
         </RadzenDataGrid>
@@ -43,20 +49,44 @@
         <RadzenButton Text="Create New Character" Click="@CreateCharacter" ButtonStyle="ButtonStyle.Secondary" />
     </div>
 </div>
+
+@if (showConfirm && retireTarget != null)
+{
+    <div style="position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9999; display:flex; aligh-items:center; justify-content:center">
+        <RadzenCard Style="width:400px; padding:2rem;">
+            <RadzenStack Gap="1rem">
+                <RadzenText TextStyle="TextStyle.H5" Style="color:#f39c12;">
+                    Confirm Retirement
+                </RadzenText>
+                <RadzenText Style="color:azure">
+                    Are you sure you want to retire <strong>@retireTarget.Name</strong>? This action can not be undone.
+                </RadzenText>
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem">
+                    <RadzenButton Text="Cancel" ButtonStyle="ButtonStyle.Secondary" Click="@(() => { showConfirm = false; retireTarget=null; })" />
+                    <RadzenButton Text="Retire" ButtonStyle="ButtonStyle.Danger" Icon="emoji_events" Click="@DoRetire" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenCard>
+    </div>
+}
+
+
 @code {
     private List<PlayerCharacterDto>? characters;
-    //    private PlayerCharacterDto? SelectedCharacter { get; set; }
-    //    private int? SelectedCharacterId => SelectedCharacter?.CharacterId;
     private IList<PlayerCharacterDto> SelectedCharacters { get; set; } = new List<PlayerCharacterDto>();
     private PlayerCharacterDto? SelectedCharacter => SelectedCharacters.FirstOrDefault();
+    private PlayerCharacterDto? retireTarget;
     private int? SelectedCharacterId => SelectedCharacter?.CharacterId;
 
     private bool _loaded, _loadInProgress;
+    private bool showConfirm;
+
+    private Func<Task>? _stateHandler;
 
     protected override void OnInitialized()
     {
-        SessionState.OnChange += () => InvokeAsync(StateHasChanged);
-        Console.WriteLine("OnInitialized Called Called");
+        _stateHandler = () => InvokeAsync(StateHasChanged);
+        SessionState.OnChange += _stateHandler;
 
     }
 
@@ -96,6 +126,13 @@
         await InvokeAsync(StateHasChanged);
     }
 
+    private Task ConfirmRetire(PlayerCharacterDto character)
+    {
+        retireTarget = character;
+        showConfirm = true;
+        return Task.CompletedTask;
+    }
+
     private async Task LoginCharacter()
     {
         if (!SelectedCharacterId.HasValue || characters == null)
@@ -114,6 +151,40 @@
         Nav.NavigateTo("/play");
     }
 
+    private async Task DoRetire()
+    {
+        if (retireTarget == null) return;
+
+        var success = await CharacterService.RetireCharacterAsync(retireTarget.CharacterId);
+        if (success)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Character Retired",
+                Detail = $"{retireTarget.Name} has been retired. Farewell, brave adventurer!",
+                Duration = 4000
+			});
+
+            ClearSelection();
+            _loaded = false;
+            await TryLoadCharactersAsync();
+            await InvokeAsync(StateHasChanged);
+        }
+        else
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Retirement Failed",
+                Detail = $"An error occurred while trying to retire {retireTarget.Name}. Please try again later.",
+                Duration = 4000
+			});
+        }
+        retireTarget = null;
+        showConfirm = false;
+    }
+
     private void ClearSelection()
     {
         SelectedCharacters = new List<PlayerCharacterDto>();
@@ -124,6 +195,6 @@
 
     public void Dispose()
     {
-        SessionState.OnChange -= () => InvokeAsync(StateHasChanged);
+        SessionState.OnChange -= _stateHandler;
     }
 }

@@ -176,11 +176,24 @@ public class CharacterService : ICharacterService
     {
         const string sql = @"
                     SELECT 
-                        c.characterid, c.name, c.level, c.roomid, pc.isonline, pc.lastcommand, u.username, c.class
+                        c.characterid, c.name, c.level, c.roomid, c.race, c.alignment, pc.isonline, pc.lastcommand, u.username, c.class
                     FROM characters c
                     JOIN playercharacters pc ON pc.characterid = c.characterid
                     JOIN users u ON u.userid = pc.userid
                     WHERE pc.isonline = true
+                    ORDER BY c.name";
+
+        using var conn = await _db.CreateOpenConnectionAsync();
+        return await conn.QueryAsync<PlayerCharacterDto>(sql);
+    }
+    public async Task<IEnumerable<PlayerCharacterDto>> FullCharacterListAsync()
+    {
+        const string sql = @"
+                    SELECT 
+                        c.characterid, c.name, c.level, c.roomid, c.race, c.alignment, pc.isonline, pc.lastcommand, u.username, c.class
+                    FROM characters c
+                    JOIN playercharacters pc ON pc.characterid = c.characterid
+                    JOIN users u ON u.userid = pc.userid
                     ORDER BY c.name";
 
         using var conn = await _db.CreateOpenConnectionAsync();
@@ -263,5 +276,36 @@ public class CharacterService : ICharacterService
         );
 
         return result;
+    }
+    public async Task<bool> RetireCharacterAsync(int characterId)
+    {
+        using var conn = await _db.CreateOpenConnectionAsync();
+
+        const string getPcSql = @"
+SELECT playercharacterid FROM playercharacters
+WHERE characterid = @characterId;";
+        var pcId = await conn.ExecuteScalarAsync<int?>(getPcSql, new { characterId });
+        if(pcId == null) return false;
+
+        const string retireSql = @"
+UPDATE characters
+SET charactertype = 'hof', isalive = false
+WHERE characterid = @characterId;";
+        const string deletePcSql = @"
+DELETE FROM playercharacters
+WHERE characterid = @characterId;";
+        const string deleteInventorySql = @"
+DELETE FROM playerinventory
+WHERE playercharacterid = @pcId;";
+        await conn.ExecuteAsync(deleteInventorySql, new { pcId = pcId });
+        const string deleteEquippedSql = @"
+DELETE FROM equippeditems
+WHERE playercharacterid = @pcId;";
+        await conn.ExecuteAsync(deleteEquippedSql, new { pcId = pcId });
+
+        var retireResult = await conn.ExecuteAsync(retireSql, new { characterId });
+        if (retireResult == 0) return false;
+        var deleteResult = await conn.ExecuteAsync(deletePcSql, new { characterId });
+        return deleteResult > 0;
     }
 }
