@@ -1,7 +1,9 @@
 ﻿using LanceMudCapstone.DTOs;
+using LanceMudCapstone.Services;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+
 
 namespace LanceMudCapstone.Services;
 
@@ -9,6 +11,10 @@ public class CharacterSheetService
 {
     public byte[] GenerateCharacterSheet(PlayerCharacterDto character)
     {
+        int statbonus = 0;
+
+        statbonus += (character.Constitution - 10) / 2;
+
         var document = Document.Create(container =>
         {
             container.Page(page =>
@@ -59,7 +65,7 @@ public class CharacterSheetService
                             combat.Item().Text($"MP: {character.Mana}/{character.MaxMana}").FontColor(Colors.White);
                             combat.Item().Text($"Stamina: {character.Stamina}/{character.MaxStamina}").FontColor(Colors.White);
                             combat.Item().Text($"AC: {character.ArmorClass}").FontColor(Colors.White);
-                            combat.Item().Text($"Hit Dice: {character.HitDice ?? "N/A"}").FontColor(Colors.White);
+                            combat.Item().Text($"Hit Dice: {character.HitDice ?? $"1d6 + {statbonus}"}").FontColor(Colors.White);
                         });
                         RowDescriptor.ConstantItem(11);
                         RowDescriptor.RelativeItem().Border(1).BorderColor(Colors.Purple.Medium).Padding(8).Column(progression =>
@@ -69,9 +75,76 @@ public class CharacterSheetService
                             progression.Item().Text($"Active Quest: {(character.ActiveQuest.HasValue ? $"Quest #{character.ActiveQuest.Value}" : "None")}").FontColor(Colors.White);
                         });
                     });
+                    col.Item().Border(1).BorderColor(Colors.Purple.Medium).Padding(8).Column(equip =>
+                    {
+                        equip.Item().Text("Equipment").FontSize(18).SemiBold().FontColor(Colors.Purple.Lighten2);
+                        equip.Item().PaddingTop(4).Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.ConstantColumn(100);
+                                columns.RelativeColumn(1);
+                            });
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("Head").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("Eyes").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("Neck").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("Shoulders").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("Chest").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("Back").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("Wrists").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("Hands").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("Ring (left)").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("Ring (right)").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("Waist").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("Legs").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("Feet").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("Main Hand").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("Off Hand").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("Ammunition").FontColor(Colors.White);
+                            table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                        });
+                    });
+
+                    col.Item().PageBreak();
+
+                    col.Item().Border(1).BorderColor(Colors.Purple.Medium).Padding(8).Column(inv =>
+                    {
+                        inv.Item().Text("Inventory").FontSize(18).SemiBold().FontColor(Colors.Purple.Lighten2);
+                        inv.Item().PaddingTop(4).Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn(1);
+                                columns.RelativeColumn(1);
+                                columns.RelativeColumn(1);
+                            });
+
+                            for (int i = 0; i < 18; i++)
+                            {
+                                table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                                table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                                table.Cell().Padding(4).BorderBottom(1).BorderColor(Colors.Grey.Darken1).Text("").FontColor(Colors.White);
+                            }
+                        });
+                    });
                     col.Item().Border(1).BorderColor(Colors.Purple.Medium).Padding(8).Column(footer =>
                     {
-                        footer.Item().Text($"Legends of the Lance - Character Sheet - Generated at {DateTime.Now:MMM dd, yy HH:mm}").FontSize(12).SemiBold().FontColor(Colors.Purple.Lighten2);
+                        footer.Item().Text($"Legends of the Lance - Character Sheet - Generated at {DateTime.Now:MMM dd, yyyy HH:mm}").FontSize(12).SemiBold().FontColor(Colors.Purple.Lighten2);
                         footer.Item().Text($" UserName: {character.Username ?? "Unknown"}").FontColor(Colors.Grey.Lighten1);
                     });
                 });

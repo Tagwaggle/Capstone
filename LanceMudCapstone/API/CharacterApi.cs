@@ -238,6 +238,7 @@ public static class CharacterApi
                      c.armorclass, c.strength, c.dexterity, c.constitution, c.intelligence,
                      c.wisdom, c.charisma, c.hitdice, c.roomid, c.isalive, c.charactertype,
                      pc.gold, pc.activequest, pc.lastonline, pc.createdat, pc.xp, pc.xpneeded,
+                     pc.mana, pc.maxmana, pc.stamina, pc.maxstamina,
                      u.username
                 FROM playercharacters pc
                 JOIN characters c ON pc.characterid = c.characterid
@@ -279,7 +280,11 @@ public static class CharacterApi
                     CreatedAt = reader.GetDateTime(reader.GetOrdinal("createdat")),
                     Username = reader.GetString(reader.GetOrdinal("username")),
                     Xp = reader.GetInt32(reader.GetOrdinal("xp")),
-                    XpNeeded = reader.GetInt32(reader.GetOrdinal("xpneeded"))
+                    XpNeeded = reader.GetInt32(reader.GetOrdinal("xpneeded")),
+                    Mana = reader.GetInt32(reader.GetOrdinal("mana")),
+                    MaxMana = reader.GetInt32(reader.GetOrdinal("maxmana")),
+                    Stamina = reader.GetInt32(reader.GetOrdinal("stamina")),
+                    MaxStamina = reader.GetInt32(reader.GetOrdinal("maxstamina"))
                 };
 
                 var pdfBytes = sheetService.GenerateCharacterSheet(pfile);
