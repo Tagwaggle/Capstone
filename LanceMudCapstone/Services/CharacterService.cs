@@ -285,7 +285,7 @@ public class CharacterService : ICharacterService
 SELECT playercharacterid FROM playercharacters
 WHERE characterid = @characterId;";
         var pcId = await conn.ExecuteScalarAsync<int?>(getPcSql, new { characterId });
-        if(pcId == null) return false;
+        if (pcId == null) return false;
 
         const string retireSql = @"
 UPDATE characters
