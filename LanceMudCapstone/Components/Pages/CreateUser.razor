@@ -15,8 +15,10 @@
         <RadzenTemplateForm TItem="CreateUserModel" Data="@model" Submit="HandleCreate" Method="post">
             <RadzenTextBox @bind-Value="model.Username" Name="Username" Placeholder="Username" Style="width:100%" />
             <RadzenRequiredValidator Component="Username" Text="Username is required" />
+				<RadzenLengthValidator Component="Username" Text="Username must be between 3 and 20 characters" MinLength="3" MaxLength="20" />
             <RadzenTextBox @bind-Value="model.Email" Name="Email" Placeholder="Email" Style="width:100%;margin-top:1.5rem;" />
             <RadzenRequiredValidator Component="Email" Text="Email is required" />
+				<RadzenEmailValidator Component="Email" Text="Invalid email format" />
             <RadzenPassword @bind-Value="model.Password" Name="Password" Placeholder="Password" Style="width:100%;margin-top:1.5rem;" />
             <RadzenRequiredValidator Component="Password" Text="Password is required!" />
             <RadzenPassword @bind-Value="model.ConfirmPassword" Name="ConfirmPassword" Placeholder="Confirm Password" Style="width:100%;margin-top:1.5rem;" />

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+    <Node Id="Models" Group="Expanded" Label="Models" Category="CodeSchema_Namespace" />
+    <Node Id="LanceMudCapstone.Models.Ability" Label="Ability" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.AbilityBook" Label="AbilityBook" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.Character" Label="Character" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.CharacterAbility" Label="CharacterAbility" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.ChatMessage" Label="ChatMessage" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.Spell" Label="Spell" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.ContactFormModel" Label="ContactFormModel" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.Container" Label="Container" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.EquippedItem" Label="EquippedItem" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.Item" Label="Item" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.ItemEffect" Label="ItemEffect" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.LootTable" Label="LootTable" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.NonPlayerCharacters" Label="NonPlayerCharacters" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.PlayerCharacter" Label="PlayerCharacter" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.PlayerInventory" Label="PlayerInventory" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.Room" Label="Room" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.RoomExit" Label="RoomExit" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.RoomItem" Label="RoomItem" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.User" Label="User" Category="CodeSchema_Class" Group="Models" />
+    <Node Id="LanceMudCapstone.Models.WeaponEffect" Label="WeaponEffect" Category="CodeSchema_Class" Group="Models" />
+  </Nodes>
+  <Links>
+    <Link Source="Models" Target="LanceMudCapstone.Models.Ability" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.AbilityBook" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.Character" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.CharacterAbility" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.ChatMessage" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.Spell" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.ContactFormModel" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.Container" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.EquippedItem" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.Item" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.ItemEffect" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.LootTable" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.NonPlayerCharacters" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.PlayerCharacter" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.PlayerInventory" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.Room" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.RoomExit" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.RoomItem" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.User" Category="Contains" />
+    <Link Source="Models" Target="LanceMudCapstone.Models.WeaponEffect" Category="Contains" />
+  </Links>
+  <Categories>
+    <Category Id="Contains" />
+    <Category Id="Inheritance" Background="#FF00FF00" />
+    <Category Id="Implementation" Background="#FFFFFF00" />
+    <Category Id="Composes" Background="#FF008000" />
+    <Category Id="Aggregates" Background="#FFFFA500" />
+    <Category Id="Uses" Background="#FF000000" />
+  </Categories>
+  <Styles>
+    <Style TargetType="Link" GroupLabel="Inherits" ValueLabel="True">
+      <Condition Expression="HasCategory('Inherits')" />
+      <Setter Property="Stroke" Value="#FF000000" />
+      <Setter Property="StrokeThickness" Value="2" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Implements" ValueLabel="True">
+      <Condition Expression="HasCategory('Implements')" />
+      <Setter Property="Stroke" Value="#FF000000" />
+      <Setter Property="StrokeThickness" Value="2" />
+      <Setter Property="StrokeDashArray" Value="4,2" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Composes" ValueLabel="True">
+      <Condition Expression="HasCategory('Composes')" />
+      <Setter Property="Stroke" Value="#FFFFA500" />
+      <Setter Property="StrokeThickness" Value="1" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Aggregates" ValueLabel="True">
+      <Condition Expression="HasCategory('Aggregates')" />
+      <Setter Property="Stroke" Value="#FFFFA500" />
+      <Setter Property="StrokeThickness" Value="1" />
+      <Setter Property="StrokeDashArray" Value="2,4" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Uses" ValueLabel="True">
+      <Condition Expression="HasCategory('Uses')" />
+      <Setter Property="Stroke" Value="#FF000000" />
+      <Setter Property="StrokeThickness" Value="1" />
+      <Setter Property="StrokeDashArray" Value="1,2" />
+    </Style>
+  </Styles>
+</DirectedGraph>

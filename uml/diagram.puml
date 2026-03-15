@@ -1,0 +1,5 @@
+@startuml
+class Character
+class CombatService
+Character --> CombatService
+@enduml
