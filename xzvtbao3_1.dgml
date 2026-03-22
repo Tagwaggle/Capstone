@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+    <Node Id="LanceMudCapstone.Services.AbilityEngine" Category="CodeSchema_Class" Bounds="678.028333333333,96,110.286666666667,26" Label="AbilityEngine" />
+    <Node Id="LanceMudCapstone.Services.AbilityResult" Category="CodeSchema_Class" Bounds="20,380,106.346666666667,26" Label="AbilityResult" />
+    <Node Id="LanceMudCapstone.Services.CharacterService" Category="CodeSchema_Class" Bounds="677.69,210,128.963333333333,26" Label="CharacterService" />
+    <Node Id="LanceMudCapstone.Services.CharacterSheetService" Category="CodeSchema_Class" Bounds="593.893333333333,380,158.746666666667,26" Label="CharacterSheetService" />
+    <Node Id="LanceMudCapstone.Services.CombatService" Category="CodeSchema_Class" Bounds="759.011666666667,40,120.32,26" Label="CombatService" />
+    <Node Id="LanceMudCapstone.Services.DbHelper" Category="CodeSchema_Class" Bounds="569.335,324,91.6733333333334,26" Label="DbHelper" />
+    <Node Id="LanceMudCapstone.Services.EffectService" Category="CodeSchema_Class" Bounds="1665.28833333333,210,107.766666666667,26" Label="EffectService" />
+    <Node Id="LanceMudCapstone.Services.EmailService" Category="CodeSchema_Class" Bounds="156.346666666667,380,106.623333333333,26" Label="EmailService" />
+    <Node Id="LanceMudCapstone.Services.EquipRepository" Category="CodeSchema_Class" Bounds="304.596666666666,210,127.15,26" Label="EquipRepository" />
+    <Node Id="LanceMudCapstone.Services.ICharacterService" Category="CodeSchema_Interface" Bounds="691.093333333333,324.02,132.156666666667,25.96" Label="ICharacterService" />
+    <Node Id="LanceMudCapstone.Services.ICombatService" Category="CodeSchema_Interface" Bounds="1355.415,210.02,123.513333333333,25.96" Label="ICombatService" />
+    <Node Id="LanceMudCapstone.Services.IEquipRepository" Category="CodeSchema_Interface" Bounds="20,324.02,130.343333333333,25.96" Label="IEquipRepository" />
+    <Node Id="LanceMudCapstone.Services.IItemRepository" Category="CodeSchema_Interface" Bounds="181.006666666667,324.02,124.33,25.96" Label="IItemRepository" />
+    <Node Id="LanceMudCapstone.Services.InventoryService" Category="CodeSchema_Class" Bounds="147.086666666667,96,128.17,26" Label="InventoryService" />
+    <Node Id="LanceMudCapstone.Services.ItemEffectParser" Category="CodeSchema_Class" Bounds="147.933333333333,210,126.476666666667,26" Label="ItemEffectParser" />
+    <Node Id="LanceMudCapstone.Services.ItemRepository" Category="CodeSchema_Class" Bounds="462.603333333333,210,121.136666666667,26" Label="ItemRepository" />
+    <Node Id="LanceMudCapstone.Services.LocalStorageService" Category="CodeSchema_Class" Bounds="837.051666666666,210,146.24,26" Label="LocalStorageService" />
+    <Node Id="LanceMudCapstone.Services.LogoutService" Category="CodeSchema_Class" Bounds="910.206666666666,40,115.93,26" Label="LogoutService" />
+    <Node Id="LanceMudCapstone.Services.MobService" Category="CodeSchema_Class" Bounds="1803.59333333333,210,103.156666666667,26" Label="MobService" />
+    <Node Id="LanceMudCapstone.Services.MudHubClient" Category="CodeSchema_Class" Bounds="292.97,380,118.373333333333,26" Label="MudHubClient" />
+    <Node Id="LanceMudCapstone.Services.PasswordHelper" Category="CodeSchema_Class" Bounds="2068.295,324,125.753333333334,26" Label="PasswordHelper" />
+    <Node Id="LanceMudCapstone.Services.RespawnService" Category="CodeSchema_Class" Bounds="1509.61333333333,210,125.116666666667,26" Label="RespawnService" />
+    <Node Id="LanceMudCapstone.Services.RoomService" Category="CodeSchema_Class" Bounds="1013.41166666667,210,109.52,26" Label="RoomService" />
+    <Node Id="LanceMudCapstone.Services.SQLiteService" Category="CodeSchema_Class" Bounds="1936.86333333333,210,112.616666666667,26" Label="SQLiteService" />
+    <Node Id="LanceMudCapstone.Services.SessionRepository" Category="CodeSchema_Class" Bounds="1656.75833333333,95.9999999999998,136.826666666667,26" Label="SessionRepository" />
+    <Node Id="LanceMudCapstone.Services.SessionState" Category="CodeSchema_Class" Bounds="856.638333333333,96,107.066666666667,26" Label="SessionState" />
+    <Node Id="LanceMudCapstone.Services.SessionState.CharacterSession" Category="CodeSchema_Class" Bounds="1173.55666666667,248,131.23,26" Label="CharacterSession" />
+    <Node Id="LanceMudCapstone.Services.SessionState.UserSession" Category="CodeSchema_Class" Bounds="1173.55666666667,192,104.35,26" Label="UserSession" />
+    <Node Id="LanceMudCapstone.Services.UserIconHelper" Category="CodeSchema_Class" Bounds="441.343333333333,380,122.55,26" Label="UserIconHelper" />
+    <Node Id="LanceMudCapstone.Services.UserService" Category="CodeSchema_Class" Bounds="2080.13,210,102.083333333333,26" Label="UserService" />
+    <Node Id="LanceMudCapstone.Services.WorldEngine" Category="CodeSchema_Class" Bounds="1517.76333333333,95.9999999999999,108.816666666667,26" Label="WorldEngine" />
+    <Node Id="Services" Category="CodeSchema_Namespace" Bounds="0,0,2214.04833333333,426" Group="Expanded" Label="Services" />
+    <Node Id="Services.SessionState" Category="CodeSchema_Namespace" Bounds="1153.55666666667,152,171.23,142" Group="Expanded" Label="Services.SessionState" />
+  </Nodes>
+  <Links>
+    <Link Source="LanceMudCapstone.Services.CharacterService" Target="LanceMudCapstone.Services.DbHelper" Category="Uses" Bounds="636.351623535156,236,91.3375854492188,81.9880676269531" />
+    <Link Source="LanceMudCapstone.Services.CharacterService" Target="LanceMudCapstone.Services.ICharacterService" Category="Implements" Bounds="743.882202148438,236,10.407470703125,79.096923828125" />
+    <Link Source="LanceMudCapstone.Services.CombatService" Target="LanceMudCapstone.Services.AbilityEngine" Category="Uses" Bounds="760.677917480469,66,38.5294799804688,25.0889434814453" />
+    <Link Source="LanceMudCapstone.Services.CombatService" Target="LanceMudCapstone.Services.CharacterService" Category="Uses" Bounds="755.989868164063,66,63.1818237304688,136.541885375977" />
+    <Link Source="LanceMudCapstone.Services.CombatService" Target="LanceMudCapstone.Services.DbHelper" Category="Uses" Bounds="620.588500976563,66,150.130615234375,249.267181396484" />
+    <Link Source="LanceMudCapstone.Services.CombatService" Target="LanceMudCapstone.Services.ICombatService" Category="Implements" Bounds="879.2490234375,63.6993560791016,516.5146484375,140.356323242188" />
+    <Link Source="LanceMudCapstone.Services.CombatService" Target="LanceMudCapstone.Services.InventoryService" Category="Uses" Bounds="284.218719482422,58.5410537719727,474.792938232422,43.7309265136719" />
+    <Link Source="LanceMudCapstone.Services.CombatService" Target="LanceMudCapstone.Services.SessionState" Category="Uses" Bounds="840.296691894531,66,41.0850219726563,25.2831268310547" />
+    <Link Source="LanceMudCapstone.Services.EquipRepository" Target="LanceMudCapstone.Services.DbHelper" Category="Uses" Bounds="396.338348388672,236,182.495025634766,84.2284851074219" />
+    <Link Source="LanceMudCapstone.Services.EquipRepository" Target="LanceMudCapstone.Services.IEquipRepository" Category="Implements" Bounds="125.742073059082,236,210.157676696777,84.6571350097656" />
+    <Link Source="LanceMudCapstone.Services.InventoryService" Target="LanceMudCapstone.Services.CharacterService" Category="Uses" Bounds="275.256652832031,114.192794799805,444.657897949219,89.9980010986328" />
+    <Link Source="LanceMudCapstone.Services.InventoryService" Target="LanceMudCapstone.Services.DbHelper" Category="Uses" Bounds="262.323974609375,122,352.847717285156,193" />
+    <Link Source="LanceMudCapstone.Services.InventoryService" Target="LanceMudCapstone.Services.IEquipRepository" Category="Uses" Bounds="85.1716690063477,122,88.9094619750977,193.019989013672" />
+    <Link Source="LanceMudCapstone.Services.InventoryService" Target="LanceMudCapstone.Services.IItemRepository" Category="Uses" Bounds="137.360290527344,122,84.7912445068359,195.981781005859" />
+    <Link Source="LanceMudCapstone.Services.InventoryService" Target="LanceMudCapstone.Services.ItemEffectParser" Category="Uses" Bounds="211.171661376953,122,0,79" />
+    <Link Source="LanceMudCapstone.Services.ItemRepository" Target="LanceMudCapstone.Services.DbHelper" Category="Uses" Bounds="533.662902832031,236,65.3653564453125,80.9962158203125" />
+    <Link Source="LanceMudCapstone.Services.ItemRepository" Target="LanceMudCapstone.Services.IItemRepository" Category="Implements" Bounds="283.387969970703,236,207.853881835938,84.626220703125" />
+    <Link Source="LanceMudCapstone.Services.LogoutService" Target="LanceMudCapstone.Services.SessionRepository" Category="Uses" Bounds="1026.13671875,56.1034088134766,625.052856445313,38.7660369873047" />
+    <Link Source="LanceMudCapstone.Services.LogoutService" Target="LanceMudCapstone.Services.SessionState" Category="Uses" Bounds="930.110595703125,66,24.5968017578125,23.748649597168" />
+    <Link Source="LanceMudCapstone.Services.RespawnService" Target="LanceMudCapstone.Services.DbHelper" Category="Uses" Bounds="664.563781738281,236,867.368835449219,86.2389831542969" />
+    <Link Source="LanceMudCapstone.Services.SessionRepository" Target="LanceMudCapstone.Services.SQLiteService" Category="Uses" Bounds="1755.73303222656,122,198.595336914063,84.4771118164063" />
+    <Link Source="LanceMudCapstone.Services.SessionState" Target="LanceMudCapstone.Services.CharacterService" Category="Uses" Bounds="768.77685546875,122,122.236938476563,82.9464874267578" />
+    <Link Source="LanceMudCapstone.Services.SessionState" Target="LanceMudCapstone.Services.LocalStorageService" Category="Uses" Bounds="910.171691894531,122,0,79" />
+    <Link Source="LanceMudCapstone.Services.SessionState" Target="LanceMudCapstone.Services.RoomService" Category="Uses" Bounds="928.189208984375,122,114.666381835938,82.7339630126953" />
+    <Link Source="LanceMudCapstone.Services.SessionState" Target="LanceMudCapstone.Services.SessionState.CharacterSession" Category="Uses" />
+    <Link Source="LanceMudCapstone.Services.SessionState" Target="LanceMudCapstone.Services.SessionState.UserSession" Category="Uses" />
+    <Link Source="LanceMudCapstone.Services.UserService" Target="LanceMudCapstone.Services.DbHelper" Category="Uses" Bounds="667.370361328125,235.834075927734,1414.77587890625,86.7402648925781" />
+    <Link Source="LanceMudCapstone.Services.UserService" Target="LanceMudCapstone.Services.PasswordHelper" Category="Uses" Bounds="2131.17163085938,236,0,79" />
+    <Link Source="LanceMudCapstone.Services.WorldEngine" Target="LanceMudCapstone.Services.EffectService" Category="Uses" Bounds="1588.93481445313,122,106.361694335938,82.4845886230469" />
+    <Link Source="LanceMudCapstone.Services.WorldEngine" Target="LanceMudCapstone.Services.ICombatService" Category="Uses" Bounds="1442.07006835938,122,112.426147460938,82.6875915527344" />
+    <Link Source="LanceMudCapstone.Services.WorldEngine" Target="LanceMudCapstone.Services.MobService" Category="Uses" Bounds="1604.44360351563,122,210.108032226563,84.6371459960938" />
+    <Link Source="LanceMudCapstone.Services.WorldEngine" Target="LanceMudCapstone.Services.RespawnService" Category="Uses" Bounds="1572.17163085938,122,0,79" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.AbilityEngine" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.AbilityResult" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.CharacterService" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.CharacterSheetService" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.CombatService" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.DbHelper" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.EffectService" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.EmailService" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.EquipRepository" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.ICharacterService" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.ICombatService" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.IEquipRepository" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.IItemRepository" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.InventoryService" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.ItemEffectParser" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.ItemRepository" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.LocalStorageService" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.LogoutService" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.MobService" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.MudHubClient" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.PasswordHelper" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.RespawnService" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.RoomService" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.SQLiteService" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.SessionRepository" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.SessionState" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.UserIconHelper" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.UserService" Category="Contains" />
+    <Link Source="Services" Target="LanceMudCapstone.Services.WorldEngine" Category="Contains" />
+    <Link Source="Services" Target="Services.SessionState" Category="Contains" />
+    <Link Source="Services.SessionState" Target="LanceMudCapstone.Services.SessionState.CharacterSession" Category="Contains" />
+    <Link Source="Services.SessionState" Target="LanceMudCapstone.Services.SessionState.UserSession" Category="Contains" />
+  </Links>
+  <Categories>
+    <Category Id="CodeSchema_Class" Label="Class" BasedOn="CodeSchema_Type" CanBeDataDriven="True" DefaultAction="Node:Both:CodeSchema_Member" Icon="CodeSchema_Class" NavigationActionLabel="Classes" />
+    <Category Id="CodeSchema_Interface" Label="Interface" BasedOn="CodeSchema_Type" CanBeDataDriven="True" DefaultAction="Node:Both:CodeSchema_Member" Icon="CodeSchema_Interface" NavigationActionLabel="Interfaces" />
+    <Category Id="CodeSchema_Namespace" Label="Namespace" CanBeDataDriven="True" DefaultAction="Node:Both:CodeSchema_Type" Icon="CodeSchema_Namespace" NavigationActionLabel="Namespaces" />
+    <Category Id="CodeSchema_Type" Label="Type" CanBeDataDriven="True" DefaultAction="Node:Both:CodeSchema_Member" Icon="CodeSchema_Class" NavigationActionLabel="Types" />
+    <Category Id="Contains" Label="Contains" Description="Whether the source of the link contains the target object" CanBeDataDriven="False" CanLinkedNodesBeDataDriven="True" IncomingActionLabel="Contained By" IsContainment="True" OutgoingActionLabel="Contains" />
+    <Category Id="Implements" Label="Implements" CanBeDataDriven="True" CanLinkedNodesBeDataDriven="True" IncomingActionLabel="Implemented by" OutgoingActionLabel="Implements" />
+    <Category Id="Uses" Background="#FF000000" />
+  </Categories>
+  <Properties>
+    <Property Id="Background" Label="Background" Description="The background color" DataType="System.Windows.Media.Brush" />
+    <Property Id="Bounds" DataType="System.Windows.Rect" />
+    <Property Id="CanBeDataDriven" Label="CanBeDataDriven" Description="CanBeDataDriven" DataType="System.Boolean" />
+    <Property Id="CanLinkedNodesBeDataDriven" Label="CanLinkedNodesBeDataDriven" Description="CanLinkedNodesBeDataDriven" DataType="System.Boolean" />
+    <Property Id="DefaultAction" Label="DefaultAction" Description="DefaultAction" DataType="System.String" />
+    <Property Id="Expression" DataType="System.String" />
+    <Property Id="Group" Label="Group" Description="Display the node as a group" DataType="Microsoft.VisualStudio.GraphModel.GraphGroupStyle" />
+    <Property Id="GroupLabel" DataType="System.String" />
+    <Property Id="Icon" Label="Icon" Description="Icon" DataType="System.String" />
+    <Property Id="IncomingActionLabel" Label="IncomingActionLabel" Description="IncomingActionLabel" DataType="System.String" />
+    <Property Id="IsContainment" DataType="System.Boolean" />
+    <Property Id="IsEnabled" DataType="System.Boolean" />
+    <Property Id="Label" Label="Label" Description="Displayable label of an Annotatable object" DataType="System.String" />
+    <Property Id="NavigationActionLabel" Label="NavigationActionLabel" Description="NavigationActionLabel" DataType="System.String" />
+    <Property Id="OutgoingActionLabel" Label="OutgoingActionLabel" Description="OutgoingActionLabel" DataType="System.String" />
+    <Property Id="TargetType" DataType="System.Type" />
+    <Property Id="Value" DataType="System.String" />
+    <Property Id="ValueLabel" DataType="System.String" />
+  </Properties>
+  <Styles>
+    <Style TargetType="Link" GroupLabel="Inherits" ValueLabel="True">
+      <Condition Expression="HasCategory('Inherits')" />
+      <Setter Property="Stroke" Value="#FF000000" />
+      <Setter Property="StrokeThickness" Value="2" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Implements" ValueLabel="True">
+      <Condition Expression="HasCategory('Implements')" />
+      <Setter Property="Stroke" Value="#FF000000" />
+      <Setter Property="StrokeThickness" Value="2" />
+      <Setter Property="StrokeDashArray" Value="4,2" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Composes" ValueLabel="True">
+      <Condition Expression="HasCategory('Composes')" />
+      <Setter Property="Stroke" Value="#FFFFA500" />
+      <Setter Property="StrokeThickness" Value="1" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Aggregates" ValueLabel="True">
+      <Condition Expression="HasCategory('Aggregates')" />
+      <Setter Property="Stroke" Value="#FFFFA500" />
+      <Setter Property="StrokeThickness" Value="1" />
+      <Setter Property="StrokeDashArray" Value="2,4" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Uses" ValueLabel="True">
+      <Condition Expression="HasCategory('Uses')" />
+      <Setter Property="Stroke" Value="#FF000000" />
+      <Setter Property="StrokeThickness" Value="1" />
+      <Setter Property="StrokeDashArray" Value="1,2" />
+    </Style>
+  </Styles>
+</DirectedGraph>
