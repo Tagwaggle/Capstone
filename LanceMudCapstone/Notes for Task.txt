@@ -24,3 +24,13 @@ GUI				-	NavComp, MudHub, CharacterSheet, Leaderboard, etc
 
 /// SECTION B \\\
 
+Complete
+
+/// SECTION C \\\
+
+Complete
+
+/// SECTION D \\\
+Complete
+
+/// SECTION E \\\
